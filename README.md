@@ -1,1 +1,1 @@
-# Battle on Chip
+# BattleChip
