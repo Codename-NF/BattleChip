@@ -45,3 +45,4 @@ Thumbs.db
 # Built APK
 ###
 *.apk
+.vs/
