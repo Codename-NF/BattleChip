@@ -112,12 +112,16 @@ int main () {
     list<ship>::iterator shipsp1 = p1->ships_list.begin();
     list<ship>::iterator shipsp2 = p2->ships_list.begin();
 
-    while (!setup_finished) {        
-        // check setup bounds 
-        // wait for inputs (x and y coordinates and length and orientation )
+    while (!setup_finished) {
+        // *** place holder for bluetooth inputs ***
+        int x_in = 10;
+        int y_in = 10;
+        int length = 10;
+        int orientation = VERTICAL;
+        bool came_from_player1 = true;
+        // *** place holder for bluetooht inputs ***
         
-        // check if all points is in bound 
-        err = check_in_bound(x_start_in, y_start_in, length, orientation);
+        err = check_in_bound(x_in, y_in, length, orientation);
 
         if (err) {
             cout << "out of bound" << endl;
@@ -126,7 +130,7 @@ int main () {
         list<player>::iterator currently_setting_up = came_from_player1 ? p1: p2;
         list<ship>::iterator *ships_being_set_up = came_from_player1 ? &shipsp1: &shipsp2;
 
-        err = check_path_empty(x_start_in, y_start_in, length, orientation, currently_setting_up->ships_list);
+        err = check_path_empty(x_in, y_in, length, orientation, currently_setting_up->ships_list);
 
         if (err) {
             cout << "another ship in the way for player 1 " << endl;
@@ -135,7 +139,7 @@ int main () {
         if ((*ships_being_set_up)->sizse == 0) {
             (*ships_being_set_up)->orientation = orientation;
             (*ships_being_set_up)->size = length;
-            (*ships_being_set_up)->start_box = box(x_start_in, y_start_in);
+            (*ships_being_set_up)->start_box = box(x_in, y_in);
             (*ships_being_set_up)++;
         }
 
@@ -147,16 +151,24 @@ int main () {
     }
 
     while (!game_finished) {
+        // *** place holder for bluetooth inputs ***
+        int x_in = 10;
+        int y_in = 10;
+        int length = 10;
+        int orientation = VERTICAL;
+        bool came_from_player1 = true;
+        // *** place holder for bluetooht inputs ***
+
         int current_attacking = came_from_player1 ? 1: 2;
         int next_up = came_from_player1 ? 2: 1;
         list<player>::iterator current_under_attack = came_from_player1 ? p2: p1;
 
         cout << "Next up is player " << next_up << endl;
 
-        if (not_hit_yet) {
-            current_under_attack->boxes_hit.push_back(box(x, y));
+        if (not_hit_yet(x_in, y_in, current_under_attack->boxes_hit)) {
+            current_under_attack->boxes_hit.push_back(box(x_in, y_in));
 
-            status = check_hit_what(x, y, current_under_attack->ships_list);
+            status = check_hit_what(x_in, y_in, current_under_attack->ships_list);
 
             cout << "Your hit status is " << status << endl;
 
