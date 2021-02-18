@@ -18,7 +18,7 @@ module tb_ai();
     initial begin
         rst_n = 1'd0;
         ships = 5'b11111;
-        fired = 100'd9;
+        fired = 100'd0;
         #100;
         rst_n = 1'd1;
         #100000;
