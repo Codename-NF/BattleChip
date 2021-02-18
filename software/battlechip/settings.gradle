@@ -1,2 +1,4 @@
 include ':app'
 rootProject.name = "BattleChip"
+include ':unityLibrary'
+project(':unityLibrary').projectDir = new File('..\\unity\\androidBuild\\unityLibrary')
