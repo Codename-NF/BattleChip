@@ -49,7 +49,7 @@ struct ship {
 
 struct player {
     public: 
-        string player_name = ""; 
+        string player_name; 
         int player_num;
         list<ship> ships_list;
         list<box> boxes_hit;
@@ -59,6 +59,7 @@ struct player {
             for (int i = 0; i < NUM_OF_SHIPS; i++) {
                 this->ships_list.push_back(ship());
             }
+            this->player_name = "";
             this->player_num = player_num;
             this->remaining_ships = NUM_OF_SHIPS;
         }
@@ -69,7 +70,7 @@ struct battleship {
         list<player> players;
 
         battleship(int num_player) {
-            for (int i = 0; i < num_player; i++) {
+            for (int i = 1; i <= num_player; i++) {
                 this->players.push_back(player(i));
             }
         }
@@ -148,20 +149,22 @@ int main () {
         }
     }
 
+    list<player>::iterator player_it = game.players.begin();
+    int count = 0;
     while (!all_players_joined) {
 // ******************* bluetooth place holder *******************
         string name = ask_for_name();
 // ******************* bluetooth place holder *******************
-
-        list<player>::iterator player_it = game.players.begin();
-        if (player_it != game.players.end() && player_it->player_name.empty()) {
+        if (player_it->player_name.empty()) {
             player_it->player_name = name;
             player_it++;
+            count++;
         }
-
-        if (player_it == game.players.end()) {
+        
+        if (count == player_num) {
             all_players_joined = true;
         }
+        
     }
 
     list<ship>::iterator shipsp1 = p1->ships_list.begin();
@@ -428,7 +431,7 @@ string ask_for_name() {
     string name; 
     cout << "Please type your name: "; // Type a number and press enter
     cin >> name; // Get user input from the keyboard
-    cout << "Your number is: " << name << endl; // Display the input value
+    cout << "Your name is: " << name << endl; // Display the input value
 
     return name;
 }
