@@ -13,6 +13,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import com.unity3d.player.UnityPlayerActivity;
+
 public class MainActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     private final int BACKGROUND_LOCATION_REQUEST_CODE = 1;
@@ -30,6 +32,9 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
             setUpBluetooth();
             bluetoothThread = new BluetoothThread();
         });
+
+        findViewById(R.id.startUnity).setOnClickListener(view ->
+                startActivity(new Intent(this, UnityPlayerActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)));
     }
 
     private void getBackgroundPermissionsIfNecessary() {
