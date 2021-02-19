@@ -5,7 +5,7 @@
 
 using namespace std;
 
-const int NUM_OF_SHIPS = 5;
+const int NUM_OF_SHIPS = 1;
 const int SUNK_STATUS_CODE = 2;
 const int HIT_STATUS_CODE = 1;
 const int MISS_STATUS_CODE = 0;
@@ -113,8 +113,9 @@ shootvalues ask_for_shoot(int player_num);
 // ******************* bluetooth place holder *******************
 void declare_win (int player_who_won);
 int check_in_bound(int x_start, int y_start, int size, int orientation); 
-int check_path_empty(int x_start, int y_start, int size, int orientation, list<ship> ships); 
-int check_hit_what(int x, int y, list<ship> ships, int *remaining_ships);
+int check_path_empty(int x_start, int y_start, int size, int orientation, list<ship> ships);
+bool contains_box(ship *ship, int x, int y);
+int check_hit_what(int x, int y, list<ship> *ships, int *remaining_ships);
 bool all_ships_destroyed(list<ship> ships);
 bool not_hit_yet(int x, int y, list<box> boxes);
 /**
@@ -257,7 +258,7 @@ int main () {
 
         if (not_hit_yet(x_in, y_in, current_under_attack->boxes_hit)) {
 
-            int status = check_hit_what(x_in, y_in, current_under_attack->ships_list, &current_under_attack->remaining_ships);
+            int status = check_hit_what(x_in, y_in, &(current_under_attack->ships_list), &current_under_attack->remaining_ships);
 
             current_under_attack->boxes_hit.push_back(box(x_in, y_in, status));
 
@@ -375,33 +376,33 @@ int check_path_empty(int x_start, int y_start, int size, int orientation, list<s
     return 0;
 }
 
-bool contains_box(ship ship, int x, int y) {
-    if (ship.orientation == VERTICAL) {
-        if (x != ship.start_box.x) {
+bool contains_box(ship *ship, int x, int y) {
+    if (ship->orientation == VERTICAL) {
+        if (x != ship->start_box.x) {
             return false;
         }
         else {
-            if (y >= ship.start_box.y && y <= ship.start_box.y + ship.size) {
-                ship.hit_count++;
+            if (y >= ship->start_box.y && y <= ship->start_box.y + ship->size) {
+                ship->hit_count++;
                 return true;
             }
             return false;
         }
     }
     else { // if HORINZONTAL 
-        if (y != ship.start_box.y) {
+        if (y != ship->start_box.y) {
             return false;
         }
         else {
-            if (x >= ship.start_box.x && x <= ship.start_box.x + ship.size) {
-                ship.hit_count++;
+            if (x >= ship->start_box.x && x <= ship->start_box.x + ship->size) {
+                ship->hit_count++;
                 return true;
             }
             return false;
         }
     }
 }
-int check_hit_what(int x, int y, list<ship> ships, int *remaining_ships) {
+int check_hit_what(int x, int y, list<ship> *ships, int *remaining_ships) {
     /*
     return 0 for miss 
     return 1 for hit a box of a ship
@@ -410,9 +411,13 @@ int check_hit_what(int x, int y, list<ship> ships, int *remaining_ships) {
     */
    
 
-   for (list<ship>::iterator it = ships.begin(); it != ships.end(); it++) {
-       if ( contains_box(*it, x, y) ) {
+   for (list<ship>::iterator it = ships->begin(); it != ships->end(); it++) {
+       if ( contains_box(&(*it), x, y) ) {
+           // TODO 
+           // this is not being modified properly 
+           cout << "hit count is " << it->hit_count << endl;
            if (it->hit_count == it->size) {
+               *remaining_ships = *remaining_ships - 1;
                return SUNK_STATUS_CODE;
            }
            else {
@@ -443,6 +448,7 @@ setupvalues ask_for_setup(int player_num) {
     int orientation;
     int device_num;
 
+    cout << "Player " << player_num << endl;
     cout << "What x position would you like to place your ship: ";
     cin >> x;
     cout << "What y position would you like to place your ship: ";
@@ -462,6 +468,7 @@ shootvalues ask_for_shoot(int player_num) {
     int y;
     int device_num;
 
+    cout << "Player " << player_num << endl;
     cout << "What x position would you like to shoot: ";
     cin >> x;
     cout << "What y position would you liek to shoot: ";
