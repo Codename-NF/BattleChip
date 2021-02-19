@@ -21,7 +21,7 @@ module tb_ai();
         fired = 100'd0;
         #100;
         rst_n = 1'd1;
-        #100000;
+        #33000;
         $stop;
     end
 endmodule: tb_ai
