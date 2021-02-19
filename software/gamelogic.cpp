@@ -7,6 +7,9 @@
 using namespace std;
 
 const int NUM_OF_SHIPS = 5;
+const int SUNK_STATUS_CODE = 2;
+const int HIT_STATUS_CODE = 1;
+const int MISS_STATUS_CODE = 0;
 
 enum orientations {VERTICAL = 1, HORIZONTAL = 2};
 
@@ -19,9 +22,9 @@ struct ship {
         int hit_count;
     
         ship() {
-            size = 0;
-            afloat = true;
-            hit_count = 0;
+            this->size = 0;
+            this->afloat = true;
+            this->hit_count = 0;
         }
 } ;
 
@@ -29,10 +32,17 @@ struct box {
     public:
         int x;
         int y;
+        int status;
 
         box(int x, int y) {
-            x = x;
-            y = y;
+            this->x = x;
+            this->y = y;
+        }
+
+        box(int x, int y, int status) {
+            this->x = x;
+            this->y = y;
+            this->status = status;
         }
 } ;
 
@@ -46,10 +56,10 @@ struct player {
 
         player(int player_num) {
             for (int i = 0; i < NUM_OF_SHIPS; i++) {
-                ships_list.push_back(ship());
+                this->ships_list.push_back(ship());
             }
-            player_num = player_num;
-            remaining_ships = NUM_OF_SHIPS
+            this->player_num = player_num;
+            this->remaining_ships = NUM_OF_SHIPS
         }
 } ;
 
@@ -59,7 +69,7 @@ struct battleship {
 
         battleship(int num_player) {
             for (int i = 0; i < num_player; i++) {
-                players.push_back(player(i));
+                this->players.push_back(player(i));
             }
         }
 } ;
@@ -73,7 +83,17 @@ int check_path_empty(int x_start, int y_start, int size, int orientation, list<s
 int check_hit_what(int x, int y, list<ship> ships);
 bool all_ships_destroyed(list<ship> ships);
 bool not_hit_yet(int x, int y);
-
+/**
+ * For AI(Eleiah):
+ * 1. Boxes that's already hit (probably 1 update at a time instead of putting all in memory)
+ * 2. Hit status
+ * 3. Remaining ships
+ * 
+ * 
+ * For display(Mario):
+ * 1. Places hit
+ * 2. Hit Stuats 
+ **/
 int main () {
     bool all_players_joined = false;
     bool setup_finished = false;
@@ -166,9 +186,10 @@ int main () {
         cout << "Next up is player " << next_up << endl;
 
         if (not_hit_yet(x_in, y_in, current_under_attack->boxes_hit)) {
-            current_under_attack->boxes_hit.push_back(box(x_in, y_in));
 
-            status = check_hit_what(x_in, y_in, current_under_attack->ships_list);
+            int status = check_hit_what(x_in, y_in, current_under_attack->ships_list);
+
+            current_under_attack->boxes_hit.push_back(box(x_in, y_in, status));
 
             cout << "Your hit status is " << status << endl;
 
@@ -314,9 +335,7 @@ int check_hit_what(int x, int y, list<ship> ships, int *remaining_ships) {
     return 2 if the entire ship is sunk
     -> Decrements remaining count each time a sunk appears 
     */
-   int SUNK_STATUS_CODE = 2;
-   int HIT_STATUS_CODE = 1;
-   int MISS_STATUS_CODE = 0;
+   
 
    for (list<ship>::iterator it = ships.begin(); it != ships.end(); it++) {
        if ( contains_box(it, x, y) ) {
