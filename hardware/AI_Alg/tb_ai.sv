@@ -28,7 +28,7 @@ module tb_ai();
         #200;
         start <= 1'd0;
         wait (DUT.done === 1'd1)
-        #100;
+        #200;
         $stop;
     end
 endmodule: tb_ai
