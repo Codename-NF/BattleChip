@@ -198,9 +198,10 @@ int main () {
 
         int err;
         err = check_in_bound(x_in, y_in, length, orientation);
-
+        //TODO: set up error needs to be handled more carefully to makesure all ships are in place when finished.
         if (err) {
             cout << "out of bound" << endl;
+            continue;
         }
         
         list<player>::iterator currently_setting_up = came_from_player1 ? p1: p2;
@@ -210,6 +211,7 @@ int main () {
 
         if (err) {
             cout << "another ship in the way for player 1 " << endl;
+            continue;
         }
         
         if ((*ships_being_set_up)->size == 0) {
@@ -266,6 +268,7 @@ int main () {
 
         }
         else {
+            //TODO: "feature" if you hit the same place again you loose your turn ;) 
             cout << "Can't hit here buddy" << endl;
         }
 
@@ -413,8 +416,6 @@ int check_hit_what(int x, int y, list<ship> *ships, int *remaining_ships) {
 
    for (list<ship>::iterator it = ships->begin(); it != ships->end(); it++) {
        if ( contains_box(&(*it), x, y) ) {
-           // TODO 
-           // this is not being modified properly 
            cout << "hit count is " << it->hit_count << endl;
            if (it->hit_count == it->size) {
                *remaining_ships = *remaining_ships - 1;
