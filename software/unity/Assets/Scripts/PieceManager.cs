@@ -77,7 +77,7 @@ public class PieceManager : MonoBehaviour
         // TODO increase this number
         for (int i = 0; i < 2; i++)
         {
-            pieces[i].Place(board.mAllCells[0, i]);
+            pieces[i].Place(board.mAllCells[1, i + 1]);
         }
     }
     /*

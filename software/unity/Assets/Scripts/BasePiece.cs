@@ -6,6 +6,8 @@ using UnityEngine.EventSystems;
 
 public class BasePiece : EventTrigger
 {
+    public Image mOutlineImage;
+
     [HideInInspector]
     public Color mColor = Color.clear;
     public bool mIsFirstMove = true;
@@ -16,7 +18,7 @@ public class BasePiece : EventTrigger
     protected RectTransform mRectTransform = null;
     protected PieceManager mPieceManager;
 
-    // protected Cell mTargetCell = null;
+    protected Cell mTargetCell = null;
 
     protected Vector3Int mMovement = Vector3Int.one;
     protected List<Cell> mHighlightedCells = new List<Cell>();
@@ -41,12 +43,10 @@ public class BasePiece : EventTrigger
         gameObject.SetActive(true);
     }
 
-    /*
+    
     public void Reset()
     {
         Kill();
-
-        mIsFirstMove = true;
 
         Place(mOriginalCell);
     }
@@ -59,7 +59,7 @@ public class BasePiece : EventTrigger
         // Remove piece
         gameObject.SetActive(false);
     }
-
+    /*
     public bool HasMove()
     {
         CheckPathing();
@@ -85,7 +85,7 @@ public class BasePiece : EventTrigger
         mPieceManager.SwitchSides(mColor);
     }
     */
-    //#region Movement
+
     private void CreateCellPath(int xDirection, int yDirection, int movement)
     {
         // Target position
@@ -138,7 +138,7 @@ public class BasePiece : EventTrigger
         CreateCellPath(-1, -1, mMovement.z);
         CreateCellPath(1, -1, mMovement.z);
     }
-    /*
+    
     protected void ShowCells()
     {
         foreach (Cell cell in mHighlightedCells)
@@ -159,7 +159,7 @@ public class BasePiece : EventTrigger
         mIsFirstMove = false;
 
         // If there is an enemy piece, remove it
-        mTargetCell.RemovePiece();
+        // mTargetCell.RemovePiece();
 
         // Clear current
         mCurrentCell.mCurrentPiece = null;
@@ -172,17 +172,15 @@ public class BasePiece : EventTrigger
         transform.position = mCurrentCell.transform.position;
         mTargetCell = null;
     }
-    #endregion
 
-    #region Events
     public override void OnBeginDrag(PointerEventData eventData)
     {
         base.OnBeginDrag(eventData);
 
-        // Test for cells
+        // Update this piece's list of cells that it can move to
         CheckPathing();
 
-        // Show valid cells
+        // Highlight the cells in the recently generated list
         ShowCells();
     }
 
@@ -194,8 +192,11 @@ public class BasePiece : EventTrigger
         transform.position += (Vector3)eventData.delta;
 
         // Check for overlapping available squares
+        
+        // For each available cell
         foreach (Cell cell in mHighlightedCells)
         {
+            // Check if cursor is in that available cell
             if (RectTransformUtility.RectangleContainsScreenPoint(cell.mRectTransform, Input.mousePosition))
             {
                 // If the mouse is within a valid cell, get it, and break.
@@ -203,19 +204,20 @@ public class BasePiece : EventTrigger
                 break;
             }
 
-            // If the mouse is not within any highlighted cell, we don't have a valid move.
+            // We do not move the piece if the cursor is not within a valid cell
             mTargetCell = null;
         }
+        
     }
 
     public override void OnEndDrag(PointerEventData eventData)
     {
         base.OnEndDrag(eventData);
 
-        // Hide
-        ClearCells();
-
-        // Return to original position
+        // Stop highlighting available cells
+        // ClearCells();
+        
+        // If we haven't chosen a cell when releasing the piece, put it back to where it was
         if (!mTargetCell)
         {
             transform.position = mCurrentCell.gameObject.transform.position;
@@ -226,8 +228,7 @@ public class BasePiece : EventTrigger
         Move();
 
         // End turn
-        mPieceManager.SwitchSides(mColor);
+        // mPieceManager.SwitchSides(mColor);
+        
     }
-    #endregion
-    */
 }
