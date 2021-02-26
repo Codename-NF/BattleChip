@@ -38,14 +38,47 @@ module tb_rtl_drawscreen();
     end
     initial begin
         TB_KEY[3] = 1'b0;
-        TB_SW[2:0] = 3'b000;
+        TB_SW[3:0] = 4'd5;
+        TB_SW[7:4] = 4'd5;
+        TB_SW[9:8] = 2'd0;
         curX = 0;
         #5;
         TB_KEY[3] = 1'b1;
-        TB_KEY[0] = 1'b0;
+        TB_KEY[0] = 1'b1;
+        TB_KEY[1] = 1'b1;
+
         for (i = 0; i <= 76800; i++) begin
             #1;#1;
         end
+        $stop;
+
+        TB_KEY[0] = 1'b0;
+        for (i = 0; i <= 2000; i++) begin
+            #1;#1;
+        end
+        TB_KEY[0] = 1'b1;
+        #2;
+        #2;
+        $stop;
+        #2;
+        TB_KEY[1] = 1'b0;
+        for (i = 0; i <= 2000; i++) begin
+            #1;#1;
+        end
+        TB_KEY[1] = 1'b1;
+        #2;
+        TB_SW[9:8] = 2'd1;
+        TB_SW[3:0] = 4'd0;
+        TB_SW[7:4] = 4'd9;
+        #2;
+        TB_KEY[0] = 1'b0;
+        for (i = 0; i <= 2000; i++) begin
+            #1;#1;
+        end
+        #2
+
+
+
 
         $stop;
     end
