@@ -11,9 +11,6 @@ using namespace std;
  * Why don't you just make it contain a ship anyways...
  * 
  * 
- * also main really shouldn't be 150 lines
- * you should split loops into their own functions
- * 
  * 
  * */
 const int NUM_OF_SHIPS = 1;
@@ -306,7 +303,6 @@ void setting_up_ships(list<player>::iterator *p1, list<player>::iterator *p2) {
             came_from_player1 = false;
         }
 // ******************* bluetooth place holder *******************
-        //TODO: set up error needs to be handled more carefully to makesure all ships are in place when finished.
         if (out_of_bound(x_in, y_in, length, orientation)) {
             cout << "out of bound" << endl;
             p1count--;
@@ -397,8 +393,9 @@ void playing_game(list<player>::iterator *p1, list<player>::iterator *p2) {
 
         }
         else {
-            //TODO: "feature" if you hit the same place again you loose your turn ;) 
-            cout << "Can't hit here buddy" << endl;
+            cout << "Can't hit here buddy. Please try again." << endl;
+            start1 = !start1;
+            continue;
         }
 
         if (current_under_attack->remaining_ships == 0) {
