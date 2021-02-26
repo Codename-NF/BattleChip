@@ -15,10 +15,6 @@ using namespace std;
  * you should split loops into their own functions
  * 
  * 
- * also is it possible to use set of boxes instead of lists
- * sets = O(1) lookup with no loops
- * like not_hit_yet could be so much easier instead of requiring a loop
- * 
  * */
 const int NUM_OF_SHIPS = 1;
 const int SUNK_STATUS_CODE = 2;
@@ -76,7 +72,7 @@ struct player {
         string player_name; 
         int player_num;
         list<ship> ships_list;
-        list<box> boxes_hit;
+        set<box> boxes_hit;
         int remaining_ships;
         set<box> all_boxes_on_board;
 
@@ -143,7 +139,7 @@ bool path_empty(int x_start, int y_start, set<box> all_boxes_on_board);
 bool contains_box(ship *ship, int x, int y);
 int check_hit_what(int x, int y, list<ship> *ships, int *remaining_ships);
 bool all_ships_destroyed(list<ship> ships);
-bool not_hit_yet(int x, int y, list<box> boxes);
+bool not_hit_yet(int x, int y, set<box> boxes);
 /**
  * For AI(Eleiah):
  * 1. Boxes that's already hit (probably 1 update at a time instead of putting all in memory)
@@ -302,7 +298,7 @@ int main () {
 
             int status = check_hit_what(x_in, y_in, &(current_under_attack->ships_list), &current_under_attack->remaining_ships);
 
-            current_under_attack->boxes_hit.push_back(box(x_in, y_in, status));
+            current_under_attack->boxes_hit.insert(box(x_in, y_in, status));
 
             cout << "Your hit status is " << status << endl;
 
@@ -324,14 +320,8 @@ int main () {
   return 0;
 }
 
-bool not_hit_yet(int x, int y, list<box> boxes) {
-    for (list<box>::iterator it = boxes.begin(); it != boxes.end(); it++) {
-        if (x == it->x && y == it->y) {
-            return false;
-        }
-    }
-
-    return true;
+bool not_hit_yet(int x, int y, set<box> boxes) {
+    return boxes.find(box(x,y)) == boxes.end();
 }
 
 void declare_win (int player_who_won) {
