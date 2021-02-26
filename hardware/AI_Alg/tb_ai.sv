@@ -3,11 +3,12 @@ module tb_ai();
     reg clk, rst_n, start;
     reg [4:0] ships;
     reg [99:0] fired;
+    reg [99:0] hits;
     wire done;
     wire [6:0] largest_index;
     wire [99:0][5:0] density;
 
-    ai DUT(fired, ships, clk, rst_n, density, largest_index, done, start);
+    ai DUT(fired, hits, ships, clk, rst_n, density, largest_index, done, start);
 
     initial begin
         clk = 1'b1;
@@ -19,8 +20,10 @@ module tb_ai();
 
     initial begin
         rst_n = 1'd0;
-        ships = 5'b11111;
+        ships = 5'b10101;
         fired = {1'b1,{6{1'b0}},1'b1,{7{1'b0}},5'b11111,{4{1'b0}},5'b10101,{5{1'b0}},3'b111,{3{1'b0}},1'b1,{6{1'b0}},1'b1,{25{1'b0}}};
+        hits = 100'd0;
+        hits = hits + {1'b1,{41{1'b0}}};
         #100;
         rst_n = 1'd1;
         wait (DUT.done === 1'd1)
@@ -28,6 +31,21 @@ module tb_ai();
         #200;
         start <= 1'd0;
         wait (DUT.done === 1'd1)
+        #300;
+
+        // Play through a game
+        rst_n = 1'd0;
+        ships = 5'b11111;
+        fired = 100'd0;
+        hits = 100'd0;
+        #100;
+        rst_n = 1'd1;
+        wait (DUT.done === 1'd1)
+        start <= 1'd1;
+        #200;
+        start <= 1'd0;
+        wait (DUT.done === 1'd1)
+        assert(largest_index === 7'd44);
         #300;
         $stop;
     end
