@@ -37,6 +37,7 @@ module ai(input logic [99:0] fired, input logic [99:0] hits, input logic [4:0] s
                     end
                     else begin
                         pos <= pos + 7'd5;
+                        done <= 1'b0;
                     end
                 end
                 `clean_var: begin
