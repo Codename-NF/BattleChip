@@ -84,10 +84,21 @@ void test_contains_box(void) {
 };
 
 
+void test_check_hit_what(void) {
+    list<ship> mylist;
+    for (int i = 0; i < NUM_OF_SHIPS; i++) {
+        mylist.push_back(ship());
+    }
+    int remainingships = 5;
+    TEST_CHECK_(check_hit_what(0,0,&mylist,&remainingships) == false, "check_hit_what(myship, %d, %d)==%d", 0,5, false);
+};
+
+
 TEST_LIST = {
     
     {"bool out_of_bound(int, int, int, int);", test_out_of_bound},
     {"bool path_empty(int, int, set<box>);", test_path_empty},
     {"bool contains_box(ship, int, int);", test_contains_box},
+    {"int check_hit_what(int, int, list<ship>*, int *);", test_check_hit_what},
     {0} // terminating test 
 };
