@@ -7,6 +7,8 @@ using UnityEngine;
 public class PieceManager : MonoBehaviour
 {
     public GameObject mPiecePrefab;
+    // mNoActiveInteraction is false when the user is moving/rotating a piece
+    public bool mNoActiveInteraction;
 
     // Change mSizes to tweak the number/types of ships
     private int[] mSizes = { 2, 3, 3, 4, 5 };
@@ -15,6 +17,9 @@ public class PieceManager : MonoBehaviour
 
     public void Setup(Board board)
     {
+        // Initialize dragging boolean
+        mNoActiveInteraction = true;
+
         // Create ship pieces
         mShips = CreatePieces(board);
 
@@ -63,12 +68,17 @@ public class PieceManager : MonoBehaviour
         for (int i = 0; i < pieces.Count; i++)
         {
             Debug.Log("Placed piece");
-            pieces[i].Place(board.mAllCells[0, i + 2]);
+            pieces[i].Place(board.mAllCells[0, i * 2]);
         }
     }
 
-    public List<BasePiece> GetShips()
+    public string ExportShips()
     {
-        return mShips;
+        string exportedShips = "";
+        for (int i = 0; i < mShips.Count; i++)
+        {
+            exportedShips += mShips[i].ExportShip();
+        }
+        return exportedShips;
     }
 }

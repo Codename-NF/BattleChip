@@ -29,4 +29,12 @@ public class GameManager : MonoBehaviour
         unityActivity.Call("sendBluetoothMessageToConsole", message);
     }
 
+    public void ConfirmShipPlacements()
+    {
+        string message = mPieceManager.ExportShips();
+        Debug.Log("Sending: " + message);
+        AndroidJavaClass jc = new AndroidJavaClass("com.nf.battlechip.MainUnityActivity");
+        AndroidJavaObject unityActivity = jc.GetStatic<AndroidJavaObject>("instance");
+        unityActivity.Call("sendBluetoothMessageToConsole", message);
+    }
 }
