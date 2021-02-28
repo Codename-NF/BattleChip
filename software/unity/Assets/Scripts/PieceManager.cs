@@ -8,23 +8,10 @@ public class PieceManager : MonoBehaviour
 {
     public GameObject mPiecePrefab;
 
+    // Change mSizes to tweak the number/types of ships
+    private int[] mSizes = { 2, 3, 3, 4, 5 };
     private List<BasePiece> mShips = null;
 
-    private string[] mShipTypes = new string[2]
-    {
-        //"2", "2", "3", "4", "5"
-        "2", "2"
-    };
-
-    private Dictionary<string, Type> mPieceLibrary = new Dictionary<string, Type>()
-    {
-        {"2", typeof(SmallShip) },
-        /*
-        {"3", typeof(MediumShip) },
-        {"4", typeof(LargeShip) },
-        {"5", typeof(GiantShip) },
-        */
-    };
 
     public void Setup(Board board)
     {
@@ -38,25 +25,23 @@ public class PieceManager : MonoBehaviour
     private List<BasePiece> CreatePieces(Board board)
     {
         List<BasePiece> newPieces = new List<BasePiece>();
+        int shipLength;
 
-        for (int i = 0; i < mShipTypes.Length; i++)
+        for (int i = 0; i < mSizes.Length; i++)
         {
-            // Get the type
-            string key = mShipTypes[i];
-            Type pieceType = mPieceLibrary[key];
-
             // Create
-            BasePiece newPiece = CreatePiece(pieceType);
+            shipLength = mSizes[i];
+            BasePiece newPiece = CreatePiece(shipLength);
             newPieces.Add(newPiece);
 
             // Setup
-            newPiece.Setup(new Color32(120, 73, 80, 255), this);
+            newPiece.Setup(new Color32(222, 0, 0, 255), this, shipLength);
         }
 
         return newPieces;
     }
 
-    private BasePiece CreatePiece(Type pieceType)
+    private BasePiece CreatePiece(int length) // (Type pieceType)
     {
         // Create new object
         GameObject newPieceObject = Instantiate(mPiecePrefab);
@@ -67,7 +52,7 @@ public class PieceManager : MonoBehaviour
         newPieceObject.transform.localRotation = Quaternion.identity;
 
         // Store new piece
-        BasePiece newPiece = (BasePiece)newPieceObject.AddComponent(pieceType);
+        BasePiece newPiece = (BasePiece) newPieceObject.AddComponent(typeof(BasePiece));
 
         return newPiece;
     }
@@ -75,15 +60,15 @@ public class PieceManager : MonoBehaviour
     private void PlacePieces(List<BasePiece> pieces, Board board)
     {
         // TODO increase this number
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < pieces.Count; i++)
         {
-            pieces[i].Place(board.mAllCells[1, i + 1]);
+            Debug.Log("Placed piece");
+            pieces[i].Place(board.mAllCells[0, i + 2]);
         }
     }
-    /*
-    private void SetInteractive(List<BasePiece> allPieces, bool value)
+
+    public List<BasePiece> GetShips()
     {
-        foreach (BasePiece piece in allPieces)
-            piece.enabled = value;
-    } */
+        return mShips;
+    }
 }

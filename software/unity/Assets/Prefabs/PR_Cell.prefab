@@ -37,7 +37,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 50, y: 50}
-  m_SizeDelta: {x: 60, y: 60}
+  m_SizeDelta: {x: 80, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &8608511824030040357
 MonoBehaviour:
@@ -51,11 +51,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d416ec0ddb7763d459d72db1508ad928, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mImage: {fileID: 273553887096828986}
   mOutlineImage: {fileID: 3736763817828573573}
   mBoardPosition: {x: 0, y: 0}
   mBoard: {fileID: 0}
   mRectTransform: {fileID: 0}
-  mCurrentPiece: {fileID: 0}
+  mCurrentPieces: []
 --- !u!222 &930869003673962901
 CanvasRenderer:
   m_ObjectHideFlags: 0

@@ -30,14 +30,14 @@ public class Board : MonoBehaviour
 
                 // Place the cell by taking it's (x,y) and scaling it to the screen
                 RectTransform rectTransform = newCell.GetComponent<RectTransform>();
-                rectTransform.anchoredPosition = new Vector2((x * 70) + 50, (y * 70) + 50);
+                rectTransform.anchoredPosition = new Vector2((x * 80) + 5, (y * 80) + 50);
 
                 // Call the cell's setup function
                 mAllCells[x, y] = newCell.GetComponent<Cell>();
                 mAllCells[x, y].Setup(new Vector2Int(x, y), this);
             }
         }
-
+        /*
         for (int x = 0; x < 10; x += 2)
         {
             for (int y = 0; y < 10; y++)
@@ -47,7 +47,7 @@ public class Board : MonoBehaviour
 
                 mAllCells[finalX, y].GetComponent<Image>().color = new Color32(79, 123, 159, 255);
             }
-        }
+        } */
     }
     /*
     public CellState ValidateCell(int targetx, int targetY, BasePiece checkingPiece)

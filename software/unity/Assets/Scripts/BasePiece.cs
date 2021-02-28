@@ -10,178 +10,73 @@ public class BasePiece : EventTrigger
 
     [HideInInspector]
     public Color mColor = Color.clear;
-    public bool mIsFirstMove = true;
 
-    protected Cell mOriginalCell = null;
-    protected Cell mCurrentCell = null;
+    private Cell mLastCell = null;
+    private Cell mCurrentCell = null;
 
-    protected RectTransform mRectTransform = null;
-    protected PieceManager mPieceManager;
+    private RectTransform mRectTransform = null;
+    private PieceManager mPieceManager;
 
-    protected Cell mTargetCell = null;
+    private Cell mTargetCell = null;
 
-    protected Vector3Int mMovement = Vector3Int.one;
-    protected List<Cell> mHighlightedCells = new List<Cell>();
+    private Vector3Int mMovement = Vector3Int.one;
+    private List<Cell> mHighlightedCells = new List<Cell>();
 
-    public virtual void Setup(Color32 newSpriteColor, PieceManager newPieceManager)
+    private int mShipSize;
+    private bool mIsHorizontal;
+    private bool mWasDragged;
+
+    public Cell GetCurrentCell()
+    {
+        return mCurrentCell;
+    }
+
+    public void Setup(Color32 newSpriteColor, PieceManager newPieceManager, int Size)
     {
         mPieceManager = newPieceManager;
 
         GetComponent<Image>().color = newSpriteColor;
         mRectTransform = GetComponent<RectTransform>();
+
+        mShipSize = Size;
+        mIsHorizontal = true;
     }
 
-    public virtual void Place(Cell newCell)
+    public void Place(Cell newCell)
     {
         // Cell stuff
         mCurrentCell = newCell;
-        mOriginalCell = newCell;
-        mCurrentCell.mCurrentPiece = this;
+        mLastCell = newCell;
+        mCurrentCell.mCurrentPieces.Add(this);
 
         // Object stuff
         transform.position = newCell.transform.position;
         gameObject.SetActive(true);
+
+        MoveTail(mCurrentCell, mIsHorizontal, true, mShipSize);
     }
 
-    
-    public void Reset()
+    private void Move()
     {
-        Kill();
-
-        Place(mOriginalCell);
-    }
-
-    public virtual void Kill()
-    {
-        // Clear current cell
-        mCurrentCell.mCurrentPiece = null;
-
-        // Remove piece
-        gameObject.SetActive(false);
-    }
-    /*
-    public bool HasMove()
-    {
-        CheckPathing();
-
-        // If no moves
-        if (mHighlightedCells.Count == 0)
-            return false;
-
-        // If moves available
-        return true;
-    }
-
-    public void ComputerMove()
-    {
-        // Get random cell
-        int i = Random.Range(0, mHighlightedCells.Count);
-        mTargetCell = mHighlightedCells[i];
-
-        // Move to new cell
-        Move();
-
-        // End turn
-        mPieceManager.SwitchSides(mColor);
-    }
-    */
-
-    private void CreateCellPath(int xDirection, int yDirection, int movement)
-    {
-        // Target position
-        int currentX = mCurrentCell.mBoardPosition.x;
-        int currentY = mCurrentCell.mBoardPosition.y;
-
-        // Check each cell
-        for (int i = 1; i <= movement; i++)
-        {
-            currentX += xDirection;
-            currentY += yDirection;
-
-            // Get the state of the target cell
-            /*
-            CellState cellState = CellState.None;
-            cellState = mCurrentCell.mBoard.ValidateCell(currentX, currentY, this);
-            */
-            /*
-            // If enemy, add to list, break
-            if (cellState == CellState.Enemy)
-            {
-                mHighlightedCells.Add(mCurrentCell.mBoard.mAllCells[currentX, currentY]);
-                break;
-            }
-
-            // If the cell is not free, break
-            if (cellState != CellState.Free)
-                break;
-            */
-            // Add to list
-            mHighlightedCells.Add(mCurrentCell.mBoard.mAllCells[currentX, currentY]);
-        }
-    }
-    
-    protected virtual void CheckPathing()
-    {
-        // Horizontal
-        CreateCellPath(1, 0, mMovement.x);
-        CreateCellPath(-1, 0, mMovement.x);
-
-        // Vertical 
-        CreateCellPath(0, 1, mMovement.y);
-        CreateCellPath(0, -1, mMovement.y);
-
-        // Upper diagonal
-        CreateCellPath(1, 1, mMovement.z);
-        CreateCellPath(-1, 1, mMovement.z);
-
-        // Lower diagonal
-        CreateCellPath(-1, -1, mMovement.z);
-        CreateCellPath(1, -1, mMovement.z);
-    }
-    
-    protected void ShowCells()
-    {
-        foreach (Cell cell in mHighlightedCells)
-            cell.mOutlineImage.enabled = true;
-    }
-
-    protected void ClearCells()
-    {
-        foreach (Cell cell in mHighlightedCells)
-            cell.mOutlineImage.enabled = false;
-
-        mHighlightedCells.Clear();
-    }
-
-    protected virtual void Move()
-    {
-        // First move switch
-        mIsFirstMove = false;
-
-        // If there is an enemy piece, remove it
-        // mTargetCell.RemovePiece();
-
         // Clear current
-        mCurrentCell.mCurrentPiece = null;
+        mCurrentCell.mCurrentPieces.Remove(this);
 
         // Switch cells
         mCurrentCell = mTargetCell;
-        mCurrentCell.mCurrentPiece = this;
+        mCurrentCell.mCurrentPieces.Add(this);
 
         // Move on board
         transform.position = mCurrentCell.transform.position;
         mTargetCell = null;
+
+        MoveTail(mCurrentCell, mIsHorizontal, true, mShipSize);
     }
 
     public override void OnBeginDrag(PointerEventData eventData)
     {
         base.OnBeginDrag(eventData);
 
-        // Update this piece's list of cells that it can move to
-        CheckPathing();
-
-        // Highlight the cells in the recently generated list
-        ShowCells();
+        mWasDragged = true;
     }
 
     public override void OnDrag(PointerEventData eventData)
@@ -194,10 +89,10 @@ public class BasePiece : EventTrigger
         // Check for overlapping available squares
         
         // For each available cell
-        foreach (Cell cell in mHighlightedCells)
+        foreach (Cell cell in mCurrentCell.mBoard.mAllCells)
         {
-            // Check if cursor is in that available cell
-            if (RectTransformUtility.RectangleContainsScreenPoint(cell.mRectTransform, Input.mousePosition))
+            // Check if cell is available and cursor is in that available cell
+            if (cell.mCurrentPieces.Count == 0 && RectTransformUtility.RectangleContainsScreenPoint(cell.mRectTransform, Input.mousePosition))
             {
                 // If the mouse is within a valid cell, get it, and break.
                 mTargetCell = cell;
@@ -213,22 +108,89 @@ public class BasePiece : EventTrigger
     public override void OnEndDrag(PointerEventData eventData)
     {
         base.OnEndDrag(eventData);
+        Board board = mCurrentCell.mBoard;
 
-        // Stop highlighting available cells
-        // ClearCells();
-        
         // If we haven't chosen a cell when releasing the piece, put it back to where it was
-        if (!mTargetCell)
+        if (!mTargetCell || !VerifyPlacement(mTargetCell, mIsHorizontal, mShipSize))
         {
             transform.position = mCurrentCell.gameObject.transform.position;
-            return;
+            mTargetCell = mCurrentCell;
+            MoveTail(mCurrentCell, mIsHorizontal, true, mShipSize);
+        }
+        else
+        {
+            // Move to new cell
+            Move();
+        }
+    }
+
+    public override void OnPointerDown(PointerEventData eventData)
+    {
+        base.OnPointerDown(eventData);
+
+        MoveTail(mCurrentCell, mIsHorizontal, false, mShipSize);
+        mWasDragged = false;
+    }
+
+    public override void OnPointerUp(PointerEventData eventData)
+    {
+        base.OnPointerUp(eventData);
+        Cell endCell = (mTargetCell) ? mTargetCell : mCurrentCell;
+        if (!mWasDragged)
+        {
+            if (VerifyPlacement(endCell, !mIsHorizontal, mShipSize))
+            {
+                mIsHorizontal = !mIsHorizontal;
+            }
+            MoveTail(endCell, mIsHorizontal, true, mShipSize);
+        }        
+    }
+
+    private void MoveTail(Cell anchorCell, bool horizontal, bool placing, int length)
+    {
+        Cell cellToUpdate;
+        Board board = anchorCell.mBoard;
+
+        int xCoord = anchorCell.mBoardPosition.x;
+        int yCoord = anchorCell.mBoardPosition.y;
+
+        for (int i = 0; i < length - 1; i++)
+        {
+            // Get coords of cell to update
+            if (horizontal)
+            {
+                xCoord++;
+            }
+            else
+            {
+                yCoord--;
+            }
+
+            // Add this piece to the cell
+            cellToUpdate = board.mAllCells[xCoord, yCoord];
+
+            if (placing)
+            {
+                cellToUpdate.mCurrentPieces.Add(this);
+            }
+            else
+            {
+                cellToUpdate.mCurrentPieces.Remove(this);
+            }
+        }
+    }
+    
+    private bool VerifyPlacement(Cell location, bool isHorizontal, int shipLength)
+    {
+        bool valid = true;
+        int biggestX = (isHorizontal) ? location.mBoardPosition.x + shipLength - 1 : location.mBoardPosition.x;
+        int smallestY = (!isHorizontal) ? location.mBoardPosition.y - shipLength + 1 : location.mBoardPosition.y;
+
+        if (biggestX >= 10 || smallestY < 0)
+        {
+            valid = false;
         }
 
-        // Move to new cell
-        Move();
-
-        // End turn
-        // mPieceManager.SwitchSides(mColor);
-        
+        return valid;
     }
 }
