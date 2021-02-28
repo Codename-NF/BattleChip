@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         });
 
         findViewById(R.id.startUnity).setOnClickListener(view ->
-                startActivity(new Intent(this, UnityPlayerActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)));
+                startActivity(new Intent(this, MainUnityActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP)));
     }
 
     private void getBackgroundPermissionsIfNecessary() {
