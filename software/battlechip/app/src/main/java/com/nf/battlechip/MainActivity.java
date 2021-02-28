@@ -1,19 +1,25 @@
 package com.nf.battlechip;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.unity3d.player.UnityPlayerActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import com.nf.battlechip.pojo.User;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -35,6 +41,30 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
 
         findViewById(R.id.startUnity).setOnClickListener(view ->
                 startActivity(new Intent(this, MainUnityActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP)));
+
+        findViewById(R.id.get_database_info).setOnClickListener(view -> getUser());
+    }
+
+    public void getUser() {
+        UserService service = UserService.getUserService();
+        Call<User> call = service.getUser("Freetumble"); // TODO: replace this with variable user
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.isSuccessful()) {
+                    TextView userData = findViewById(R.id.user_data);
+                    User user = response.body();
+                    userData.setText("Name: " + user.getUsername() + " Wins: " + user.getWins() + " Losses: " + user.getLosses());
+                }
+                Log.d("onResponse", "received");
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                // do nothing
+                Log.d("onFailure", "failed " + t);
+            }
+        });
     }
 
     private void getBackgroundPermissionsIfNecessary() {
