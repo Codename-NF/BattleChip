@@ -7,6 +7,8 @@
 #include "game.h"
 #include "utils.h"
 #include "constants.h"
+#include <stdlib.h>     /* srand, rand */
+#include <time.h>       /* time */
 
 using namespace std;
 
@@ -31,7 +33,7 @@ void getting_names(battleship *game, int player_num) {
     }
 }
 
-void setting_up_ships(list<player>::iterator *p1, list<player>::iterator *p2) {
+void setting_up_ships(list<player>::iterator *p1, list<player>::iterator *p2, bool single_player_mode) {
     bool setup_finished = false;
 
     list<ship>::iterator shipsp1 = (*p1)->ships_list.begin();
@@ -46,7 +48,13 @@ void setting_up_ships(list<player>::iterator *p1, list<player>::iterator *p2) {
             p1count++;
         }
         else {
-            inputs = ask_for_setup(2);
+            if (!single_player_mode) {
+                inputs = ask_for_setup(2);
+            }
+            else {
+                cout << "Player 1 done setting up ships." << endl;
+                return;
+            }
         }
         int x_in = inputs.x;
         int y_in = inputs.y;
@@ -108,7 +116,7 @@ void setting_up_ships(list<player>::iterator *p1, list<player>::iterator *p2) {
 
 }
 
-void playing_game(list<player>::iterator *p1, list<player>::iterator *p2) {
+void playing_game(list<player>::iterator *p1, list<player>::iterator *p2, bool single_player_mode) {
     bool game_finished = false;
 
     bool start1 = true;
@@ -120,8 +128,25 @@ void playing_game(list<player>::iterator *p1, list<player>::iterator *p2) {
             start1 = !start1;
         }
         else {
-            inputs = ask_for_shoot(2);
-            start1 = !start1;
+            if (!single_player_mode) {
+                inputs = ask_for_shoot(2);
+                start1 = !start1;
+            }
+            else {
+                // Get input from HARDWARE AI algorithm 
+
+                // for now be random shoots
+                /* initialize random seed: */
+                cout << "AI to shoot......." << endl;
+                srand (time(0));
+                inputs.x = rand() % 10;
+                inputs.y = rand() % 10;
+                inputs.device_num = 2;
+
+                cout << "AI shoots at (" << inputs.x << "," << inputs.y << ")" << endl;
+                start1 = !start1;
+            }
+            
         }
         
         int x_in = inputs.x;
@@ -163,6 +188,63 @@ void playing_game(list<player>::iterator *p1, list<player>::iterator *p2) {
         else {
             cout << "Next up is player " << next_up << endl;
         }
+    }
+
+}
+
+
+void AI_setting_up(list<player>::iterator *AI) {
+    list<ship>::iterator ships_being_set_up = (*AI)->ships_list.begin();
+    (*AI)->player_name = "Milo";
+
+    cout << "AI name is " << (*AI)->player_name << endl;
+
+    // setting up ships 
+    // keep getting random place until it works? 
+    // 5 ships, 2 3 3 4 5 
+    int ship_sizes[5]= {2, 3, 3, 4, 5};
+
+    int i = 0;
+    while (i < NUM_OF_SHIPS) {
+        srand (time(0));
+        int x_in = rand() % 10;
+        int y_in = rand() % 10;
+        int orientation = (rand() % 2) + 1;
+        int length = ship_sizes[i];
+        if (out_of_bound(x_in, y_in, length, orientation)) {
+            cout << "out of bound" << endl;
+            continue;
+        }
+
+        if (!path_empty(x_in, y_in, (*AI)->all_boxes_on_board)) {
+            cout << "another ship in the way for " << (*AI)->player_name << endl;
+            continue;
+        }
+
+        // setting the ship
+        if (ships_being_set_up->size == 0) {
+            ships_being_set_up->orientation = orientation;
+            ships_being_set_up->size = length;
+            ships_being_set_up->start_box = box(x_in, y_in);
+            ships_being_set_up++;
+        }
+
+        int offset_x, offset_y;
+        if (orientation == VERTICAL) {
+            offset_x = 0;
+            offset_y = 1;
+        }
+        else {
+            offset_x = 1;
+            offset_y = 0;
+        }
+
+        // adding all the boxes into the set
+        for (int i = 0; i < length; i++) {
+            (*AI)->all_boxes_on_board.insert(box(x_in + (offset_x * i), y_in + (offset_y * i)));
+        }
+
+        i++;
     }
 
 }
