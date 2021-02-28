@@ -31,7 +31,7 @@ bool contains_box(ship *ship, int x, int y) {
             return false;
         }
         else {
-            if (y >= ship->start_box.y && y <= ship->start_box.y + ship->size) {
+            if (y >= ship->start_box.y && y <= ship->start_box.y + ship->size - 1) {
                 ship->hit_count++;
                 return true;
             }
@@ -43,7 +43,7 @@ bool contains_box(ship *ship, int x, int y) {
             return false;
         }
         else {
-            if (x >= ship->start_box.x && x <= ship->start_box.x + ship->size) {
+            if (x >= ship->start_box.x && x <= ship->start_box.x + ship->size - 1) {
                 ship->hit_count++;
                 return true;
             }
