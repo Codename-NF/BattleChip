@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">BattleChip</string>
     <string name="game_view_content_description">Game view</string>
+    <string name="single_player_button_label">Singleplayer</string>
+    <string name="multi_player_button_label">Multiplayer</string>
+    <string name="player_stats_button_label">Player Stats</string>
+    <string name="options_button_label">Options</string>
+    <string name="logo_content_description">BattleChip logo</string>
+    <string name="logging_button_label">Logging</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.nf.battlechip;
+package com.nf.battlechip.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,6 +14,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import com.nf.battlechip.R;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -61,7 +62,7 @@ public class LoginActivity extends AppCompatActivity {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             if (account != null) {
-                Log.d(LOGIN_DEBUG_TAG, account.getEmail());
+                Log.d(LOGIN_DEBUG_TAG, account.getDisplayName() + " " + account.getEmail());
                 // TODO: check token with backend first
                 startMainActivity();
             }

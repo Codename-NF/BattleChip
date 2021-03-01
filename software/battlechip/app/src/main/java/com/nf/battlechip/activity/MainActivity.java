@@ -1,4 +1,4 @@
-package com.nf.battlechip;
+package com.nf.battlechip.activity;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
@@ -6,8 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.TextView;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -15,11 +14,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.nf.battlechip.pojo.User;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import com.nf.battlechip.BluetoothThread;
+import com.nf.battlechip.R;
 
 public class MainActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -33,38 +29,19 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        findViewById(R.id.button).setOnClickListener(view -> {
+        findViewById(R.id.options_button).setOnClickListener(view -> {
             getBackgroundPermissionsIfNecessary();
             setUpBluetooth();
             bluetoothThread = new BluetoothThread();
         });
 
-        findViewById(R.id.startUnity).setOnClickListener(view ->
-                startActivity(new Intent(this, MainUnityActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP)));
-
-        findViewById(R.id.get_database_info).setOnClickListener(view -> getUser());
+        findViewById(R.id.single_player_button).setOnClickListener(this::startUnityActivity);
+        findViewById(R.id.multi_player_button).setOnClickListener(this::startUnityActivity);
+        findViewById(R.id.player_stats_button).setOnClickListener(view -> startActivity(new Intent(this, UserStatisticsActivity.class)));
     }
 
-    public void getUser() {
-        UserService service = UserService.getUserService();
-        Call<User> call = service.getUser("Freetumble"); // TODO: replace this with variable user
-        call.enqueue(new Callback<User>() {
-            @Override
-            public void onResponse(Call<User> call, Response<User> response) {
-                if (response.isSuccessful()) {
-                    TextView userData = findViewById(R.id.user_data);
-                    User user = response.body();
-                    userData.setText("Name: " + user.getUsername() + " Wins: " + user.getWins() + " Losses: " + user.getLosses());
-                }
-                Log.d("onResponse", "received");
-            }
-
-            @Override
-            public void onFailure(Call<User> call, Throwable t) {
-                // do nothing
-                Log.d("onFailure", "failed " + t);
-            }
-        });
+    private void startUnityActivity(View view) {
+        startActivity(new Intent(this, MainUnityActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP));
     }
 
     private void getBackgroundPermissionsIfNecessary() {
