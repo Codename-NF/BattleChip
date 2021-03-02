@@ -1,9 +1,4 @@
-package com.nf.battlechip;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+package com.nf.battlechip.activity;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
@@ -11,9 +6,16 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
-import com.unity3d.player.UnityPlayerActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import com.nf.battlechip.BluetoothThread;
+import com.nf.battlechip.R;
 
 public class MainActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -27,14 +29,19 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        findViewById(R.id.button).setOnClickListener(view -> {
+        findViewById(R.id.options_button).setOnClickListener(view -> {
             getBackgroundPermissionsIfNecessary();
             setUpBluetooth();
             bluetoothThread = new BluetoothThread();
         });
 
-        findViewById(R.id.startUnity).setOnClickListener(view ->
-                startActivity(new Intent(this, UnityPlayerActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)));
+        findViewById(R.id.single_player_button).setOnClickListener(this::startUnityActivity);
+        findViewById(R.id.multi_player_button).setOnClickListener(this::startUnityActivity);
+        findViewById(R.id.player_stats_button).setOnClickListener(view -> startActivity(new Intent(this, UserStatisticsActivity.class)));
+    }
+
+    private void startUnityActivity(View view) {
+        startActivity(new Intent(this, MainUnityActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP));
     }
 
     private void getBackgroundPermissionsIfNecessary() {
