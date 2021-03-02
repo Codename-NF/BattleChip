@@ -1,4 +1,4 @@
-package com.nf.battlechip;
+package com.nf.battlechip.activity;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -6,6 +6,7 @@ import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.nf.battlechip.R;
 import com.unity3d.player.UnityPlayer;
 import com.unity3d.player.UnityPlayerActivity;
 
@@ -20,13 +21,12 @@ public class MainUnityActivity extends UnityPlayerActivity {
         instance = this;
 
         Button testButton = new Button(this);
-        testButton.setText("Logging");
+        testButton.setText(getString(R.string.logging_button_label));
         testButton.setGravity(Gravity.CENTER);
         testButton.setOnClickListener(view -> {
             Log.d("tag", "button clicked");
             UnityPlayer.UnitySendMessage("PR_GameManager", "ReceiveBluetoothMessageFromConsole", "Test message");
         });
-
         mUnityPlayer.addView(testButton, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 

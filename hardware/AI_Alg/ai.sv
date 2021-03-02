@@ -2,17 +2,18 @@
 `define clean_var 3'd1
 `define check_fire 3'd2
 `define add_density 3'd3
-`define waiting 3'd4
+`define find_largest_density 3'd4
+`define waiting 3'd5
 
-module ai(input logic [99:0] fired, input logic [4:0] ships, input logic clk, input logic rst_n, output logic [99:0][5:0] density
-            output logic done);
+module ai(input logic [99:0] fired, input logic [4:0] ships, input logic clk, input logic rst_n, output logic [99:0][5:0] density,
+            output logic [6:0] largest_index, output logic done, input logic start);
 
     reg [1:0] ship0_density_x, ship0_density_y;
     reg [2:0][1:0] ship1_2_density_x, ship1_2_density_y;
     reg [2:0] state;
     reg [3:0] ship3_density_x, ship3_density_y, x, y;
     reg [4:0] ship4_density_x, ship4_density_y;
-    reg [6:0] pos, largest_index;
+    reg [6:0] pos;
 
 	always @(posedge clk or negedge rst_n) begin
         if (rst_n === 1'b0) begin
@@ -154,16 +155,19 @@ module ai(input logic [99:0] fired, input logic [4:0] ships, input logic clk, in
                     if (pos === 7'd99) begin
                         done <= 1'd1;
                         state <= `set_density;
+                        pos <= 7'd0;
+                    end
+                    else begin
+                        pos <= pos + 7'd1;
                     end
                     if (density[pos] > density[largest_index]) begin
                         largest_index <= pos;
                     end
-                    pos <= pos + 7'd1;
                 end
                 default: begin
                     if (start <= 1'd1) begin
                         done <=  1'd0;
-                        state <= clean_var;
+                        state <= `clean_var;
                     end
                     else begin
                         done <= 1'd1;
