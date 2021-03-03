@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     private final int BACKGROUND_LOCATION_REQUEST_CODE = 1;
     private final int ENABLE_BT_REQUEST_CODE = 2;
 
-    private BluetoothThread bluetoothThread;
+    private BluetoothThread bluetoothThread = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +32,13 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         findViewById(R.id.options_button).setOnClickListener(view -> {
             getBackgroundPermissionsIfNecessary();
             setUpBluetooth();
-            bluetoothThread = new BluetoothThread();
+            if (bluetoothThread == null || !bluetoothThread.isValidThread()) {
+                bluetoothThread = new BluetoothThread();
+                new Thread(bluetoothThread).start();
+            }
+            if (bluetoothThread.isValidThread()) {
+                bluetoothThread.write("Test\n".getBytes());
+            }
         });
 
         findViewById(R.id.single_player_button).setOnClickListener(this::startUnityActivity);
@@ -74,7 +80,6 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, ENABLE_BT_REQUEST_CODE);
         }
-
     }
 
     @Override
