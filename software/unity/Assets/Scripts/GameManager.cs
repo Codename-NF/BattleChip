@@ -29,4 +29,8 @@ public class GameManager : MonoBehaviour
         unityActivity.Call("sendBluetoothMessageToConsole", message);
     }
 
+    public void ConfirmShipPlacements()
+    {
+        SendBluetoothMessageToConsole(mPieceManager.ExportShips());
+    }
 }

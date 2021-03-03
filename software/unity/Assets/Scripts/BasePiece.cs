@@ -26,9 +26,23 @@ public class BasePiece : EventTrigger
     private bool mIsHorizontal;
     private bool mWasDragged;
 
-    public Cell GetCurrentCell()
+    // Convert the ship to a string, which we will send to the server over bluetooth
+    public string ExportShip()
     {
-        return mCurrentCell;
+        string shipString;
+
+        shipString = mCurrentCell.mBoardPosition.x.ToString();
+        shipString += " ";
+        shipString += mCurrentCell.mBoardPosition.y.ToString();
+        shipString += " ";
+        shipString += mShipSize;
+        shipString += " ";
+        shipString += mIsHorizontal;
+        shipString += "\n";
+
+        Debug.Log("Exporting ship as: " + shipString);
+
+        return shipString;
     }
 
     public void Setup(Color32 newSpriteColor, PieceManager newPieceManager, int Size)
@@ -127,6 +141,8 @@ public class BasePiece : EventTrigger
     public override void OnPointerDown(PointerEventData eventData)
     {
         base.OnPointerDown(eventData);
+        // Signal that the user is currently updating a piece's location/orientation
+        mPieceManager.mNoActiveInteraction = false;
 
         MoveTail(mCurrentCell, mIsHorizontal, false, mShipSize);
         mWasDragged = false;
@@ -143,7 +159,9 @@ public class BasePiece : EventTrigger
                 mIsHorizontal = !mIsHorizontal;
             }
             MoveTail(endCell, mIsHorizontal, true, mShipSize);
-        }        
+        }
+        // Signal that the user is not currently moving any pieces
+        mPieceManager.mNoActiveInteraction = true;
     }
 
     private void MoveTail(Cell anchorCell, bool horizontal, bool placing, int length)

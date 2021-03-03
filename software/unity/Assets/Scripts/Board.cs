@@ -13,6 +13,7 @@ public enum CellState
 public class Board : MonoBehaviour
 {
     public GameObject mCellPrefab;
+    public bool mDoneSetup = false;
 
     // 2D array of all cells in the Board
     public Cell[,] mAllCells = new Cell[10, 10];
@@ -37,23 +38,26 @@ public class Board : MonoBehaviour
                 mAllCells[x, y].Setup(new Vector2Int(x, y), this);
             }
         }
-        /*
-        for (int x = 0; x < 10; x += 2)
-        {
-            for (int y = 0; y < 10; y++)
-            {
-                int offset = (y % 2 != 0) ? 0 : 1;
-                int finalX = x + offset;
-
-                mAllCells[finalX, y].GetComponent<Image>().color = new Color32(79, 123, 159, 255);
-            }
-        } */
+        mDoneSetup = true;
     }
-    /*
-    public CellState ValidateCell(int targetx, int targetY, BasePiece checkingPiece)
+    public bool ValidateShips()
     {
-        Debug.Log("TODO: Implement Validation");
-        return CellState.Empty;
+        // Don't validate until ships have been placed
+        if (!mDoneSetup) return false;
+
+        // Check each cell in the 10x10 board
+        for (int i = 0; i < 10; i++)
+        {
+            for (int j = 0; j < 10; j++)
+            {
+                // If cell is occupied by more than one ship
+                if (mAllCells[i, j].mCurrentPieces.Count > 1)
+                {
+                    return false;
+                }
+            }
+        }
+        // By this point, there are no cells with overlapping ships
+        return true;
     }
-    */
 }
