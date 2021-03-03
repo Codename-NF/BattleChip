@@ -62,7 +62,7 @@ public class LoginActivity extends AppCompatActivity {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             if (account != null) {
-                Log.d(LOGIN_DEBUG_TAG, account.getDisplayName() + " " + account.getEmail());
+                Log.d(LOGIN_DEBUG_TAG, account.getDisplayName() + " " + account.getIdToken() + " " + account.getEmail());
                 // TODO: check token with backend first
                 startMainActivity();
             }
