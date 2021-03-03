@@ -24,7 +24,7 @@ public class GameManager : MonoBehaviour
 
     void SendBluetoothMessageToConsole(string message) {
         Debug.Log("Sending: " + message);
-        AndroidJavaClass jc = new AndroidJavaClass("com.nf.battlechip.MainUnityActivity");
+        AndroidJavaClass jc = new AndroidJavaClass("com.nf.battlechip.activity.MainUnityActivity");
         AndroidJavaObject unityActivity = jc.GetStatic<AndroidJavaObject>("instance");
         unityActivity.Call("sendBluetoothMessageToConsole", message);
     }
