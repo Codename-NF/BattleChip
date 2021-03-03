@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 
 const userController = require('../controllers/user');
+const auth = require('../middleware/auth');
 
-router.get('/:username/', userController.getUser);
-
-router.post('/', userController.createUser);
+// Get info for specific user
+router.get('/:email/', auth.checkToken, userController.getUser);
 
 module.exports = router;

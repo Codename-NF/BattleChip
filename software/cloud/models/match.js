@@ -1,27 +1,27 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-let User = new Schema({
-    email: {
+let Match = new Schema({
+    player_one: {
         type: String,
         required: true,
     },
-	first_name: {
+	player_two: {
         type: String,
         required: true,
     },
-	last_name: {
+	winner: {
         type: String,
         required: true,
     },
-    wins: {
+    player_one_score: {
         type: Number,
 		required: true,
     },
-    losses: {
+    player_two_score: {
         type: Number,
 		required: true,
     }
 });
 
-module.exports = mongoose.model('User', User);
+module.exports = mongoose.model('Match', Match);
