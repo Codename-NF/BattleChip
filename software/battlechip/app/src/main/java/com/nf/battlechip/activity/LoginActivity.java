@@ -15,6 +15,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.nf.battlechip.R;
+import com.nf.battlechip.RetrofitHelper;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -30,9 +31,10 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // user is already signed in
-        if (GoogleSignIn.getLastSignedInAccount(this) != null) {
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if (account != null) {
             Log.d(LOGIN_DEBUG_TAG, "Already signed in!");
-            startMainActivity();
+            startMainActivity(account.getIdToken());
         }
 
         setContentView(R.layout.activity_login);
@@ -63,15 +65,16 @@ public class LoginActivity extends AppCompatActivity {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             if (account != null) {
                 Log.d(LOGIN_DEBUG_TAG, account.getDisplayName() + " " + account.getEmail());
-                // TODO: check token with backend first
-                startMainActivity();
+                startMainActivity(account.getIdToken());
             }
         } catch (ApiException e) {
             Log.d(LOGIN_DEBUG_TAG, e.toString());
         }
     }
 
-    private void startMainActivity() {
+    private void startMainActivity(String idToken) {
+        RetrofitHelper.initRetrofit(idToken);
+        // TODO: check token with backend first
         startActivity(new Intent(this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
         finish();
     }
