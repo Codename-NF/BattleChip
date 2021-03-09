@@ -139,8 +139,8 @@ void playing_game(list<player>::iterator *p1, list<player>::iterator *p2, bool s
                 /* initialize random seed: */
                 cout << "AI to shoot......." << endl;
                 srand (time(0));
-                inputs.x = rand() % 10;
-                inputs.y = rand() % 10;
+                inputs.x = rand() % (BOUNDARY_MAX + 1);
+                inputs.y = rand() % (BOUNDARY_MAX + 1);
                 inputs.device_num = 2;
 
                 cout << "AI shoots at (" << inputs.x << "," << inputs.y << ")" << endl;
@@ -207,8 +207,8 @@ void AI_setting_up(list<player>::iterator *AI) {
     int i = 0;
     while (i < NUM_OF_SHIPS) {
         srand (time(0));
-        int x_in = rand() % 10;
-        int y_in = rand() % 10;
+        int x_in = rand() % (BOUNDARY_MAX + 1);
+        int y_in = rand() % (BOUNDARY_MAX + 1);
         int orientation = (rand() % 2) + 1;
         int length = ship_sizes[i];
         if (out_of_bound(x_in, y_in, length, orientation)) {
