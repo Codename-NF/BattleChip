@@ -6,6 +6,7 @@ import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.nf.battlechip.BluetoothThread;
 import com.nf.battlechip.R;
 import com.unity3d.player.UnityPlayer;
 import com.unity3d.player.UnityPlayerActivity;
@@ -33,7 +34,7 @@ public class MainUnityActivity extends UnityPlayerActivity {
     // Function receives messages from Unity
     public void sendBluetoothMessageToConsole(String message) {
         Log.d("sendBluetooth", message);
-        // TODO: actually send this to the console
+        BluetoothThread.getInstance().write(message.getBytes());
     }
 
     public static void sendBluetoothMessageToUnity(String message) {
