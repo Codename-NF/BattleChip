@@ -13,18 +13,20 @@ import java.io.OutputStream;
 import java.util.Optional;
 import java.util.UUID;
 
-public class BluetoothThread implements Runnable {
+public class BluetoothThread {
 
     private static final String BLUETOOTH_DEBUG = "Bluetooth";
+    private static BluetoothThread instance = null;
+    private static Thread readingThread = null;
 
     private final String MAC_ID = "B8:9A:2A:30:2B:35"; // TODO: Update this to be correct address
     private final UUID uuid = UUID.fromString("94f39d29-7d6d-437d-973b-fba39e49d4ee");
 
-    private final BluetoothSocket bluetoothSocket;
+    private BluetoothSocket bluetoothSocket;
     private InputStream inputStream;
     private OutputStream outputStream;
 
-    public BluetoothThread() {
+    BluetoothThread() {
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
         // List all devices
         for (BluetoothDevice device : adapter.getBondedDevices()) {
@@ -32,18 +34,17 @@ public class BluetoothThread implements Runnable {
         }
         Optional<BluetoothDevice> device = adapter.getBondedDevices().stream()
                 .filter(bondedDevice -> MAC_ID.equals(bondedDevice.getAddress())).findAny();
-        BluetoothSocket socket = null;
+        bluetoothSocket = null;
         inputStream = null;
         outputStream = null;
 
         // create socket
         try {
-            socket = device.isPresent() ? device.get().createRfcommSocketToServiceRecord(uuid)
+            bluetoothSocket = device.isPresent() ? device.get().createRfcommSocketToServiceRecord(uuid)
                     : null;
         } catch (IOException e) {
             Log.d(BLUETOOTH_DEBUG, "Socket creation failed\n" + e.toString());
         }
-        bluetoothSocket = socket;
 
         // connect socket
         if (bluetoothSocket != null) {
@@ -63,25 +64,44 @@ public class BluetoothThread implements Runnable {
         }
     }
 
-    @Override
-    public void run() {
+    public static BluetoothThread getInstance() {
+        if (instance == null || !instance.isValidThread()) {
+            instance = new BluetoothThread();
+        }
+        return instance;
+    }
+
+    public void startReading() {
+        if (readingThread == null) {
+            if (bluetoothSocket != null && bluetoothSocket.isConnected()) {
+                readingThread = new Thread(this::read);
+                readingThread.start();
+            } else {
+                Log.d(BLUETOOTH_DEBUG, "Can't read, socket not connected");
+            }
+        }
+    }
+
+    public void read() {
         Log.d(BLUETOOTH_DEBUG, "Starting thread");
         try {
             byte[] readBuffer = new byte[1024];
             while (inputStream != null) {
-                inputStream.read(readBuffer);
+                int bytesRead = inputStream.read(readBuffer);
                 String message = new String(readBuffer);
-                message = message.substring(0, message.indexOf("\n") + 1);
+                message = message.substring(0, bytesRead);
                 Log.d(BLUETOOTH_DEBUG, "Read: " + message);
                 MainUnityActivity.sendBluetoothMessageToUnity(message);
             }
         } catch (IOException e) {
+            close();
+            readingThread = null;
             Log.d(BLUETOOTH_DEBUG, "Read failed, exiting\n" + e.toString());
         }
     }
 
     public boolean isValidThread() {
-        return inputStream != null && outputStream != null;
+        return bluetoothSocket != null && inputStream != null && outputStream != null;
     }
 
     public void write(byte[] bytes) {
@@ -94,14 +114,17 @@ public class BluetoothThread implements Runnable {
         }
     }
 
-    public void close() {
-        try {
-            bluetoothSocket.close();
-        } catch (IOException e) {
-            Log.d(BLUETOOTH_DEBUG, "Failed to close socket\n" + e.toString());
-        } finally {
-            inputStream = null;
-            outputStream = null;
+    private void close() {
+        if (bluetoothSocket != null) {
+            try {
+                bluetoothSocket.close();
+            } catch (IOException e) {
+                Log.d(BLUETOOTH_DEBUG, "Failed to close socket\n" + e.toString());
+            } finally {
+                inputStream = null;
+                outputStream = null;
+                bluetoothSocket = null;
+            }
         }
     }
 }
