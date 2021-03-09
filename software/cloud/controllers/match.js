@@ -14,7 +14,7 @@ const updateUserRecord = async (email, didWinGame) => {
 
 module.exports = {
 	getMatches: async (req, res) => {
-		const userEmail = req.params.email
+		const userEmail = res.locals.email
         
         // Check if user exists
         const myUser = await User.findOne({ email: userEmail }).catch(() => null);
