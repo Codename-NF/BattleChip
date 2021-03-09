@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -10,10 +11,20 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log(name);
-        Debug.Log(mBoard + " " + mPieceManager);
-        mBoard.Create();
-        mPieceManager.Setup(mBoard);
+        switch (SceneManager.GetActiveScene().buildIndex)
+        {
+            case 0: // Placement
+                mBoard.Create();
+                mPieceManager.Setup(mBoard);
+                break;
+            case 1:
+                mBoard.Create();
+                break;
+            default:
+                Debug.Log("This scene shouldn't have a GameManager");
+                break;
+        }
+        
     }
 
     void ReceiveBluetoothMessageFromConsole(string message) {
@@ -29,8 +40,19 @@ public class GameManager : MonoBehaviour
         unityActivity.Call("sendBluetoothMessageToConsole", message);
     }
 
-    public void ConfirmShipPlacements()
+    public void ConfirmButton()
     {
-        SendBluetoothMessageToConsole(mPieceManager.ExportShips());
+        switch (SceneManager.GetActiveScene().buildIndex)
+        {
+            case 0: // Placement
+                SendBluetoothMessageToConsole(mPieceManager.ExportShips());
+                break;
+            case 1:
+                
+                break;
+            default:
+                Debug.Log("Error, this button shouldn't exist on this scene");
+                break;
+        }
     }
 }

@@ -3,13 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public enum CellState
-{
-    Empty,
-    Occupied,
-    OutOfBounds
-}
-
 public class Board : MonoBehaviour
 {
     public GameObject mCellPrefab;
@@ -20,7 +13,6 @@ public class Board : MonoBehaviour
 
     public void Create()
     {
-        Debug.Log("Create Board Called!");
         // Create a 10x10 board of cells
         for (int x = 0; x < 10; x++)
         {
@@ -31,7 +23,7 @@ public class Board : MonoBehaviour
 
                 // Place the cell by taking it's (x,y) and scaling it to the screen
                 RectTransform rectTransform = newCell.GetComponent<RectTransform>();
-                rectTransform.anchoredPosition = new Vector2((x * 80) + 5, (y * 80) + 50);
+                rectTransform.anchoredPosition = new Vector2((x * 95) + 15, (y * 95) + 50);
 
                 // Call the cell's setup function
                 mAllCells[x, y] = newCell.GetComponent<Cell>();
