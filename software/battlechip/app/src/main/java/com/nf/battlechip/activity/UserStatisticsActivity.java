@@ -6,7 +6,9 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.nf.battlechip.R;
+import com.nf.battlechip.RetrofitHelper;
 import com.nf.battlechip.UserService;
 import com.nf.battlechip.pojo.User;
 
@@ -28,8 +30,8 @@ public class UserStatisticsActivity extends AppCompatActivity {
     }
 
     public void getUser() {
-        UserService service = UserService.getUserService();
-        Call<User> call = service.getUser("Freetumble"); // TODO: replace this with variable user
+        UserService service = RetrofitHelper.getUserService();
+        Call<User> call = service.getUser(GoogleSignIn.getLastSignedInAccount(this).getEmail());
         call.enqueue(new Callback<User>() {
             @Override
             @EverythingIsNonNull
@@ -37,7 +39,10 @@ public class UserStatisticsActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     TextView userView = findViewById(R.id.user_name_text_view);
                     User user = response.body();
-                    userView.setText("Name: " + user.getUsername() + "\nWins: " + user.getWins() + "\nLosses: " + user.getLosses());
+                    userView.setText("Name: " + user.getFirstName() + " " + user.getLastName()
+                            + "\nEmail: " + user.getEmail()
+                            + "\nWins: " + user.getWins()
+                            + "\nLosses: " + user.getLosses());
                 }
                 Log.d(USER_STATISTICS_DEBUG, "Received a response for getUser");
             }

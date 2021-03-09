@@ -34,7 +34,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -300, y: -300}
+  m_AnchoredPosition: {x: -250, y: -300}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &3217880423967376922
@@ -51,6 +51,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mCellPrefab: {fileID: 6932336299350239048, guid: ad75eec1a43afa84180525fef2cd61ea,
     type: 3}
+  mDoneSetup: 0
 --- !u!223 &5942865539862143831
 Canvas:
   m_ObjectHideFlags: 0

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class ConfirmButton : MonoBehaviour
 {
@@ -16,6 +17,17 @@ public class ConfirmButton : MonoBehaviour
 
     void FixedUpdate()
     {
-        GetComponent<Button>().interactable = (mPieceManager.mNoActiveInteraction && mBoard.ValidateShips());
+        switch (SceneManager.GetActiveScene().buildIndex)
+        {
+            case 0:
+                GetComponent<Button>().interactable = (mPieceManager.mNoActiveInteraction && mBoard.ValidateShips());
+                break;
+            case 1:
+                break;
+
+            default:
+                break;
+        }
+        
     }
 }

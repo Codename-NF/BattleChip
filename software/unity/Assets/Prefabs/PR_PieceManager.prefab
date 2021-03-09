@@ -50,8 +50,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba433dd8a7769e14e81ccd7a108c26a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Instance: {fileID: 0}
   mPiecePrefab: {fileID: 2557521700239071184, guid: 06f3bd78fb2d5c94a90d26f9a52ea7c7,
     type: 3}
+  mNoActiveInteraction: 0
 --- !u!223 &4499743198139437384
 Canvas:
   m_ObjectHideFlags: 0

@@ -24,8 +24,8 @@ public class MainUnityActivity extends UnityPlayerActivity {
         testButton.setText(getString(R.string.logging_button_label));
         testButton.setGravity(Gravity.CENTER);
         testButton.setOnClickListener(view -> {
-            Log.d("tag", "button clicked");
-            UnityPlayer.UnitySendMessage("PR_GameManager", "ReceiveBluetoothMessageFromConsole", "Test message");
+            Log.d("LoggingButton", "Logging button clicked");
+            sendBluetoothMessageToUnity("Test message");
         });
         mUnityPlayer.addView(testButton, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
@@ -34,6 +34,11 @@ public class MainUnityActivity extends UnityPlayerActivity {
     public void sendBluetoothMessageToConsole(String message) {
         Log.d("sendBluetooth", message);
         // TODO: actually send this to the console
+    }
+
+    public static void sendBluetoothMessageToUnity(String message) {
+        UnityPlayer.UnitySendMessage("PR_GameManager",
+                "ReceiveBluetoothMessageFromConsole", message);
     }
 
     @Override

@@ -5,8 +5,8 @@ using UnityEngine.UI;
 
 public class Cell : MonoBehaviour
 {
+    public GlobalState Instance;
     public Image mImage;
-    public Image mOutlineImage;
 
     [HideInInspector]
     public Vector2Int mBoardPosition = Vector2Int.zero;
@@ -28,7 +28,7 @@ public class Cell : MonoBehaviour
         mRectTransform = GetComponent<RectTransform>();
     }
 
-    private void Update()
+    protected void Update()
     {
         // If cell has a piece colour that cell
         switch (mCurrentPieces.Count)
@@ -37,18 +37,18 @@ public class Cell : MonoBehaviour
                 // Otherwise, give it the original colour (checkerboard)
                 if (mBoardPosition.x % 2 != mBoardPosition.y % 2)
                 {
-                    mImage.color = new Color32(80, 120, 160, 255);
+                    mImage.color = Instance.savedColorTheme.CellColorLight;
                 }
                 else
                 {
-                    mImage.color = new Color32(100, 140, 180, 255);
+                    mImage.color = Instance.savedColorTheme.CellColorDark;
                 }
                 break;
             case 1:
-                mImage.color = new Color32(220, 80, 80, 255);
+                mImage.color = Instance.savedColorTheme.CellPieceColor;
                 break;
             default:
-                mImage.color = new Color32(0, 0, 0, 255);
+                mImage.color = Instance.savedColorTheme.CellOverlapColor;
                 break;
         }
     }
