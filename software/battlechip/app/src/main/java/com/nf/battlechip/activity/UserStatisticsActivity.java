@@ -6,7 +6,6 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.nf.battlechip.R;
 import com.nf.battlechip.RetrofitHelper;
 import com.nf.battlechip.UserService;
@@ -31,7 +30,7 @@ public class UserStatisticsActivity extends AppCompatActivity {
 
     public void getUser() {
         UserService service = RetrofitHelper.getUserService();
-        Call<User> call = service.getUser(GoogleSignIn.getLastSignedInAccount(this).getEmail());
+        Call<User> call = service.getUser();
         call.enqueue(new Callback<User>() {
             @Override
             @EverythingIsNonNull

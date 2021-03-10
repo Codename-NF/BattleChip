@@ -30,14 +30,12 @@ public class GameManager : MonoBehaviour
     void ReceiveBluetoothMessageFromConsole(string message) {
         Debug.Log("Received: " + message);
         // TODO: REPLACE THIS WITH ACTUAL PROCESSING
-        SendBluetoothMessageToConsole(message);
     }
 
-    void SendBluetoothMessageToConsole(string message) {
+    void SendPlacementMessage(string message) {
         Debug.Log("Sending: " + message);
-        AndroidJavaClass jc = new AndroidJavaClass("com.nf.battlechip.activity.MainUnityActivity");
-        AndroidJavaObject unityActivity = jc.GetStatic<AndroidJavaObject>("instance");
-        unityActivity.Call("sendBluetoothMessageToConsole", message);
+        AndroidJavaClass jc = new AndroidJavaClass("com.nf.battlechip.UnityMessage");
+        jc.CallStatic("placement", message);
     }
 
     public void ConfirmButton()
@@ -45,7 +43,7 @@ public class GameManager : MonoBehaviour
         switch (SceneManager.GetActiveScene().buildIndex)
         {
             case 0: // Placement
-                SendBluetoothMessageToConsole(mPieceManager.ExportShips());
+                SendPlacementMessage(mPieceManager.ExportShips());
                 break;
             case 1:
                 
