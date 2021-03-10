@@ -12,7 +12,7 @@ struct box {
     public:
         int x;
         int y;
-        int status;
+        mutable int status;
 
         box(int x, int y) {
             this->x = x;

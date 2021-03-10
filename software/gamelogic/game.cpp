@@ -172,6 +172,11 @@ void playing_game(list<player>::iterator *p1, list<player>::iterator *p2, bool s
 
             current_under_attack->boxes_hit.insert(box(x_in, y_in, status));
 
+            if (status == SUNK_STATUS_CODE) {
+                // need to go through all boxes with that ship
+                change_status_box_all_boxes(x_in, y_in, &(current_under_attack->boxes_hit), &(current_under_attack->ships_list));
+            }
+
             cout << "Your hit status is " << status << endl;
 
         }
