@@ -5,8 +5,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
-import com.nf.battlechip.activity.MainUnityActivity;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -91,7 +89,7 @@ public class BluetoothThread {
                 String message = new String(readBuffer);
                 message = message.substring(0, bytesRead);
                 Log.d(BLUETOOTH_DEBUG, "Read: " + message);
-                MainUnityActivity.sendBluetoothMessageToUnity(message);
+                UnityMessage.processBluetoothMessage(message);
             }
         } catch (IOException e) {
             close();
