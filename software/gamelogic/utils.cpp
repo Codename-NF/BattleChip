@@ -68,6 +68,8 @@ int check_hit_what(int x, int y, list<ship> *ships, int *remaining_ships) {
            if (it->hit_count == it->size) {
                *remaining_ships = *remaining_ships - 1;
                (*it).afloat = false;
+               // set bit here
+               // set8[1] = 1; // 00000010 
                return SUNK_STATUS_CODE;
            }
            else {
