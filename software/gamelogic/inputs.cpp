@@ -2,6 +2,7 @@
 #include "constants.h"
 #include "structs.h"
 #include <iostream>
+#include <sstream>
 using namespace std;
 
 // ******************* bluetooth place holder *******************
@@ -54,3 +55,23 @@ shootvalues ask_for_shoot(int player_num) {
 }
 
 // ******************* bluetooth place holder *******************
+// taking in a list of inputs 
+void get_input_UI(list<setupvalues> *list_setupval, string inputstring, int device_num) {
+    //string input = inputstring;
+    string input = "0 0 2 2 \n1 1 2 3 \n5 5 2 2\n";
+    stringstream ss;
+
+    ss << input;
+    
+    for (int i = 0; i < NUM_OF_SHIPS; i++) {
+
+        int x,y,size, orientation;
+        ss >> x >> y >> size >> orientation;
+        (*list_setupval).push_back(setupvalues(x, y, size, orientation, device_num));
+        // std::cout << "x: " << x << '\n';
+        // std::cout << "y: " << y << '\n';
+        // std::cout << "size: " << size << '\n';
+        // std::cout << "orientation: " << orientation << '\n';
+        // std::cout << ss.str() << endl; // converting string stream to string 
+    }
+}
