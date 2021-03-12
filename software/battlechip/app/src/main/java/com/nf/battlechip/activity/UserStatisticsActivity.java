@@ -4,8 +4,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.nf.battlechip.R;
 import com.nf.battlechip.RetrofitHelper;
 import com.nf.battlechip.UserService;
@@ -16,7 +14,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.internal.EverythingIsNonNull;
 
-public class UserStatisticsActivity extends AppCompatActivity {
+public class UserStatisticsActivity extends SetThemeActivity {
 
     private static final String USER_STATISTICS_DEBUG = "User_Statistics";
 

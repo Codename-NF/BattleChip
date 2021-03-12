@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -23,7 +22,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.internal.EverythingIsNonNull;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends SetThemeActivity {
 
     private GoogleSignInClient client;
 
@@ -36,19 +35,20 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // user is already signed in
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        if (account != null) {
-            Log.d(LOGIN_DEBUG_TAG, "Already signed in!");
-            startMainActivity(account.getIdToken());
-        }
-
-        setContentView(R.layout.activity_login);
-
         client = GoogleSignIn.getClient(this, new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestIdToken("110124662131-u2iujveotr90trk5phf99i2kq2agomgf.apps.googleusercontent.com")
                 .build());
+
+        // user is already signed in
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if (account != null) {
+            handleSignedInUser(client.silentSignIn());
+            Log.d(LOGIN_DEBUG_TAG, "Already signed in!");
+        }
+
+        setContentView(R.layout.activity_login);
+
 
         findViewById(R.id.sign_in_button).setOnClickListener(this::signIn);
     }

@@ -48,17 +48,17 @@ public class BluetoothThread {
         if (bluetoothSocket != null) {
             try {
                 bluetoothSocket.connect();
+                // get streams
+                try {
+                    inputStream = bluetoothSocket.getInputStream();
+                    outputStream = bluetoothSocket.getOutputStream();
+                } catch (IOException e) {
+                    Log.d(BLUETOOTH_DEBUG, "Exception getting streams\n" + e.toString());
+                }
             } catch (IOException exception) {
                 close();
             }
 
-            // get streams
-            try {
-                inputStream = bluetoothSocket.getInputStream();
-                outputStream = bluetoothSocket.getOutputStream();
-            } catch (IOException e) {
-                Log.d(BLUETOOTH_DEBUG, "Exception getting streams\n" + e.toString());
-            }
         }
     }
 
