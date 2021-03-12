@@ -17,7 +17,7 @@ public class BluetoothThread {
     private static BluetoothThread instance = null;
     private static Thread readingThread = null;
 
-    private final String MAC_ID = "B8:9A:2A:30:2B:35"; // TODO: Update this to be correct address
+    private final String MAC_ID = "20:18:11:21:24:72"; // TODO: Update this to be correct address
     private final UUID uuid = UUID.fromString("94f39d29-7d6d-437d-973b-fba39e49d4ee");
 
     private BluetoothSocket bluetoothSocket;

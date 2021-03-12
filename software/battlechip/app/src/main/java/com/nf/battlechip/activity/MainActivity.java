@@ -43,7 +43,7 @@ public class MainActivity extends SetThemeActivity implements ActivityCompat.OnR
             BluetoothThread thread = BluetoothThread.getInstance();
             thread.startReading();
             if (thread.isValidThread()) {
-                thread.write("Test".getBytes());
+                thread.write("Test message\n\n".getBytes());
             }
         });
     }
