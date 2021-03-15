@@ -22,5 +22,12 @@
         <item name="colorPrimary">@color/blue_500</item>
     </style>
 
+    <style name="Theme.PinkBattleChip" parent="Theme.BattleChip">
+        <item name="colorPrimary">@color/pink_500</item>
+    </style>
+
+    <style name="Theme.OrangeBattleChip" parent="Theme.BattleChip">
+        <item name="colorPrimary">@color/orange_500</item>
+    </style>
 
 </resources>

@@ -16,12 +16,10 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.nf.battlechip.BluetoothThread;
 import com.nf.battlechip.R;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class MainActivity extends SetThemeActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -58,13 +56,15 @@ public class MainActivity extends SetThemeActivity implements ActivityCompat.OnR
         dialog.show();
 
         ChipGroup group = dialog.findViewById(R.id.color_chip_group);
-        Map<Integer, Integer> chipToThemeMapping = new HashMap<>();
-        chipToThemeMapping.put(R.id.chip_purple, R.style.Theme_BattleChip);
-        chipToThemeMapping.put(R.id.chip_green, R.style.Theme_GreenBattleChip);
-        chipToThemeMapping.put(R.id.chip_blue, R.style.Theme_BlueBattleChip);
 
         dialog.setButton(DialogInterface.BUTTON_POSITIVE, "Confirm", (alertDialog, which) -> {
-            PreferenceManager.getDefaultSharedPreferences(this).edit().putInt("theme", chipToThemeMapping.getOrDefault(group.getCheckedChipId(), R.style.Theme_BattleChip)).apply();
+            Chip checkedChip = dialog.findViewById(group.getCheckedChipId());
+            String color = (String) checkedChip.getTag(R.string.color_key);
+            String themeId = (String) checkedChip.getTag(R.string.theme_key);
+            PreferenceManager.getDefaultSharedPreferences(this).edit()
+                    .putInt("theme", Integer.parseInt(themeId.substring(1))).apply();
+            PreferenceManager.getDefaultSharedPreferences(this).edit()
+                    .putString("color", color).apply();
             recreate();
             dialog.dismiss();
         });

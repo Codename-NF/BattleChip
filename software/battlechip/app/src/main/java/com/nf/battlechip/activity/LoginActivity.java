@@ -43,7 +43,7 @@ public class LoginActivity extends SetThemeActivity {
         // user is already signed in
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if (account != null) {
-            handleSignedInUser(client.silentSignIn());
+            client.silentSignIn().addOnCompleteListener(this::handleSignedInUser);
             Log.d(LOGIN_DEBUG_TAG, "Already signed in!");
         }
 
