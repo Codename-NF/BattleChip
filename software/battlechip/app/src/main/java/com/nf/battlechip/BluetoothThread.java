@@ -8,7 +8,10 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public class BluetoothThread {
@@ -17,8 +20,9 @@ public class BluetoothThread {
     private static BluetoothThread instance = null;
     private static Thread readingThread = null;
 
-    private final String MAC_ID = "20:18:11:21:24:72"; // TODO: Update this to be correct address
-    private final UUID uuid = UUID.fromString("94f39d29-7d6d-437d-973b-fba39e49d4ee");
+    private static final Set<String> MAC_IDS = new HashSet<>(Arrays.asList("20:18:11:21:24:72")); // TODO: rely only on device name?
+    private static final Set<String> DEVICE_NAMES = new HashSet<>(Arrays.asList("hc01.com HC-05"));
+    private static final UUID SERVICE_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     private BluetoothSocket bluetoothSocket;
     private InputStream inputStream;
@@ -31,15 +35,17 @@ public class BluetoothThread {
             Log.d(BLUETOOTH_DEBUG, device.getAddress() + " " + device.getName());
         }
         Optional<BluetoothDevice> device = adapter.getBondedDevices().stream()
-                .filter(bondedDevice -> MAC_ID.equals(bondedDevice.getAddress())).findAny();
+                .filter(bondedDevice -> MAC_IDS.contains(bondedDevice.getAddress())
+                        || DEVICE_NAMES.contains(bondedDevice.getName())).findAny();
         bluetoothSocket = null;
         inputStream = null;
         outputStream = null;
 
         // create socket
         try {
-            bluetoothSocket = device.isPresent() ? device.get().createRfcommSocketToServiceRecord(uuid)
+            bluetoothSocket = device.isPresent() ? device.get().createRfcommSocketToServiceRecord(SERVICE_UUID)
                     : null;
+            Log.d(BLUETOOTH_DEBUG, device.isPresent() ? "Connected " + bluetoothSocket.toString() : "Failed");
         } catch (IOException e) {
             Log.d(BLUETOOTH_DEBUG, "Socket creation failed\n" + e.toString());
         }
@@ -84,12 +90,19 @@ public class BluetoothThread {
         Log.d(BLUETOOTH_DEBUG, "Starting thread");
         try {
             byte[] readBuffer = new byte[1024];
+            StringBuilder builder = new StringBuilder();
+
             while (inputStream != null) {
-                int bytesRead = inputStream.read(readBuffer);
-                String message = new String(readBuffer);
-                message = message.substring(0, bytesRead);
-                Log.d(BLUETOOTH_DEBUG, "Read: " + message);
-                UnityMessage.processBluetoothMessage(message);
+                int bytesRead = inputStream.read(readBuffer); // possible to read portions of the message at a time
+                String readCharacters = new String(readBuffer).substring(0, bytesRead);
+                builder.append(readCharacters);
+                Log.d(BLUETOOTH_DEBUG, "Read: " + readCharacters);
+
+                // Only send to Bluetooth if entire message has been read
+                if ("\n\n".equals(builder.substring(builder.length() - 2, builder.length()))) {
+                    UnityMessage.processBluetoothMessage(builder.toString());
+                    builder = new StringBuilder();
+                }
             }
         } catch (IOException e) {
             close();
