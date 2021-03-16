@@ -52,7 +52,7 @@ bool contains_box(ship *ship, int x, int y) {
     }
 }
 
-int check_hit_what(int x, int y, list<ship> *ships, int *remaining_ships) {
+int check_hit_what(int x, int y, list<ship> *ships, int *remaining_ships, bitset<5> *ships_alive) {
     /*
     return 0 for miss 
     return 1 for hit a box of a ship
@@ -68,6 +68,24 @@ int check_hit_what(int x, int y, list<ship> *ships, int *remaining_ships) {
            if (it->hit_count == it->size) {
                *remaining_ships = *remaining_ships - 1;
                (*it).afloat = false;
+               switch(it->size) {
+                    case 5:
+                        (*ships_alive)[4] = 0; //5'b0xxxx
+                        break;
+                    case 4:
+                        (*ships_alive)[3] = 0; //5'bx0xxx
+                        break;
+                    case 3:
+                        if ((*ships_alive)[2] == 0) {
+                            (*ships_alive)[1] = 0; //5'bxxx0x
+                        }
+                        else {
+                            (*ships_alive)[2] = 0; //5'bxx0xx
+                        }
+                        break;
+                    case 2:
+                        (*ships_alive)[0] = 0; //5'bxxxx0
+               }
                return SUNK_STATUS_CODE;
            }
            else {
