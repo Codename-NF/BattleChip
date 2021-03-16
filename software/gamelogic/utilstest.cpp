@@ -240,12 +240,59 @@ void test_check_hit_what(void) {
 
 };
 
+void test_not_hit_yet(void) {
+    set<box> boxes;
+    for (int i = 0; i < 10; i++) {
+        boxes.insert(box(i,i));
+    }
+
+    int inputx, inputy;
+
+    for (int i = 0; i < 10; i++) {
+        inputx = i;
+        inputy = i;
+        TEST_CHECK_(not_hit_yet(inputx, inputy, boxes) == false, "not_hit_yet(%d, %d, boxes)==%d", inputx, inputy, false);
+    }
+    
+    inputx = 1;
+    inputy = 0;
+
+    TEST_CHECK_(not_hit_yet(inputx, inputy, boxes) == true, "not_hit_yet(%d, %d, boxes)==%d", inputx, inputy, true);
+
+    inputx = 2;
+    inputy = 0;
+
+    TEST_CHECK_(not_hit_yet(inputx, inputy, boxes) == true, "not_hit_yet(%d, %d, boxes)==%d", inputx, inputy, true);
+
+    inputx = 3;
+    inputy = 0;
+
+    TEST_CHECK_(not_hit_yet(inputx, inputy, boxes) == true, "not_hit_yet(%d, %d, boxes)==%d", inputx, inputy, true);
+
+    inputx = 9;
+    inputy = 0;
+
+    TEST_CHECK_(not_hit_yet(inputx, inputy, boxes) == true, "not_hit_yet(%d, %d, boxes)==%d", inputx, inputy, true);
+
+    inputx = 0;
+    inputy = 9;
+
+    TEST_CHECK_(not_hit_yet(inputx, inputy, boxes) == true, "not_hit_yet(%d, %d, boxes)==%d", inputx, inputy, true);
+
+    inputx = 3;
+    inputy = 8;
+
+    TEST_CHECK_(not_hit_yet(inputx, inputy, boxes) == true, "not_hit_yet(%d, %d, boxes)==%d", inputx, inputy, true);
+
+}
+
 
 TEST_LIST = {
     
     {"bool out_of_bound(int, int, int, int);", test_out_of_bound},
     {"bool path_empty(int, int, set<box>);", test_path_empty},
     {"bool contains_box(ship, int, int);", test_contains_box},
-    {"int check_hit_what(int, int, list<ship>*, int *);", test_check_hit_what},
+    {"int check_hit_what(int, int, list<ship>*, int *, bitset<5> *);", test_check_hit_what},
+    {"bool not_hit_yet(int, int, set<box>);", test_not_hit_yet},
     {0} // terminating test 
 };
