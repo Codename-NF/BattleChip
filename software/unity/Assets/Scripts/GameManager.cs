@@ -30,47 +30,36 @@ public class GameManager : MonoBehaviour
         switch (GlobalState.GameState)
         {
             case GameState.Placement:
-                // SendBluetoothMessageToConsole(mPieceManager.ExportShips());
                 string exportString = mPieceManager.ExportShips();
                 Debug.Log(exportString); // Debug, Placement
                 mStatus.GetComponent<TextMeshProUGUI>().text = "Placements confirmed. Waiting for opponent...";
 
-                // CALL placement(exported_string)
+                // Send ship placements to Android
                 jc.CallStatic("placement", exportString);
-
-                /*
-                mTitle.GetComponent<TextMeshProUGUI>().text = "Your turn to attack!";
-                mStatus.GetComponent<TextMeshProUGUI>().text = "Tap the tile you want to strike.";
-                GlobalState.GameState = GameState.Attacking;
-                */
-                mWaiting = true;
                 
+                mWaiting = true;
                 break;
+
             case GameState.Attacking:
                 int xCoord = mBoard.mTargetedCell.mBoardPosition.x;
                 int yCoord = mBoard.mTargetedCell.mBoardPosition.y;
 
                 Debug.Log("Shoot " + xCoord.ToString() + " " + yCoord.ToString() + "\n");
 
-                // CALL shoot(x,y)
+                // Send target coords to Android
                 jc.CallStatic("shoot", xCoord, yCoord);
 
                 mWaiting = true;
                 break;
-            // This will be removed once pushes from android are implemented
-            case GameState.Defending:
-                Debug.Log("Not implemented yet");
-                mTitle.GetComponent<TextMeshProUGUI>().text = "Your turn to attack!";
-                mStatus.GetComponent<TextMeshProUGUI>().text = "Tap the tile you want to strike.";
-                GlobalState.GameState = GameState.Attacking;
-                break;
+
+            // No button logic for Defending because there is nothing for the camera to confirm
+
             default:
                 Debug.Log("ERROR: Button should be NOT visible right now!");
                 break;
         }
     }
 
-    #region Communication
     // Basic Communication
     void ReceiveBluetoothMessageFromConsole(string message)
     {
@@ -91,48 +80,77 @@ public class GameManager : MonoBehaviour
         string[] msgTokens = message.Split(' ');
         switch(msgTokens[0])
         {
-            case "result": // result(int, int, bool)
-                int xCoord = int.Parse(msgTokens[1]);
-                int yCoord = int.Parse(msgTokens[2]);
-                bool didHit = bool.Parse(msgTokens[3]);
-                
-                // Update board with shot status
-                mBoard.mShotsOnOpponent[xCoord, yCoord] = (didHit) ? ShotType.Hit : ShotType.Miss;
-                mBoard.mTargetedCell = null;
+            case "gameStart":
+                if (GlobalState.GameState == GameState.Placement && mWaiting)
+                {
+                    // If player is first
+                    if (bool.Parse(msgTokens[1]))
+                    {
+                        // Prepare attack screen
+                        mTitle.GetComponent<TextMeshProUGUI>().text = "Your turn to attack!";
+                        mStatus.GetComponent<TextMeshProUGUI>().text = "Tap the tile you want to strike.";
+                        GlobalState.GameState = GameState.Attacking;
 
-                // TODO: Insert 2 second sleep here
+                    }
+                    else
+                    {
+                        // Prepare defending screen
+                        mTitle.GetComponent<TextMeshProUGUI>().text = "Opponent's turn...";
+                        mStatus.GetComponent<TextMeshProUGUI>().text = "Your opponent is attacking your board!";
+                        GlobalState.GameState = GameState.Defending;
+                    }
 
-                // Prepare defending screen
-                mTitle.GetComponent<TextMeshProUGUI>().text = "Opponent's turn...";
-                mStatus.GetComponent<TextMeshProUGUI>().text = "Your opponent is attacking your board!";
-                GlobalState.GameState = GameState.Defending;
-
-                mWaiting = false;
+                    mWaiting = false;
+                }
                 break;
 
-            case "gameStart":
-                // If player is first
-                if (bool.Parse(msgTokens[1]))
+            case "result":
+                if (GlobalState.GameState == GameState.Attacking && mWaiting)
                 {
-                    // Prepare attack screen
-                    mTitle.GetComponent<TextMeshProUGUI>().text = "Your turn to attack!";
-                    mStatus.GetComponent<TextMeshProUGUI>().text = "Tap the tile you want to strike.";
-                    GlobalState.GameState = GameState.Attacking;
-                    
-                }
-                else
-                {
+                    int xCoord = int.Parse(msgTokens[1]);
+                    int yCoord = int.Parse(msgTokens[2]);
+                    bool didHit = bool.Parse(msgTokens[3]);
+
+                    // Update board with shot status
+                    mBoard.mShotsOnOpponent[xCoord, yCoord] = (didHit) ? ShotType.Hit : ShotType.Miss;
+                    mBoard.mTargetedCell = null;
+
+                    // TODO: Insert 2 second sleep here
+
                     // Prepare defending screen
                     mTitle.GetComponent<TextMeshProUGUI>().text = "Opponent's turn...";
                     mStatus.GetComponent<TextMeshProUGUI>().text = "Your opponent is attacking your board!";
                     GlobalState.GameState = GameState.Defending;
-                }
 
-                mWaiting = false;
+                    mWaiting = true;
+                }
                 break;
+
+            case "targeted":
+                if (GlobalState.GameState == GameState.Defending && mWaiting)
+                {
+                    int xCoord = int.Parse(msgTokens[1]);
+                    int yCoord = int.Parse(msgTokens[2]);
+                    
+                    // Shot hit if the cell has 1 piece on it
+                    bool didHit = (mBoard.mAllCells[xCoord, yCoord].mCurrentPieces.Count == 1);
+
+                    // Update list of shots
+                    mBoard.mShotsOnMe[xCoord, yCoord] = (didHit) ? ShotType.Hit : ShotType.Miss;
+
+                    // TODO: Insert 2 second sleep here
+
+                    // Prepare attack screen
+                    mTitle.GetComponent<TextMeshProUGUI>().text = "Your turn to attack!";
+                    mStatus.GetComponent<TextMeshProUGUI>().text = "Tap the tile you want to strike.";
+                    GlobalState.GameState = GameState.Attacking;
+
+                    mWaiting = false;
+                }
+                break;
+
             default:
                 break;
         }
     }
-    #endregion
 }
