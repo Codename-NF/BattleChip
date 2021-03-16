@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 8608511824030040357}
   - component: {fileID: 930869003673962901}
   - component: {fileID: 273553887096828986}
+  - component: {fileID: 5947112130573059322}
+  - component: {fileID: 5853906031425831244}
   m_Layer: 1
   m_Name: PR_Cell
   m_TagString: Untagged
@@ -50,9 +52,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d416ec0ddb7763d459d72db1508ad928, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Instance: {fileID: 4475770567082842725, guid: 7e6c8caebe7785e419d9cc040a511931,
-    type: 3}
+  m_Delegates:
+  - eventID: 4
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 11500000, guid: d416ec0ddb7763d459d72db1508ad928, type: 3}
+          m_MethodName: set_name
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: TargetMe
+            m_BoolArgument: 0
+          m_CallState: 2
   mImage: {fileID: 273553887096828986}
+  mCellState: 0
   mBoardPosition: {x: 0, y: 0}
   mBoard: {fileID: 0}
   mRectTransform: {fileID: 0}
@@ -94,3 +111,41 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!223 &5947112130573059322
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6932336299350239048}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
+--- !u!114 &5853906031425831244
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6932336299350239048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295

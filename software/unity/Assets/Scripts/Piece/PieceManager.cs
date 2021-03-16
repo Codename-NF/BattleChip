@@ -6,8 +6,8 @@ using UnityEngine;
 
 public class PieceManager : MonoBehaviour
 {
-    public GlobalState Instance;
     public GameObject mPiecePrefab;
+
     // mNoActiveInteraction is false when the user is moving/rotating a piece
     public bool mNoActiveInteraction;
 
@@ -41,7 +41,7 @@ public class PieceManager : MonoBehaviour
             newPieces.Add(newPiece);
 
             // Setup
-            newPiece.Setup(Instance.savedColorTheme.CellPieceHeadColor, this, shipLength);
+            newPiece.Setup(GlobalState.ColorTheme.CellPieceHeadColor, this, shipLength);
         }
 
         return newPieces;

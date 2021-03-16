@@ -50,8 +50,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba433dd8a7769e14e81ccd7a108c26a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Instance: {fileID: 0}
+  Instance: {fileID: 4475770567082842725, guid: 7e6c8caebe7785e419d9cc040a511931,
+    type: 3}
   mPiecePrefab: {fileID: 2557521700239071184, guid: 06f3bd78fb2d5c94a90d26f9a52ea7c7,
+    type: 3}
+  mGameManager: {fileID: -6126362005004834667, guid: c4d2c873b180b0a45a51e2a979cdcd52,
     type: 3}
   mNoActiveInteraction: 0
 --- !u!223 &4499743198139437384

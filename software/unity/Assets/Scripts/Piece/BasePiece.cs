@@ -26,25 +26,6 @@ public class BasePiece : EventTrigger
     private bool mIsHorizontal;
     private bool mWasDragged;
 
-    // Convert the ship to a string, which we will send to the server over bluetooth
-    public string ExportShip()
-    {
-        string shipString;
-
-        shipString = mCurrentCell.mBoardPosition.x.ToString();
-        shipString += " ";
-        shipString += mCurrentCell.mBoardPosition.y.ToString();
-        shipString += " ";
-        shipString += mShipSize;
-        shipString += " ";
-        shipString += mIsHorizontal;
-        shipString += "\n";
-
-        Debug.Log("Exporting ship as: " + shipString);
-
-        return shipString;
-    }
-
     public void Setup(Color32 newSpriteColor, PieceManager newPieceManager, int Size)
     {
         mPieceManager = newPieceManager;
@@ -55,7 +36,20 @@ public class BasePiece : EventTrigger
         mShipSize = Size;
         mIsHorizontal = true;
     }
+    
+    public void Update()
+    {
+        if (GlobalState.GameState != GameState.Placement)
+        {
+            this.GetComponent<Image>().enabled = false;
+        }
+        else
+        {
+            this.GetComponent<Image>().enabled = true;
+        }
+    }
 
+    #region MovementLogic
     public void Place(Cell newCell)
     {
         // Cell stuff
@@ -68,6 +62,40 @@ public class BasePiece : EventTrigger
         gameObject.SetActive(true);
 
         MoveTail(mCurrentCell, mIsHorizontal, true, mShipSize);
+    }
+
+    private void MoveTail(Cell anchorCell, bool horizontal, bool placing, int length)
+    {
+        Cell cellToUpdate;
+        Board board = anchorCell.mBoard;
+
+        int xCoord = anchorCell.mBoardPosition.x;
+        int yCoord = anchorCell.mBoardPosition.y;
+
+        for (int i = 0; i < length - 1; i++)
+        {
+            // Get coords of cell to update
+            if (horizontal)
+            {
+                xCoord++;
+            }
+            else
+            {
+                yCoord--;
+            }
+
+            // Add this piece to the cell
+            cellToUpdate = board.mAllCells[xCoord, yCoord];
+
+            if (placing)
+            {
+                cellToUpdate.mCurrentPieces.Add(this);
+            }
+            else
+            {
+                cellToUpdate.mCurrentPieces.Remove(this);
+            }
+        }
     }
 
     private void Move()
@@ -85,7 +113,9 @@ public class BasePiece : EventTrigger
 
         MoveTail(mCurrentCell, mIsHorizontal, true, mShipSize);
     }
+    #endregion
 
+    #region DragAndClickEvents
     public override void OnBeginDrag(PointerEventData eventData)
     {
         base.OnBeginDrag(eventData);
@@ -163,41 +193,29 @@ public class BasePiece : EventTrigger
         // Signal that the user is not currently moving any pieces
         mPieceManager.mNoActiveInteraction = true;
     }
+    #endregion
 
-    private void MoveTail(Cell anchorCell, bool horizontal, bool placing, int length)
+    #region Data
+
+    // Convert the ship to a string, which we will send to the server over bluetooth
+    public string ExportShip()
     {
-        Cell cellToUpdate;
-        Board board = anchorCell.mBoard;
+        string shipString;
 
-        int xCoord = anchorCell.mBoardPosition.x;
-        int yCoord = anchorCell.mBoardPosition.y;
+        shipString = mCurrentCell.mBoardPosition.x.ToString();
+        shipString += " ";
+        shipString += mCurrentCell.mBoardPosition.y.ToString();
+        shipString += " ";
+        shipString += mShipSize;
+        shipString += " ";
+        shipString += mIsHorizontal;
+        shipString += "\n";
 
-        for (int i = 0; i < length - 1; i++)
-        {
-            // Get coords of cell to update
-            if (horizontal)
-            {
-                xCoord++;
-            }
-            else
-            {
-                yCoord--;
-            }
+        Debug.Log("Exporting ship as: " + shipString);
 
-            // Add this piece to the cell
-            cellToUpdate = board.mAllCells[xCoord, yCoord];
-
-            if (placing)
-            {
-                cellToUpdate.mCurrentPieces.Add(this);
-            }
-            else
-            {
-                cellToUpdate.mCurrentPieces.Remove(this);
-            }
-        }
+        return shipString;
     }
-    
+
     private bool VerifyPlacement(Cell location, bool isHorizontal, int shipLength)
     {
         bool valid = true;
@@ -211,4 +229,6 @@ public class BasePiece : EventTrigger
 
         return valid;
     }
+
+    #endregion
 }

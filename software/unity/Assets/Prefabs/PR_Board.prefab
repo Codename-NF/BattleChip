@@ -49,9 +49,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4684d1dca04675408f45b66172e51f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mGameManager: {fileID: -6126362005004834667, guid: c4d2c873b180b0a45a51e2a979cdcd52,
+    type: 3}
   mCellPrefab: {fileID: 6932336299350239048, guid: ad75eec1a43afa84180525fef2cd61ea,
     type: 3}
   mDoneSetup: 0
+  mTargetedCell: {fileID: 0}
 --- !u!223 &5942865539862143831
 Canvas:
   m_ObjectHideFlags: 0

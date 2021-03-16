@@ -977,6 +977,11 @@ PrefabInstance:
       objectReference: {fileID: 1271928856}
     - target: {fileID: -6126362005004834667, guid: c4d2c873b180b0a45a51e2a979cdcd52,
         type: 3}
+      propertyPath: mTitle
+      value: 
+      objectReference: {fileID: 120834584}
+    - target: {fileID: -6126362005004834667, guid: c4d2c873b180b0a45a51e2a979cdcd52,
+        type: 3}
       propertyPath: mPieceManager
       value: 
       objectReference: {fileID: 1542339035}
@@ -1475,6 +1480,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3561308d6aff9d24592db31dfa12b235, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mGameManager: {fileID: 0}
   mBoard: {fileID: 1271928856}
   mPieceManager: {fileID: 1542339035}
 --- !u!1 &1950415036
