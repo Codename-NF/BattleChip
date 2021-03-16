@@ -119,3 +119,12 @@ void change_status_box_all_boxes(int x, int y, set<box> *boxes_hit, list<ship> *
        }
    }
 }
+
+void create_shots_with_ships(set<box> *all_boxes_hit, set<box> *shots_with_ships) {
+    (*shots_with_ships).clear();
+    for (set<box>::iterator it = all_boxes_hit->begin(); it != all_boxes_hit->end(); it++) {
+        if (it->status != SUNK_STATUS_CODE) {
+            (*shots_with_ships).insert(box(it->x, it->y));
+        }
+    }
+}
