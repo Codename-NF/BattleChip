@@ -45,6 +45,12 @@
             android:layout_height="wrap_content"
             android:text="@string/options_button_label" />
 
+        <Button
+            android:id="@+id/bluetooth_test_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Bluetooth test" />
+
     </LinearLayout>
 
     <TextView
@@ -73,6 +79,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.85"
-        app:srcCompat="@drawable/ic_battlechip_logo" />
+        app:srcCompat="@drawable/ic_in_app_battlechip_logo" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

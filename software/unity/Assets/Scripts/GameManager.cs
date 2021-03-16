@@ -76,15 +76,12 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Received: " + message);
         // TODO: REPLACE THIS WITH ACTUAL PROCESSING
-        SendBluetoothMessageToConsole(message);
     }
 
-    void SendBluetoothMessageToConsole(string message)
-    {
+    void SendPlacementMessage(string message) {
         Debug.Log("Sending: " + message);
-        AndroidJavaClass jc = new AndroidJavaClass("com.nf.battlechip.activity.MainUnityActivity");
-        AndroidJavaObject unityActivity = jc.GetStatic<AndroidJavaObject>("instance");
-        unityActivity.Call("sendBluetoothMessageToConsole", message);
+        AndroidJavaClass jc = new AndroidJavaClass("com.nf.battlechip.UnityMessage");
+        jc.CallStatic("placement", message);
     }
 
     // Android Studio to Unity functions (Android studio calls these)

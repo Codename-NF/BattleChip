@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/color_chip_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        app:checkedChip="@id/chip_purple"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_purple"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            app:checkedIconVisible="true"
+            app:chipBackgroundColor="@color/purple_500">
+
+            <tag
+                android:id="@string/color_key"
+                android:value="purple" />
+
+            <tag
+                android:id="@string/theme_key"
+                android:value="@style/Theme.BattleChip" />
+        </com.google.android.material.chip.Chip>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_green"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            app:checkedIconVisible="true"
+            app:chipBackgroundColor="@color/green_500">
+
+            <tag
+                android:id="@string/color_key"
+                android:value="green" />
+
+            <tag
+                android:id="@string/theme_key"
+                android:value="@style/Theme.GreenBattleChip" />
+        </com.google.android.material.chip.Chip>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_blue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            app:checkedIconVisible="true"
+            app:chipBackgroundColor="@color/blue_500">
+
+            <tag
+                android:id="@string/color_key"
+                android:value="blue" />
+
+            <tag
+                android:id="@string/theme_key"
+                android:value="@style/Theme.BlueBattleChip" />
+        </com.google.android.material.chip.Chip>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_pink"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            app:checkedIconVisible="true"
+            app:chipBackgroundColor="@color/pink_500">
+
+            <tag
+                android:id="@string/color_key"
+                android:value="pink" />
+
+            <tag
+                android:id="@string/theme_key"
+                android:value="@style/Theme.PinkBattleChip" />
+        </com.google.android.material.chip.Chip>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_orange"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            app:checkedIconVisible="true"
+            app:chipBackgroundColor="@color/orange_500">
+
+            <tag
+                android:id="@string/color_key"
+                android:value="pink" />
+
+            <tag
+                android:id="@string/theme_key"
+                android:value="@style/Theme.OrangeBattleChip" />
+        </com.google.android.material.chip.Chip>
+    </com.google.android.material.chip.ChipGroup>
+
+</FrameLayout>

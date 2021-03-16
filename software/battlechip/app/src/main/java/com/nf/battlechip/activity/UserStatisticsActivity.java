@@ -1,12 +1,14 @@
 package com.nf.battlechip.activity;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.nf.battlechip.R;
 import com.nf.battlechip.RetrofitHelper;
 import com.nf.battlechip.UserService;
@@ -17,7 +19,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.internal.EverythingIsNonNull;
 
-public class UserStatisticsActivity extends AppCompatActivity {
+public class UserStatisticsActivity extends SetThemeActivity {
 
     private static final String USER_STATISTICS_DEBUG = "User_Statistics";
 
@@ -31,18 +33,17 @@ public class UserStatisticsActivity extends AppCompatActivity {
 
     public void getUser() {
         UserService service = RetrofitHelper.getUserService();
-        Call<User> call = service.getUser(GoogleSignIn.getLastSignedInAccount(this).getEmail());
+        Call<User> call = service.getUser();
         call.enqueue(new Callback<User>() {
             @Override
             @EverythingIsNonNull
             public void onResponse(Call<User> call, Response<User> response) {
                 if (response.isSuccessful()) {
-                    TextView userView = findViewById(R.id.user_name_text_view);
                     User user = response.body();
-                    userView.setText("Name: " + user.getFirstName() + " " + user.getLastName()
-                            + "\nEmail: " + user.getEmail()
-                            + "\nWins: " + user.getWins()
-                            + "\nLosses: " + user.getLosses());
+
+                    if (user != null) {
+                        updateViews(user);
+                    }
                 }
                 Log.d(USER_STATISTICS_DEBUG, "Received a response for getUser");
             }
@@ -53,6 +54,25 @@ public class UserStatisticsActivity extends AppCompatActivity {
                 Log.d(USER_STATISTICS_DEBUG, "getUser failed " + t);
             }
         });
+    }
+
+    private void updateViews(User user) {
+        TextView userView = findViewById(R.id.user_name_text_view);
+        TextView statsView = findViewById(R.id.statistics_text_view);
+
+        Spannable userSpannable = new SpannableString("Name: " + user.getFirstName() + " " + user.getLastName());
+        userSpannable.setSpan(new ForegroundColorSpan(color), 0, "Name:".length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+        userSpannable.setSpan(new StyleSpan(Typeface.BOLD), 0, "Name:".length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+        userView.setText(userSpannable, TextView.BufferType.SPANNABLE);
+
+        String statsString = "Wins: " + user.getWins()
+                + "\nLosses: " + user.getLosses();
+        Spannable statSpannable = new SpannableString(statsString);
+        statSpannable.setSpan(new ForegroundColorSpan(color), 0, "Wins:".length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+        statSpannable.setSpan(new StyleSpan(Typeface.BOLD), 0, "Wins:".length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+        statSpannable.setSpan(new ForegroundColorSpan(color), statsString.indexOf("Losses:"), statsString.indexOf("Losses:") + "Losses:".length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+        statSpannable.setSpan(new StyleSpan(Typeface.BOLD), statsString.indexOf("Losses:"), statsString.indexOf("Losses:") + "Losses:".length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+        statsView.setText(statSpannable, TextView.BufferType.SPANNABLE);
     }
 
 }

@@ -45,7 +45,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.75"
-        app:srcCompat="@drawable/ic_battlechip_logo" />
+        app:srcCompat="@drawable/ic_in_app_battlechip_logo" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
