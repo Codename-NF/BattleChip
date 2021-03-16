@@ -14,3 +14,5 @@ int check_hit_what(int x, int y, list<ship> *ships, int *remaining_ships);
 bool not_hit_yet(int x, int y, set<box> boxes);
 
 void change_status_box_all_boxes(int x, int y, set<box> *boxes_hit, list<ship> *ships);
+
+void create_shots_with_ships(set<box> *all_boxes_hit, set<box> *shots_with_ships);
