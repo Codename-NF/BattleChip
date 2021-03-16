@@ -43,12 +43,11 @@ public class LoginActivity extends SetThemeActivity {
         // user is already signed in
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if (account != null) {
-            client.silentSignIn().addOnCompleteListener(this::handleSignedInUser);
             Log.d(LOGIN_DEBUG_TAG, "Already signed in!");
+            startMainActivity();
         }
 
         setContentView(R.layout.activity_login);
-
 
         findViewById(R.id.sign_in_button).setOnClickListener(this::signIn);
     }
@@ -71,15 +70,15 @@ public class LoginActivity extends SetThemeActivity {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             if (account != null) {
                 Log.d(LOGIN_DEBUG_TAG, account.getDisplayName() + " " + account.getEmail());
-                startMainActivity(account.getIdToken());
+                startMainActivity();
             }
         } catch (ApiException e) {
             Log.d(LOGIN_DEBUG_TAG, e.toString());
         }
     }
 
-    private void startMainActivity(String idToken) {
-        RetrofitHelper.initRetrofit(idToken);
+    private void startMainActivity() {
+        RetrofitHelper.initRetrofit(client);
         Call<Void> login = RetrofitHelper.getUserService().login();
         login.enqueue(new Callback<Void>() {
             @Override

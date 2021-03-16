@@ -1,5 +1,10 @@
 package com.nf.battlechip;
 
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.tasks.Tasks;
+
+import java.util.concurrent.ExecutionException;
+
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -18,18 +23,26 @@ public class RetrofitHelper {
         return userService;
     }
 
-    public static void initRetrofit(String customHeader) {
+    public static void initRetrofit(GoogleSignInClient client) {
         if (retrofit == null) {
             OkHttpClient.Builder httpClientBuilder = new OkHttpClient().newBuilder();
             HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
             loggingInterceptor.level(HttpLoggingInterceptor.Level.BODY);
             httpClientBuilder.addNetworkInterceptor(loggingInterceptor);
 
-            if (customHeader != null) {
-                httpClientBuilder.addInterceptor(chain ->
-                        chain.proceed(chain.request().newBuilder().addHeader("id_token", customHeader).build())
-                );
-            }
+            httpClientBuilder.addInterceptor(chain -> {
+                String idToken = "";
+                try {
+                    idToken = Tasks.await(client.silentSignIn()).getIdToken();
+                } catch (ExecutionException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (idToken == null) {
+                    idToken = "";
+                }
+                return chain.proceed(chain.request().newBuilder().addHeader("id_token", idToken).build());
+            });
+
             retrofit = new Retrofit.Builder()
                     .baseUrl(SERVER_URL)
                     .addConverterFactory(GsonConverterFactory.create())
