@@ -172,7 +172,7 @@ void playing_game(list<player>::iterator *p1, list<player>::iterator *p2, bool s
 
         if (not_hit_yet(x_in, y_in, current_under_attack->boxes_hit)) {
 
-            int status = check_hit_what(x_in, y_in, &(current_under_attack->ships_list), &(current_under_attack->remaining_ships));
+            int status = check_hit_what(x_in, y_in, &(current_under_attack->ships_list), &(current_under_attack->remaining_ships), &(current_under_attack->ships_alive));
 
             current_under_attack->boxes_hit.insert(box(x_in, y_in, status));
 
@@ -221,12 +221,12 @@ void AI_setting_up(list<player>::iterator *AI) {
         int orientation = (rand() % 2) + 1;
         int length = ship_sizes[i];
         if (out_of_bound(x_in, y_in, length, orientation)) {
-            cout << "out of bound" << endl;
+            //cout << "out of bound" << endl;
             continue;
         }
 
         if (!path_empty(x_in, y_in, (*AI)->all_boxes_on_board)) {
-            cout << "another ship in the way for " << (*AI)->player_name << endl;
+            //cout << "another ship in the way for " << (*AI)->player_name << endl;
             continue;
         }
 
@@ -254,6 +254,7 @@ void AI_setting_up(list<player>::iterator *AI) {
         }
 
         i++;
+        cout << "(" << x_in << " " << y_in << " " << length << " " << orientation << ")" << endl;
     }
 
 }
