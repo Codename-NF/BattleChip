@@ -1,5 +1,6 @@
 package com.nf.battlechip;
 
+import com.nf.battlechip.pojo.Matches;
 import com.nf.battlechip.pojo.User;
 
 import retrofit2.Call;
@@ -13,5 +14,8 @@ public interface UserService {
 
     @POST("login")
     Call<Void> login();
+
+    @GET("match")
+    Call<Matches> getMatches();
 
 }
