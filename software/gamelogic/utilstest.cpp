@@ -86,11 +86,158 @@ void test_contains_box(void) {
 
 void test_check_hit_what(void) {
     list<ship> mylist;
-    for (int i = 0; i < NUM_OF_SHIPS; i++) {
+    for (int i = 0; i < 5; i++) {
         mylist.push_back(ship());
     }
     int remainingships = 5;
-    TEST_CHECK_(check_hit_what(0,0,&mylist,&remainingships) == false, "check_hit_what(myship, %d, %d)==%d", 0,5, false);
+
+    bitset<5> onehot = 31; // 5'b11111
+    TEST_CHECK_(check_hit_what(0,0,&mylist,&remainingships, &onehot) == MISS_STATUS_CODE, "check_hit_what(%d, %d, myship, %d, %d)==%d", 0,0,5,31, MISS_STATUS_CODE);
+    assert(remainingships == 5);
+    assert(onehot == 31);
+
+    // initializing 
+    int i = 0;
+    int sizes[5] = {2, 3, 3, 4, 5};
+
+    for (list<ship>::iterator it = mylist.begin(); it != mylist.end(); it++) {
+        (*it).start_box = box(i,i);
+        (*it).size = sizes[i];
+        (*it).orientation = HORIZONTAL;
+        i++;
+    }
+
+    int inputx;
+    int inputy;
+
+    inputx = 0;
+    inputy = 0;
+
+    TEST_CHECK_(check_hit_what(inputx,inputy,&mylist,&remainingships, &onehot) == HIT_STATUS_CODE, "check_hit_what(%d, %d, myship, %d, %d)==%d", inputx,inputy,remainingships,(int)(onehot.to_ulong()), HIT_STATUS_CODE);
+    assert(remainingships == 5);
+    assert(onehot == 31);
+
+    inputx = 1;
+    inputy = 0;
+
+    TEST_CHECK_(check_hit_what(inputx,inputy,&mylist,&remainingships, &onehot) == SUNK_STATUS_CODE, "check_hit_what(%d, %d, myship, %d, %d)==%d", inputx,inputy,remainingships,(int)(onehot.to_ulong()), SUNK_STATUS_CODE);
+    assert(remainingships == 4);
+    assert(onehot == 30); // 5'b11110
+
+    inputx = 9;
+    inputy = 9;
+
+    TEST_CHECK_(check_hit_what(inputx,inputy,&mylist,&remainingships, &onehot) == MISS_STATUS_CODE, "check_hit_what(%d, %d, myship, %d, %d)==%d", inputx,inputy,remainingships,(int)(onehot.to_ulong()), MISS_STATUS_CODE);
+    assert(remainingships == 4);
+    assert(onehot == 30); // 5'b11110
+
+    inputx = 1;
+    inputy = 1;
+
+    TEST_CHECK_(check_hit_what(inputx,inputy,&mylist,&remainingships, &onehot) == HIT_STATUS_CODE, "check_hit_what(%d, %d, myship, %d, %d)==%d", inputx,inputy,remainingships,(int)(onehot.to_ulong()), HIT_STATUS_CODE);
+    assert(remainingships == 4);
+    assert(onehot == 30); // 5'b11110
+
+    inputx = 2;
+    inputy = 1;
+
+    TEST_CHECK_(check_hit_what(inputx,inputy,&mylist,&remainingships, &onehot) == HIT_STATUS_CODE, "check_hit_what(%d, %d, myship, %d, %d)==%d", inputx,inputy,remainingships,(int)(onehot.to_ulong()), HIT_STATUS_CODE);
+    assert(remainingships == 4);
+    assert(onehot == 30); // 5'b11110
+
+    inputx = 3;
+    inputy = 1;
+
+    TEST_CHECK_(check_hit_what(inputx,inputy,&mylist,&remainingships, &onehot) == SUNK_STATUS_CODE, "check_hit_what(%d, %d, myship, %d, %d)==%d", inputx,inputy,remainingships,(int)(onehot.to_ulong()), SUNK_STATUS_CODE);
+    assert(remainingships == 3);
+    assert(onehot == 26); // 5'b11010
+
+    inputx = 2;
+    inputy = 2;
+
+    TEST_CHECK_(check_hit_what(inputx,inputy,&mylist,&remainingships, &onehot) == HIT_STATUS_CODE, "check_hit_what(%d, %d, myship, %d, %d)==%d", inputx,inputy,remainingships,(int)(onehot.to_ulong()), HIT_STATUS_CODE);
+    assert(remainingships == 3);
+    assert(onehot == 26); // 5'b11010
+
+    inputx = 3;
+    inputy = 2;
+
+    TEST_CHECK_(check_hit_what(inputx,inputy,&mylist,&remainingships, &onehot) == HIT_STATUS_CODE, "check_hit_what(%d, %d, myship, %d, %d)==%d", inputx,inputy,remainingships,(int)(onehot.to_ulong()), HIT_STATUS_CODE);
+    assert(remainingships == 3);
+    assert(onehot == 26); // 5'b11010
+
+    inputx = 4;
+    inputy = 2;
+
+    TEST_CHECK_(check_hit_what(inputx,inputy,&mylist,&remainingships, &onehot) == SUNK_STATUS_CODE, "check_hit_what(%d, %d, myship, %d, %d)==%d", inputx,inputy,remainingships,(int)(onehot.to_ulong()), SUNK_STATUS_CODE);
+    assert(remainingships == 2);
+    assert(onehot == 24); // 5'b11000
+
+    inputx = 3;
+    inputy = 3;
+
+    TEST_CHECK_(check_hit_what(inputx,inputy,&mylist,&remainingships, &onehot) == HIT_STATUS_CODE, "check_hit_what(%d, %d, myship, %d, %d)==%d", inputx,inputy,remainingships,(int)(onehot.to_ulong()), HIT_STATUS_CODE);
+    assert(remainingships == 2);
+    assert(onehot == 24); // 5'b11000
+
+    inputx = 4;
+    inputy = 3;
+
+    TEST_CHECK_(check_hit_what(inputx,inputy,&mylist,&remainingships, &onehot) == HIT_STATUS_CODE, "check_hit_what(%d, %d, myship, %d, %d)==%d", inputx,inputy,remainingships,(int)(onehot.to_ulong()), HIT_STATUS_CODE);
+    assert(remainingships == 2);
+    assert(onehot == 24); // 5'b11000
+
+    inputx = 5;
+    inputy = 3;
+
+    TEST_CHECK_(check_hit_what(inputx,inputy,&mylist,&remainingships, &onehot) == HIT_STATUS_CODE, "check_hit_what(%d, %d, myship, %d, %d)==%d", inputx,inputy,remainingships,(int)(onehot.to_ulong()), HIT_STATUS_CODE);
+    assert(remainingships == 2);
+    assert(onehot == 24); // 5'b11000
+
+    inputx = 6;
+    inputy = 3;
+
+    TEST_CHECK_(check_hit_what(inputx,inputy,&mylist,&remainingships, &onehot) == SUNK_STATUS_CODE, "check_hit_what(%d, %d, myship, %d, %d)==%d", inputx,inputy,remainingships,(int)(onehot.to_ulong()), SUNK_STATUS_CODE);
+    assert(remainingships == 1);
+    assert(onehot == 16); // 5'b10000
+
+    inputx = 4;
+    inputy = 4;
+
+    TEST_CHECK_(check_hit_what(inputx,inputy,&mylist,&remainingships, &onehot) == HIT_STATUS_CODE, "check_hit_what(%d, %d, myship, %d, %d)==%d", inputx,inputy,remainingships,(int)(onehot.to_ulong()), HIT_STATUS_CODE);
+    assert(remainingships == 1);
+    assert(onehot == 16); // 5'b10000
+
+    inputx = 5;
+    inputy = 4;
+
+    TEST_CHECK_(check_hit_what(inputx,inputy,&mylist,&remainingships, &onehot) == HIT_STATUS_CODE, "check_hit_what(%d, %d, myship, %d, %d)==%d", inputx,inputy,remainingships,(int)(onehot.to_ulong()), HIT_STATUS_CODE);
+    assert(remainingships == 1);
+    assert(onehot == 16); // 5'b10000
+
+    inputx = 6;
+    inputy = 4;
+
+    TEST_CHECK_(check_hit_what(inputx,inputy,&mylist,&remainingships, &onehot) == HIT_STATUS_CODE, "check_hit_what(%d, %d, myship, %d, %d)==%d", inputx,inputy,remainingships,(int)(onehot.to_ulong()), HIT_STATUS_CODE);
+    assert(remainingships == 1);
+    assert(onehot == 16); // 5'b10000
+
+    inputx = 7;
+    inputy = 4;
+
+    TEST_CHECK_(check_hit_what(inputx,inputy,&mylist,&remainingships, &onehot) == HIT_STATUS_CODE, "check_hit_what(%d, %d, myship, %d, %d)==%d", inputx,inputy,remainingships,(int)(onehot.to_ulong()), HIT_STATUS_CODE);
+    assert(remainingships == 1);
+    assert(onehot == 16); // 5'b10000
+
+    inputx = 8;
+    inputy = 4;
+
+    TEST_CHECK_(check_hit_what(inputx,inputy,&mylist,&remainingships, &onehot) == SUNK_STATUS_CODE, "check_hit_what(%d, %d, myship, %d, %d)==%d", inputx,inputy,remainingships,(int)(onehot.to_ulong()), SUNK_STATUS_CODE);
+    assert(remainingships == 0);
+    assert(onehot == 0); // 5'b00000
+    
+
+
 };
 
 
