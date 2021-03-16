@@ -8,6 +8,7 @@
     <string name="logo_content_description">BattleChip logo</string>
     <string name="logging_button_label">Logging</string>
     <string name="dialog_text">Select a Theme Color</string>
+    <string name="match_history_label">Match History</string>
     <string name="color_key">color</string>
     <string name="theme_key">theme</string>
 </resources>
