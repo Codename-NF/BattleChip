@@ -376,7 +376,9 @@ void test_create_shots_with_ships(void) {
 
     create_shots_with_ships(&boxes_hit, &shots_with_ships);
 
-    // this should be exactly the same ships 
+    // should have no ships
+
+    TEST_CHECK(shots_with_ships.size() == 0);
 
     for (set<box>::iterator it = boxes_hit.begin(); it != boxes_hit.end(); it++) {
         TEST_CHECK(shots_with_ships.find(box(it->x, it->y)) != shots_with_ships.end());
@@ -400,6 +402,8 @@ void test_create_shots_with_ships(void) {
         TEST_CHECK(shots_with_ships.find(box(it->x, it->y)) != shots_with_ships.end());
     }
 
+    TEST_CHECK(shots_with_ships.size() == (1+2+2+3+4));
+
     // hit the rest
     inputx = 1;
     inputy = 0;
@@ -419,6 +423,8 @@ void test_create_shots_with_ships(void) {
         
     }
 
+    TEST_CHECK(shots_with_ships.size() == (2+2+3+4));
+
     inputx = 3;
     inputy = 1;
     boxes_hit.insert(box(inputx, inputy, SUNK_STATUS_CODE));
@@ -436,6 +442,8 @@ void test_create_shots_with_ships(void) {
         }
         
     }
+
+    TEST_CHECK(shots_with_ships.size() == (2+3+4));
 
     inputx = 4;
     inputy = 2;
@@ -455,6 +463,8 @@ void test_create_shots_with_ships(void) {
         
     }
 
+    TEST_CHECK(shots_with_ships.size() == (3+4));
+
     inputx = 6;
     inputy = 3;
     boxes_hit.insert(box(inputx, inputy, SUNK_STATUS_CODE));
@@ -473,6 +483,8 @@ void test_create_shots_with_ships(void) {
         
     }
 
+    TEST_CHECK(shots_with_ships.size() == (4));
+
     inputx = 8;
     inputy = 4;
     boxes_hit.insert(box(inputx, inputy, SUNK_STATUS_CODE));
@@ -490,6 +502,8 @@ void test_create_shots_with_ships(void) {
         }
         
     }
+
+    TEST_CHECK(shots_with_ships.size() == 0);
 
 };
 
