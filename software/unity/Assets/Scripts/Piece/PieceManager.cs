@@ -80,6 +80,6 @@ public class PieceManager : MonoBehaviour
         {
             exportedShips += mShips[i].ExportShip();
         }
-        return exportedShips;
+        return exportedShips + "~";
     }
 }
