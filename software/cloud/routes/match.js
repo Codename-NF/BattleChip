@@ -8,6 +8,6 @@ const auth = require('../middleware/auth');
 router.get('/', auth.checkToken, matchController.getMatches);
 
 // Create a new record of a match
-router.post('/', auth.checkToken, matchController.createMatch);
+router.post('/', matchController.createMatch);
 
 module.exports = router;

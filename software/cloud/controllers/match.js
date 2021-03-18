@@ -16,19 +16,38 @@ module.exports = {
 	getMatches: async (req, res) => {
 		const userEmail = res.locals.email
         
+        // Get the page number from the page parameter (?page=)
+        let pageNumber = parseInt(req.query.page);
+        
+        // Default to page 1 if requested page is invalid
+        if (pageNumber === NaN) {
+            pageNumber = 1;
+        }
+        else {
+            // If user gave a page number with a decimal, just round down
+            pageNumber = (Math.floor(pageNumber) > 1) ? Math.floor(pageNumber) : 1;
+        }
+        
         // Check if user exists
         const myUser = await User.findOne({ email: userEmail }).catch(() => null);
-        
-        // If so, get an array of that user's matches
+
+        // If User exists, get an array of that user's matches
         if (myUser) {
             const myMatchesP1 = await Match.find({ player_one: userEmail }).catch(() => []);
             const myMatchesP2 = await Match.find({ player_two: userEmail }).catch(() => []);
             const allMyMatches = myMatchesP1.concat(myMatchesP2);
             
+            // Sort matches by most recent date
+            allMyMatches.sort((a, b) => parseFloat(b.date) - parseFloat(a.date));
+            
+            // Get the requested page of up to 10 entries
+            const firstIndex = 10 * (pageNumber - 1);
+            const lastIndex = 10 * pageNumber;
+            
             res.status(200).send(
                 {
                     "status" : "OK",
-                    "matches" : allMyMatches,
+                    "matches" : allMyMatches.slice(firstIndex, lastIndex),
                 }
             )
         }
@@ -55,6 +74,9 @@ module.exports = {
                     winner: req.body.winner,
                     player_one_score: req.body.player_one_score,
                     player_two_score: req.body.player_two_score,
+                    player_one_name: `${player1.first_name} ${player1.last_name}`,
+                    player_two_name: "AI",
+                    date: Date.now() * 1000
                 }
                 await Match.create(newMatch);
                 
@@ -80,6 +102,9 @@ module.exports = {
                         winner: req.body.winner,
                         player_one_score: req.body.player_one_score,
                         player_two_score: req.body.player_two_score,
+                        player_one_name: `${player1.first_name} ${player1.last_name}`,
+                        player_two_name: `${player2.first_name} ${player2.last_name}`,
+                        date: Date.now() * 1000
                     }
                     await Match.create(newMatch);
                     
