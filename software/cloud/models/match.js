@@ -21,6 +21,18 @@ let Match = new Schema({
     player_two_score: {
         type: Number,
 		required: true,
+    },
+    player_one_name: {
+        type: String,
+		required: true,
+    },
+    player_two_name: {
+        type: String,
+		required: true,
+    },
+    date: {
+        type: Number,
+        required: true,
     }
 });
 

@@ -3,7 +3,7 @@ const User = require('../models/user');
 module.exports = {
     getUser: async (req, res) => {
         try {
-            const myUser = await User.findOne({ email: req.params.email }).catch(() => null);
+            const myUser = await User.findOne({ email: res.locals.email }).catch(() => null);
 
             if (myUser) {
                 res.status(200).send(myUser);
