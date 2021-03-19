@@ -1,23 +1,34 @@
 package com.nf.battlechip.activity;
 
-import android.graphics.Typeface;
 import android.os.Bundle;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.StyleSpan;
+import android.text.Html;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.nf.battlechip.R;
 import com.nf.battlechip.RetrofitHelper;
 import com.nf.battlechip.UserService;
+import com.nf.battlechip.pojo.Match;
+import com.nf.battlechip.pojo.Matches;
 import com.nf.battlechip.pojo.User;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.internal.EverythingIsNonNull;
+
+import static androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY;
 
 public class UserStatisticsActivity extends SetThemeActivity {
 
@@ -29,9 +40,10 @@ public class UserStatisticsActivity extends SetThemeActivity {
         setContentView(R.layout.activity_user_statistics);
 
         getUser();
+        getMatches();
     }
 
-    public void getUser() {
+    private void getUser() {
         UserService service = RetrofitHelper.getUserService();
         Call<User> call = service.getUser();
         call.enqueue(new Callback<User>() {
@@ -42,7 +54,8 @@ public class UserStatisticsActivity extends SetThemeActivity {
                     User user = response.body();
 
                     if (user != null) {
-                        updateViews(user);
+                        updateUserView(user);
+                        updateStatsView(user);
                     }
                 }
                 Log.d(USER_STATISTICS_DEBUG, "Received a response for getUser");
@@ -56,23 +69,126 @@ public class UserStatisticsActivity extends SetThemeActivity {
         });
     }
 
-    private void updateViews(User user) {
+    private void updateUserView(User user) {
         TextView userView = findViewById(R.id.user_name_text_view);
+        userView.setText(Html.fromHtml(String.format(getString(R.string.statistics_name_text), color, user.getFirstName(), user.getLastName()), Html.FROM_HTML_MODE_LEGACY));
+    }
+
+    private void updateStatsView(User user) {
         TextView statsView = findViewById(R.id.statistics_text_view);
+        statsView.setText(Html.fromHtml(String.format(getString(R.string.statistics_win_loss_text), color, user.getWins(), color, user.getLosses()), Html.FROM_HTML_MODE_LEGACY));
+    }
 
-        Spannable userSpannable = new SpannableString("Name: " + user.getFirstName() + " " + user.getLastName());
-        userSpannable.setSpan(new ForegroundColorSpan(color), 0, "Name:".length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-        userSpannable.setSpan(new StyleSpan(Typeface.BOLD), 0, "Name:".length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-        userView.setText(userSpannable, TextView.BufferType.SPANNABLE);
+    private void getMatches() {
+        UserService service = RetrofitHelper.getUserService();
+        Call<Matches> call = service.getMatches();
+        call.enqueue(new Callback<Matches>() {
+            @Override
+            @EverythingIsNonNull
+            public void onResponse(Call<Matches> call, Response<Matches> response) {
+                if (response.isSuccessful()) {
+                    updateMatchesView(response.body().getMatches());
+                }
+                Log.d(USER_STATISTICS_DEBUG, "Received a response for getMatches");
+            }
 
-        String statsString = "Wins: " + user.getWins()
-                + "\nLosses: " + user.getLosses();
-        Spannable statSpannable = new SpannableString(statsString);
-        statSpannable.setSpan(new ForegroundColorSpan(color), 0, "Wins:".length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-        statSpannable.setSpan(new StyleSpan(Typeface.BOLD), 0, "Wins:".length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-        statSpannable.setSpan(new ForegroundColorSpan(color), statsString.indexOf("Losses:"), statsString.indexOf("Losses:") + "Losses:".length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-        statSpannable.setSpan(new StyleSpan(Typeface.BOLD), statsString.indexOf("Losses:"), statsString.indexOf("Losses:") + "Losses:".length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-        statsView.setText(statSpannable, TextView.BufferType.SPANNABLE);
+            @Override
+            @EverythingIsNonNull
+            public void onFailure(Call<Matches> call, Throwable t) {
+                Log.d(USER_STATISTICS_DEBUG, "getMatches failed " + t);
+            }
+        });
+    }
+
+    private void updateMatchesView(List<Match> matches) {
+        RecyclerView recyclerView = findViewById(R.id.matches_recycler_view);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                layoutManager.getOrientation());
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addItemDecoration(dividerItemDecoration);
+        recyclerView.setAdapter(new MatchAdapter(matches));
+    }
+
+    private class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> {
+
+        private final List<Match> matches;
+
+        private class ViewHolder extends RecyclerView.ViewHolder {
+
+            private final View view;
+
+            public ViewHolder(View view) {
+                super(view);
+                this.view = view;
+            }
+
+            public void setMatch(Match match) {
+                String email = GoogleSignIn.getLastSignedInAccount(UserStatisticsActivity.this).getEmail();
+                boolean isPlayerOne = email.equals(match.getPlayerOne());
+                setScoreView(match, isPlayerOne);
+                setResultView(match.getWinner().equals(match.getPlayerOne()), isPlayerOne);
+                setDateView(match.getDate());
+                setOpponentView(isPlayerOne ? match.getPlayerTwoName() : match.getPlayerOneName());
+            }
+
+            private void setScoreView(Match match, boolean isPlayerOne) {
+                TextView scoreTextView = view.findViewById(R.id.score_text_view);
+
+                if (isPlayerOne) {
+                    scoreTextView.setText(Html.fromHtml(String.format(getString(R.string.ships_sunk_text), color, match.getPlayerOneScore(), match.getPlayerTwoScore()), FROM_HTML_MODE_LEGACY));
+                } else {
+                    scoreTextView.setText(Html.fromHtml(String.format(getString(R.string.ships_sunk_text), color, match.getPlayerTwoScore(), match.getPlayerOneScore()), FROM_HTML_MODE_LEGACY));
+                }
+            }
+
+            private void setResultView(boolean winnerIsPlayerOne, boolean isPlayerOne) {
+                TextView resultView = view.findViewById(R.id.result_text_view);
+                String winOrLossMessage;
+                int colorId;
+
+                if ((isPlayerOne && winnerIsPlayerOne) || (!isPlayerOne && !winnerIsPlayerOne)) {
+                    winOrLossMessage = "Win";
+                    colorId = R.color.winning_green;
+                } else {
+                    winOrLossMessage = "Loss";
+                    colorId = R.color.losing_red;
+                }
+                resultView.setText(Html.fromHtml(String.format(getString(R.string.match_result_text), getColor(colorId), winOrLossMessage), Html.FROM_HTML_MODE_LEGACY));
+            }
+
+            private void setDateView(String date) {
+                TextView dateView = view.findViewById(R.id.date_text_view);
+                dateView.setText(date);
+            }
+
+            private void setOpponentView(String opponent) {
+                TextView opponentView = view.findViewById(R.id.opponent_text_view);
+                opponentView.setText(Html.fromHtml(String.format(getString(R.string.opponent_text), color, opponent), Html.FROM_HTML_MODE_LEGACY));
+            }
+        }
+
+        public MatchAdapter(List<Match> matches) {
+            this.matches = matches;
+        }
+
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view_match, parent, false);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+            holder.setMatch(matches.get(position));
+        }
+
+        @Override
+        public int getItemCount() {
+            return matches.size();
+        }
     }
 
 }

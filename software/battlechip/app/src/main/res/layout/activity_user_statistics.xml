@@ -43,4 +43,17 @@
         app:layout_constraintTop_toBottomOf="@+id/user_name_text_view"
         app:layout_constraintVertical_bias="0.0" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/matches_recycler_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.6"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/statistics_text_view"
+        app:layout_constraintVertical_bias="0.2"
+        app:layout_constraintWidth_percent="0.75" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -19,6 +19,6 @@ public class UnityMessage {
 
     // Pass the Bluetooth message to Unity
     public static void processBluetoothMessage(String message) {
-        UnityPlayer.UnitySendMessage("PR_GameManager", "AndroidToUnity", message);
+        UnityPlayer.UnitySendMessage("PR_GameManager", "AndroidToUnity", message.substring(0, message.length() - 1));
     }
 }

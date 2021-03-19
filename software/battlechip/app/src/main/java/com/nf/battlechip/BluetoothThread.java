@@ -99,7 +99,7 @@ public class BluetoothThread {
                 Log.d(BLUETOOTH_DEBUG, "Read: " + readCharacters);
 
                 // Only send to Bluetooth if entire message has been read
-                if ("\n\n".equals(builder.substring(builder.length() - 2, builder.length()))) {
+                if (builder.lastIndexOf("~") == builder.length() - 1) {
                     UnityMessage.processBluetoothMessage(builder.toString());
                     builder = new StringBuilder();
                 }
@@ -116,12 +116,16 @@ public class BluetoothThread {
     }
 
     public void write(byte[] bytes) {
-        try {
-            Log.d(BLUETOOTH_DEBUG, "Write: " + new String(bytes));
-            outputStream.write(bytes);
-        } catch (IOException e) {
-            close();
-            Log.d(BLUETOOTH_DEBUG, "Write failed\n" + e.toString());
+        if (!isValidThread()) {
+            Log.d(BLUETOOTH_DEBUG, "Can't write, invalid thread");
+        } else {
+            try {
+                Log.d(BLUETOOTH_DEBUG, "Write: " + new String(bytes));
+                outputStream.write(bytes);
+            } catch (IOException e) {
+                close();
+                Log.d(BLUETOOTH_DEBUG, "Write failed\n" + e.toString());
+            }
         }
     }
 

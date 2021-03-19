@@ -25,7 +25,7 @@ public class MainUnityActivity extends UnityPlayerActivity {
         testButton.setGravity(Gravity.CENTER);
         testButton.setOnClickListener(view -> {
             Log.d("LoggingButton", "Logging button clicked");
-            UnityMessage.processBluetoothMessage("test message");
+            UnityMessage.processBluetoothMessage("gameStart true");
         });
         mUnityPlayer.addView(testButton, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
