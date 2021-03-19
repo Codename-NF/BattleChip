@@ -1,23 +1,27 @@
 package com.nf.battlechip.activity;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.nf.battlechip.BluetoothThread;
 import com.nf.battlechip.R;
 
-public class MainActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
+public class MainActivity extends SetThemeActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     private final int BACKGROUND_LOCATION_REQUEST_CODE = 1;
     private final int ENABLE_BT_REQUEST_CODE = 2;
@@ -27,19 +31,43 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        findViewById(R.id.options_button).setOnClickListener(view -> {
+        findViewById(R.id.options_button).setOnClickListener(view -> showColorDialog());
+        findViewById(R.id.single_player_button).setOnClickListener(this::startUnityActivity);
+        findViewById(R.id.multi_player_button).setOnClickListener(this::startUnityActivity);
+        findViewById(R.id.player_stats_button).setOnClickListener(view -> startActivity(new Intent(this, UserStatisticsActivity.class)));
+        findViewById(R.id.bluetooth_test_button).setOnClickListener(view -> {
             getBackgroundPermissionsIfNecessary();
             setUpBluetooth();
             BluetoothThread thread = BluetoothThread.getInstance();
             thread.startReading();
             if (thread.isValidThread()) {
-                thread.write("Test".getBytes());
+                thread.write("Test message\n\n".getBytes());
             }
         });
+    }
 
-        findViewById(R.id.single_player_button).setOnClickListener(this::startUnityActivity);
-        findViewById(R.id.multi_player_button).setOnClickListener(this::startUnityActivity);
-        findViewById(R.id.player_stats_button).setOnClickListener(view -> startActivity(new Intent(this, UserStatisticsActivity.class)));
+    private void showColorDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Select a color");
+        builder.setView(R.layout.dialog_color);
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+        builder.setPositiveButton("Confirm", (dialog, which) -> {}); // this gets replaced later
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        ChipGroup group = dialog.findViewById(R.id.color_chip_group);
+
+        dialog.setButton(DialogInterface.BUTTON_POSITIVE, "Confirm", (alertDialog, which) -> {
+            Chip checkedChip = dialog.findViewById(group.getCheckedChipId());
+            String color = (String) checkedChip.getTag(R.string.color_key);
+            String themeId = (String) checkedChip.getTag(R.string.theme_key);
+            PreferenceManager.getDefaultSharedPreferences(this).edit()
+                    .putInt("theme", Integer.parseInt(themeId.substring(1))).apply();
+            PreferenceManager.getDefaultSharedPreferences(this).edit()
+                    .putString("color", color).apply();
+            recreate();
+            dialog.dismiss();
+        });
     }
 
     private void startUnityActivity(View view) {

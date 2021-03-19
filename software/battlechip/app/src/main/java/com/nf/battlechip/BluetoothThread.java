@@ -5,12 +5,13 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
-import com.nf.battlechip.activity.MainUnityActivity;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public class BluetoothThread {
@@ -19,8 +20,9 @@ public class BluetoothThread {
     private static BluetoothThread instance = null;
     private static Thread readingThread = null;
 
-    private final String MAC_ID = "B8:9A:2A:30:2B:35"; // TODO: Update this to be correct address
-    private final UUID uuid = UUID.fromString("94f39d29-7d6d-437d-973b-fba39e49d4ee");
+    private static final Set<String> MAC_IDS = new HashSet<>(Arrays.asList("20:18:11:21:24:72")); // TODO: rely only on device name?
+    private static final Set<String> DEVICE_NAMES = new HashSet<>(Arrays.asList("hc01.com HC-05"));
+    private static final UUID SERVICE_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     private BluetoothSocket bluetoothSocket;
     private InputStream inputStream;
@@ -33,15 +35,17 @@ public class BluetoothThread {
             Log.d(BLUETOOTH_DEBUG, device.getAddress() + " " + device.getName());
         }
         Optional<BluetoothDevice> device = adapter.getBondedDevices().stream()
-                .filter(bondedDevice -> MAC_ID.equals(bondedDevice.getAddress())).findAny();
+                .filter(bondedDevice -> MAC_IDS.contains(bondedDevice.getAddress())
+                        || DEVICE_NAMES.contains(bondedDevice.getName())).findAny();
         bluetoothSocket = null;
         inputStream = null;
         outputStream = null;
 
         // create socket
         try {
-            bluetoothSocket = device.isPresent() ? device.get().createRfcommSocketToServiceRecord(uuid)
+            bluetoothSocket = device.isPresent() ? device.get().createRfcommSocketToServiceRecord(SERVICE_UUID)
                     : null;
+            Log.d(BLUETOOTH_DEBUG, device.isPresent() ? "Connected " + bluetoothSocket.toString() : "Failed");
         } catch (IOException e) {
             Log.d(BLUETOOTH_DEBUG, "Socket creation failed\n" + e.toString());
         }
@@ -50,17 +54,17 @@ public class BluetoothThread {
         if (bluetoothSocket != null) {
             try {
                 bluetoothSocket.connect();
+                // get streams
+                try {
+                    inputStream = bluetoothSocket.getInputStream();
+                    outputStream = bluetoothSocket.getOutputStream();
+                } catch (IOException e) {
+                    Log.d(BLUETOOTH_DEBUG, "Exception getting streams\n" + e.toString());
+                }
             } catch (IOException exception) {
                 close();
             }
 
-            // get streams
-            try {
-                inputStream = bluetoothSocket.getInputStream();
-                outputStream = bluetoothSocket.getOutputStream();
-            } catch (IOException e) {
-                Log.d(BLUETOOTH_DEBUG, "Exception getting streams\n" + e.toString());
-            }
         }
     }
 
@@ -86,12 +90,19 @@ public class BluetoothThread {
         Log.d(BLUETOOTH_DEBUG, "Starting thread");
         try {
             byte[] readBuffer = new byte[1024];
+            StringBuilder builder = new StringBuilder();
+
             while (inputStream != null) {
-                int bytesRead = inputStream.read(readBuffer);
-                String message = new String(readBuffer);
-                message = message.substring(0, bytesRead);
-                Log.d(BLUETOOTH_DEBUG, "Read: " + message);
-                MainUnityActivity.sendBluetoothMessageToUnity(message);
+                int bytesRead = inputStream.read(readBuffer); // possible to read portions of the message at a time
+                String readCharacters = new String(readBuffer).substring(0, bytesRead);
+                builder.append(readCharacters);
+                Log.d(BLUETOOTH_DEBUG, "Read: " + readCharacters);
+
+                // Only send to Bluetooth if entire message has been read
+                if (builder.lastIndexOf("~") == builder.length() - 1) {
+                    UnityMessage.processBluetoothMessage(builder.toString());
+                    builder = new StringBuilder();
+                }
             }
         } catch (IOException e) {
             close();
@@ -105,12 +116,16 @@ public class BluetoothThread {
     }
 
     public void write(byte[] bytes) {
-        try {
-            Log.d(BLUETOOTH_DEBUG, "Write: " + new String(bytes));
-            outputStream.write(bytes);
-        } catch (IOException e) {
-            close();
-            Log.d(BLUETOOTH_DEBUG, "Write failed\n" + e.toString());
+        if (!isValidThread()) {
+            Log.d(BLUETOOTH_DEBUG, "Can't write, invalid thread");
+        } else {
+            try {
+                Log.d(BLUETOOTH_DEBUG, "Write: " + new String(bytes));
+                outputStream.write(bytes);
+            } catch (IOException e) {
+                close();
+                Log.d(BLUETOOTH_DEBUG, "Write failed\n" + e.toString());
+            }
         }
     }
 

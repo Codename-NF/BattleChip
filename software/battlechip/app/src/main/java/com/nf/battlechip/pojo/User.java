@@ -1,5 +1,6 @@
 package com.nf.battlechip.pojo;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.gson.annotations.SerializedName;
@@ -20,14 +21,17 @@ public class User {
 
     private int losses;
 
+    @NonNull
     public String getFirstName() {
         return firstName == null ? "" : firstName;
     }
 
+    @NonNull
     public String getLastName() {
         return lastName == null ? "" : lastName;
     }
 
+    @NonNull
     public String getEmail() {
         return email == null ? "" : email;
     }
