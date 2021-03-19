@@ -32,7 +32,7 @@ bool contains_box(ship *ship, int x, int y) {
         }
         else {
             if (y >= ship->start_box.y && y <= ship->start_box.y + ship->size - 1) {
-                ship->hit_count++;
+                //ship->hit_count++;
                 return true;
             }
             return false;
@@ -44,7 +44,7 @@ bool contains_box(ship *ship, int x, int y) {
         }
         else {
             if (x >= ship->start_box.x && x <= ship->start_box.x + ship->size - 1) {
-                ship->hit_count++;
+                //ship->hit_count++;
                 return true;
             }
             return false;
@@ -52,7 +52,7 @@ bool contains_box(ship *ship, int x, int y) {
     }
 }
 
-int check_hit_what(int x, int y, list<ship> *ships, int *remaining_ships) {
+int check_hit_what(int x, int y, list<ship> *ships, int *remaining_ships, bitset<5> *ships_alive) {
     /*
     return 0 for miss 
     return 1 for hit a box of a ship
@@ -63,9 +63,29 @@ int check_hit_what(int x, int y, list<ship> *ships, int *remaining_ships) {
 
    for (list<ship>::iterator it = ships->begin(); it != ships->end(); it++) {
        if ( contains_box(&(*it), x, y) ) {
+           (*it).hit_count++;
            cout << "hit count is " << it->hit_count << endl;
            if (it->hit_count == it->size) {
                *remaining_ships = *remaining_ships - 1;
+               (*it).afloat = false;
+               switch(it->size) {
+                    case 5:
+                        (*ships_alive)[4] = 0; //5'b0xxxx
+                        break;
+                    case 4:
+                        (*ships_alive)[3] = 0; //5'bx0xxx
+                        break;
+                    case 3:
+                        if ((*ships_alive)[2] == 0) {
+                            (*ships_alive)[1] = 0; //5'bxxx0x
+                        }
+                        else {
+                            (*ships_alive)[2] = 0; //5'bxx0xx
+                        }
+                        break;
+                    case 2:
+                        (*ships_alive)[0] = 0; //5'bxxxx0
+               }
                return SUNK_STATUS_CODE;
            }
            else {
@@ -82,3 +102,29 @@ bool not_hit_yet(int x, int y, set<box> boxes) {
     return boxes.find(box(x,y)) == boxes.end();
 }
 
+void change_status_box_all_boxes(int x, int y, set<box> *boxes_hit, list<ship> *ships) {
+    for (list<ship>::iterator it = ships->begin(); it != ships->end(); it++) {
+       if ( contains_box(&(*it), x, y) ) {
+           // the box belong to this ship
+           int start_x = it->start_box.x;
+           int start_y = it->start_box.y;
+           for (int i = 0; i < it->size; i++) {
+               if (it->orientation == VERTICAL) {
+                   (*boxes_hit).find(box(start_x, start_y + i))->status = SUNK_STATUS_CODE;
+               }
+               else {
+                   (*boxes_hit).find(box(start_x + i, start_y))->status = SUNK_STATUS_CODE;
+               }
+           }
+       }
+   }
+}
+
+void create_shots_with_ships(set<box> *all_boxes_hit, set<box> *shots_with_ships) {
+    (*shots_with_ships).clear();
+    for (set<box>::iterator it = all_boxes_hit->begin(); it != all_boxes_hit->end(); it++) {
+        if (it->status != SUNK_STATUS_CODE) {
+            (*shots_with_ships).insert(box(it->x, it->y));
+        }
+    }
+}

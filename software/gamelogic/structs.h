@@ -2,6 +2,7 @@
 #include <set>
 #include <string>
 #include "constants.h"
+#include <bits/stdc++.h> 
 
 using namespace std;
 
@@ -12,7 +13,7 @@ struct box {
     public:
         int x;
         int y;
-        int status;
+        mutable int status;
 
         box(int x, int y) {
             this->x = x;
@@ -56,6 +57,7 @@ struct player {
         set<box> boxes_hit;
         int remaining_ships;
         set<box> all_boxes_on_board;
+        bitset<5> ships_alive;  
 
         player(int player_num) {
             for (int i = 0; i < NUM_OF_SHIPS; i++) {
@@ -65,6 +67,7 @@ struct player {
             this->player_num = player_num;
             this->remaining_ships = NUM_OF_SHIPS;
             this->all_boxes_on_board = {};
+            this->ships_alive = 31; // 5'b11111
         }
 } ;
 

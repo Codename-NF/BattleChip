@@ -3,13 +3,27 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum ShotType {
+    None,
+    Miss,
+    Hit,
+}
+
 public class Board : MonoBehaviour
 {
+    public GameManager mGameManager;
     public GameObject mCellPrefab;
     public bool mDoneSetup = false;
 
     // 2D array of all cells in the Board
     public Cell[,] mAllCells = new Cell[10, 10];
+
+    // 2D arrays to keep track of shots
+    public ShotType[,] mShotsOnMe = new ShotType[10, 10];
+    public ShotType[,] mShotsOnOpponent = new ShotType[10, 10];
+
+    // Reference to the cell currently being targetted
+    public Cell mTargetedCell;
 
     public void Create()
     {
@@ -30,8 +44,21 @@ public class Board : MonoBehaviour
                 mAllCells[x, y].Setup(new Vector2Int(x, y), this);
             }
         }
+        
+        // Initialize arrays of shots taken to empty
+        for (int x = 0; x < 10; x++)
+        {
+            for (int y = 0; y < 10; y++)
+            {
+                mShotsOnMe[x, y] = ShotType.None;
+                mShotsOnOpponent[x, y] = ShotType.None;
+            }
+        }
+
+        mTargetedCell = null;
         mDoneSetup = true;
     }
+
     public bool ValidateShips()
     {
         // Don't validate until ships have been placed
