@@ -24,52 +24,104 @@
  * 2. Hit Stuats 
  **/
 int main () {
-    int player_num;
-    bool single_player = false;
-    // get player_number from selecting playing mode
-    cout << "How many players? (Enter 1 for Single player or 2 for Multi player)" << endl;
-    cin >> player_num;
-    if (player_num == 2) {
-        battleship game = battleship(player_num);
-        list<player>::iterator p1, p2;
-        for (list<player>::iterator it = game.players.begin(); it != game.players.end(); it++) {
-            if (it->player_num == 1) {
-                p1 = it;
+    if (DEBUG) { // CMD playing debug only 
+        int player_num;
+        bool single_player = false;
+        // get player_number from selecting playing mode
+        cout << "How many players? (Enter 1 for Single player or 2 for Multi player)" << endl;
+        cin >> player_num;
+        if (player_num == 2) {
+            battleship game = battleship(player_num);
+            list<player>::iterator p1, p2;
+            for (list<player>::iterator it = game.players.begin(); it != game.players.end(); it++) {
+                if (it->player_num == 1) {
+                    p1 = it;
+                }
+                else if (it->player_num == 2) {
+                    p2 = it;
+                }
             }
-            else if (it->player_num == 2) {
-                p2 = it;
+            
+            getting_names(&game, player_num);
+            
+            setting_up_ships(&p1, &p2, single_player);
+
+
+            playing_game(&p1, &p2, single_player);
+        }
+        else {
+            // if player_num == 1 -> plyaing with AI
+            single_player = true;
+            battleship game = battleship(2);
+            list<player>::iterator p1, AI;
+            for (list<player>::iterator it = game.players.begin(); it != game.players.end(); it++) {
+                if (it->player_num == 1) {
+                    p1 = it;
+                }
+                else if (it->player_num == 2) {
+                    AI = it;
+                }
             }
+            
+            getting_names(&game, player_num);
+            
+            setting_up_ships(&p1, &AI, single_player);
+
+            AI_setting_up(&AI);
+
+            playing_game(&p1, &AI, single_player);
         }
         
-        getting_names(&game, player_num);
-        
-        setting_up_ships(&p1, &p2, single_player);
-
-
-        playing_game(&p1, &p2, single_player);
+        return 0;
     }
     else {
-        // if player_num == 1 -> plyaing with AI
-        single_player = true;
-        battleship game = battleship(2);
-        list<player>::iterator p1, AI;
-        for (list<player>::iterator it = game.players.begin(); it != game.players.end(); it++) {
-            if (it->player_num == 1) {
-                p1 = it;
+        int player_num;
+        bool single_player = false;
+        // get player_number from selecting playing mode
+        cout << "How many players? (Enter 1 for Single player or 2 for Multi player)" << endl;
+        cin >> player_num;
+        if (player_num == 2) {
+            battleship game = battleship(player_num);
+            list<player>::iterator p1, p2;
+            for (list<player>::iterator it = game.players.begin(); it != game.players.end(); it++) {
+                if (it->player_num == 1) {
+                    p1 = it;
+                }
+                else if (it->player_num == 2) {
+                    p2 = it;
+                }
             }
-            else if (it->player_num == 2) {
-                AI = it;
+            
+            getting_names(&game, player_num);
+            
+            setting_up_ships(&p1, &p2, single_player);
+
+
+            playing_game(&p1, &p2, single_player);
+        }
+        else {
+            // if player_num == 1 -> plyaing with AI
+            single_player = true;
+            battleship game = battleship(2);
+            list<player>::iterator p1, AI;
+            for (list<player>::iterator it = game.players.begin(); it != game.players.end(); it++) {
+                if (it->player_num == 1) {
+                    p1 = it;
+                }
+                else if (it->player_num == 2) {
+                    AI = it;
+                }
             }
+            
+            getting_names(&game, player_num);
+            
+            setting_up_ships(&p1, &AI, single_player);
+
+            AI_setting_up(&AI);
+
+            playing_game(&p1, &AI, single_player);
         }
         
-        getting_names(&game, player_num);
-        
-        setting_up_ships(&p1, &AI, single_player);
-
-        AI_setting_up(&AI);
-
-        playing_game(&p1, &AI, single_player);
+        return 0;
     }
-    
-  return 0;
 }
