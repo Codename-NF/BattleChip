@@ -2,7 +2,7 @@
 #include <set>
 #include <string>
 #include "constants.h"
-#include <bits/stdc++.h> 
+#include <bitset> 
 
 using namespace std;
 
@@ -51,7 +51,8 @@ struct ship {
 
 struct player {
     public: 
-        string player_name; 
+        string player_name; // probably don't need this 
+        string player_email;
         int player_num;
         list<ship> ships_list;
         set<box> boxes_hit;
@@ -110,7 +111,15 @@ struct shootvalues {
     }
 };
 
+struct createmessage {
+    int numplayer;
+    string email;
 
+    createmessage(int numplayer, string email) {
+        this->numplayer = numplayer;
+        this->email = email;
+    }
+};
 // ******************* bluetooth place holder *******************
 
 #endif

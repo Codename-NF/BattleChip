@@ -2,10 +2,9 @@
 #include <list>
 #include <set>
 #include <string>
-#include <sys/socket.h>
 #include "constants.h"
 #include "structs.h"
-#include <bits/stdc++.h> 
+#include <bitset> 
 
 void declare_win (int player_who_won);
 bool out_of_bound(int x_start, int y_start, int size, int orientation); 
