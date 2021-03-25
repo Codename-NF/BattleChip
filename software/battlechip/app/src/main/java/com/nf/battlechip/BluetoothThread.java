@@ -20,23 +20,25 @@ public class BluetoothThread {
     private static BluetoothThread instance = null;
     private static Thread readingThread = null;
 
-    private static final Set<String> MAC_IDS = new HashSet<>(Arrays.asList("20:18:11:21:24:72")); // TODO: rely only on device name?
-    private static final Set<String> DEVICE_NAMES = new HashSet<>(Arrays.asList("hc01.com HC-05"));
+    private static final Set<String> CHIP_ONE_MAC_IDS = new HashSet<>(Arrays.asList("20:18:11:21:24:72", "B8:9A:2A:30:2B:35")); // TODO: rely only on device name?
+    private static final Set<String> CHIP_ONE_DEVICE_NAMES = new HashSet<>(Arrays.asList("hc01.com HC-05"));
+    private static final Set<String> CHIP_TWO_MAC_IDS = new HashSet<>(); // TODO: fill
+    private static final Set<String> CHIP_TWO_DEVICE_NAMES = new HashSet<>(); // TODO: fill
     private static final UUID SERVICE_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     private BluetoothSocket bluetoothSocket;
     private InputStream inputStream;
     private OutputStream outputStream;
+    private int chipId;
 
-    BluetoothThread() {
+    BluetoothThread(int chipId) {
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
         // List all devices
         for (BluetoothDevice device : adapter.getBondedDevices()) {
             Log.d(BLUETOOTH_DEBUG, device.getAddress() + " " + device.getName());
         }
         Optional<BluetoothDevice> device = adapter.getBondedDevices().stream()
-                .filter(bondedDevice -> MAC_IDS.contains(bondedDevice.getAddress())
-                        || DEVICE_NAMES.contains(bondedDevice.getName())).findAny();
+                .filter(chipId == 1 ? BluetoothThread::isChipOneDevice : BluetoothThread::isChipTwoDevice).findAny();
         bluetoothSocket = null;
         inputStream = null;
         outputStream = null;
@@ -68,9 +70,26 @@ public class BluetoothThread {
         }
     }
 
+    private static boolean isChipOneDevice(BluetoothDevice device) {
+        return CHIP_ONE_MAC_IDS.contains(device.getAddress())
+                || CHIP_ONE_DEVICE_NAMES.contains(device.getName());
+    }
+
+    private static boolean isChipTwoDevice(BluetoothDevice device) {
+        return CHIP_TWO_MAC_IDS.contains(device.getAddress())
+                || CHIP_TWO_DEVICE_NAMES.contains(device.getName());
+    }
+
+    public static void createInstance(int chipId) {
+        if (instance != null) {
+            instance.close();
+        }
+        instance = new BluetoothThread(chipId);
+    }
+
     public static BluetoothThread getInstance() {
-        if (instance == null || !instance.isValidThread()) {
-            instance = new BluetoothThread();
+        if (instance != null && !instance.isValidThread()) {
+            instance = new BluetoothThread(instance.chipId);
         }
         return instance;
     }
@@ -129,13 +148,14 @@ public class BluetoothThread {
         }
     }
 
-    private void close() {
+    public void close() {
         if (bluetoothSocket != null) {
             try {
                 bluetoothSocket.close();
             } catch (IOException e) {
                 Log.d(BLUETOOTH_DEBUG, "Failed to close socket\n" + e.toString());
             } finally {
+                instance = null;
                 inputStream = null;
                 outputStream = null;
                 bluetoothSocket = null;

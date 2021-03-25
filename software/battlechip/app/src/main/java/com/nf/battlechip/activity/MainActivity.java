@@ -9,17 +9,18 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.nf.battlechip.BluetoothThread;
 import com.nf.battlechip.R;
+import com.nf.battlechip.UnityMessage;
 
 public class MainActivity extends SetThemeActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -30,20 +31,55 @@ public class MainActivity extends SetThemeActivity implements ActivityCompat.OnR
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getBackgroundPermissionsIfNecessary();
+        setUpBluetooth();
 
+        String email = GoogleSignIn.getLastSignedInAccount(this).getEmail();
+
+        findViewById(R.id.app_name_text_view).setOnClickListener(view -> startUnityActivity()); // TODO: remove this Unity shortcut
         findViewById(R.id.options_button).setOnClickListener(view -> showColorDialog());
-        findViewById(R.id.single_player_button).setOnClickListener(this::startUnityActivity);
-        findViewById(R.id.multi_player_button).setOnClickListener(this::startUnityActivity);
+        findViewById(R.id.single_player_button).setOnClickListener(view -> {
+            BluetoothThread.createInstance(1);
+            UnityMessage.create(email, 1);
+            startLobbyActivity();
+        });
+        findViewById(R.id.multi_player_button).setOnClickListener(view -> showMultiplayerDialog(email));
         findViewById(R.id.player_stats_button).setOnClickListener(view -> startActivity(new Intent(this, UserStatisticsActivity.class)));
         findViewById(R.id.bluetooth_test_button).setOnClickListener(view -> {
-            getBackgroundPermissionsIfNecessary();
-            setUpBluetooth();
+            BluetoothThread.createInstance(1);
             BluetoothThread thread = BluetoothThread.getInstance();
             thread.startReading();
             if (thread.isValidThread()) {
-                thread.write("Test message\n\n".getBytes());
+                thread.write("Test message~".getBytes());
             }
         });
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+
+        BluetoothThread thread = BluetoothThread.getInstance();
+        if (thread != null) {
+            thread.close();
+        }
+    }
+
+    private void showMultiplayerDialog(String email) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Do you want to create or join a lobby?");
+        builder.setNeutralButton("Cancel", ((dialog, which) -> dialog.dismiss()));
+        builder.setNegativeButton("Join", ((dialog, which) -> {
+            BluetoothThread.createInstance(2);
+            UnityMessage.join(email);
+            startLobbyActivity();
+        }));
+        builder.setPositiveButton("Create", ((dialog, which) -> {
+            BluetoothThread.createInstance(1);
+            UnityMessage.create(email, 2);
+            startLobbyActivity();
+        }));
+        builder.create().show();
     }
 
     private void showColorDialog() {
@@ -70,8 +106,12 @@ public class MainActivity extends SetThemeActivity implements ActivityCompat.OnR
         });
     }
 
-    private void startUnityActivity(View view) {
+    private void startUnityActivity() {
         startActivity(new Intent(this, MainUnityActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP));
+    }
+
+    private void startLobbyActivity() {
+        startActivity(new Intent(this, LobbyActivity.class).setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
     }
 
     private void getBackgroundPermissionsIfNecessary() {
