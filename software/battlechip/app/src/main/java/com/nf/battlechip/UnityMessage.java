@@ -37,8 +37,7 @@ public class UnityMessage {
 
     // Pass the Bluetooth message to Unity
     public static void processBluetoothMessage(String message) {
-        String messageWithoutTrailingTilde = message.substring(0, message.length() - 1);
-        String[] splitMessage = messageWithoutTrailingTilde.split("\\s");
+        String[] splitMessage = message.split("\\s");
         String command = splitMessage[0];
         if ("create".equals(command)) {
             if ("0".equals(splitMessage[2])) { // failed to create game
@@ -51,7 +50,7 @@ public class UnityMessage {
         } else if ("ready".equals(command)) {
             LobbyActivity.gamesIsReady();
         } else {
-            UnityPlayer.UnitySendMessage("PR_GameManager", "AndroidToUnity", messageWithoutTrailingTilde);
+            UnityPlayer.UnitySendMessage("PR_GameManager", "AndroidToUnity", message);
         }
     }
 }

@@ -2,6 +2,7 @@ package com.nf.battlechip.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -15,6 +16,8 @@ public class LobbyActivity extends AppCompatActivity {
     private static boolean gameIsReady = false;
     private static boolean failedToCreateGame = false;
     private static LobbyActivity instance = null;
+
+    private static final String LOBBY_DEBUG = "Lobby";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +43,7 @@ public class LobbyActivity extends AppCompatActivity {
     }
 
     public static void gamesIsReady() {
+        Log.d(LOBBY_DEBUG, "Game is ready");
         if (instance == null) {
             gameIsReady = true;
         } else {
@@ -48,6 +52,7 @@ public class LobbyActivity extends AppCompatActivity {
     }
 
     public static void failedToCreateGame() {
+        Log.d(LOBBY_DEBUG, "Failed to create game");
         if (instance == null) {
             failedToCreateGame = true;
         } else {

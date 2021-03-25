@@ -85,6 +85,7 @@ public class BluetoothThread {
             instance.close();
         }
         instance = new BluetoothThread(chipId);
+        instance.startReading();
     }
 
     public static BluetoothThread getInstance() {
@@ -117,10 +118,10 @@ public class BluetoothThread {
                 builder.append(readCharacters);
                 Log.d(BLUETOOTH_DEBUG, "Read: " + readCharacters);
 
-                // Only send to Bluetooth if entire message has been read
-                if (builder.lastIndexOf("~") == builder.length() - 1) {
-                    UnityMessage.processBluetoothMessage(builder.toString());
-                    builder = new StringBuilder();
+                // Only send to Unity if entire message has been read
+                while (builder.indexOf("~") != -1) {
+                    UnityMessage.processBluetoothMessage(builder.substring(0, builder.indexOf("~")));
+                    builder = builder.delete(0, builder.indexOf("~") + 1); // remove last message
                 }
             }
         } catch (IOException e) {
