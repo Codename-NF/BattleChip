@@ -55,10 +55,10 @@ int RS232TestForReceivedData_1(void);
 void RS232Flush_1(void);
 
 void BT_send_0(char *word);
-void BT_receive_0(char *receive_char);
+int BT_receive_0(char *receive_char);
 
 void BT_send_1(char *word);
-void BT_receive_1(char *receive_char);
+int BT_receive_1(char *receive_char);
 
 
 static inline void clear_bit(volatile unsigned char *reg, int bit) {

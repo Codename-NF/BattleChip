@@ -14,24 +14,28 @@ int main(void) {
     Init_RS232();
     RS232Flush_0();
     RS232Flush_1();
-    char receive_char[256];
-    // char radu[] = "I don't know";
+    char receive_char_0[256];
+    char receive_char_1[256];
+    receive_char_0[0] = 1;
+    receive_char_1[1] = 1;
     while(1) {
 
         if(RS232TestForReceivedData_0()) {
             // BT_send_0("Ready Player 1");
-            BT_receive_0(receive_char);
-            BT_send_0("Player1:");
-            BT_send_0(receive_char);
-            RS232Flush_0();
+            if (BT_receive_0(receive_char_0)) {
+                BT_send_0("Player1:");
+                BT_send_0(receive_char_0);
+                RS232Flush_0();
+            }
         }
         
         if(RS232TestForReceivedData_1()) {
             // BT_send_1("Ready Player 2");
-            BT_receive_1(receive_char);
-            BT_send_1("Player2:");
-            BT_send_1(receive_char);
-            RS232Flush_1();
+            if (BT_receive_1(receive_char_1)) {
+                BT_send_1("Player2:");
+                BT_send_1(receive_char_1);
+                RS232Flush_1();
+            }       
         }
     }
     BT_send_1("Message Received");
@@ -136,39 +140,59 @@ void RS232Flush_1(void)
 void BT_send_0(char *word)
 {
     char *send_char;
-    for(send_char = word; *send_char != '\0'; send_char++) {
+    send_char = word;
+    for(send_char++; *send_char != '\0'; send_char++) {
         putcharRS232_0(*send_char);
     }
 }
 void BT_send_1(char *word)
 {
     char *send_char;
-    for(send_char = word; *send_char != '\0'; send_char++) {
+    send_char = word;
+    for(send_char++; *send_char != '\0'; send_char++) {
         putcharRS232_1(*send_char);
     }
 }
 
-void BT_receive_0(char *receive_char)
+int BT_receive_0(char *receive_char)
 {
+    if(!RS232TestForReceivedData_0()) {
+        return 0;
+    }
+
     int x;
-    char recent = 'a';
-    for(x = 0;recent != '~' || RS232TestForReceivedData_0();x++) {
+    for(x = receive_char[0];RS232TestForReceivedData_0();x++) {
         receive_char[x] = getcharRS232_0();
-        recent = receive_char[x];
-        putcharRS232_0(recent);
+        putcharRS232_0(receive_char[x]);
     }
-    receive_char[x] = '\0';
-    RS232Flush_0();
+
+    if (receive_char[x-1] == '~') {
+        receive_char[0] = 1;
+        receive_char[x] = '\0';
+        RS232Flush_0();
+        return 1;
+    }
+    receive_char[0] = x;
+    return 0;
 }
-void BT_receive_1(char *receive_char)
+int BT_receive_1(char *receive_char)
 {
-    int x;
-    char recent = 'a';
-    for(x = 0;recent != '~' || RS232TestForReceivedData_1();x++) {
-        receive_char[x] = getcharRS232_1();
-        recent = receive_char[x];
-        putcharRS232_1(recent);
+    if(!RS232TestForReceivedData_1()) {
+        return 0;
     }
-    receive_char[x] = '\0';
-    RS232Flush_1();
+
+    int x;
+    for(x = receive_char[0];RS232TestForReceivedData_1();x++) {
+        receive_char[x] = getcharRS232_1();
+        putcharRS232_1(receive_char[x]);
+    }
+
+    if (receive_char[x-1] == '~') {
+        receive_char[0] = 1;
+        receive_char[x] = '\0';
+        RS232Flush_1();
+        return 1;
+    }
+    receive_char[0] = x;
+    return 0;
 }
