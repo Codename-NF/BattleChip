@@ -23,7 +23,7 @@
 
             <tag
                 android:id="@string/color_key"
-                android:value="purple" />
+                android:value="@color/purple_500" />
 
             <tag
                 android:id="@string/theme_key"
@@ -40,7 +40,7 @@
 
             <tag
                 android:id="@string/color_key"
-                android:value="green" />
+                android:value="@color/green_500" />
 
             <tag
                 android:id="@string/theme_key"
@@ -57,7 +57,7 @@
 
             <tag
                 android:id="@string/color_key"
-                android:value="blue" />
+                android:value="@color/blue_500" />
 
             <tag
                 android:id="@string/theme_key"
@@ -74,7 +74,7 @@
 
             <tag
                 android:id="@string/color_key"
-                android:value="pink" />
+                android:value="@color/pink_500" />
 
             <tag
                 android:id="@string/theme_key"
@@ -91,7 +91,7 @@
 
             <tag
                 android:id="@string/color_key"
-                android:value="pink" />
+                android:value="@color/orange_500" />
 
             <tag
                 android:id="@string/theme_key"

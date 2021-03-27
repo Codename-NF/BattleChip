@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -75,8 +77,10 @@ public class UserStatisticsActivity extends SetThemeActivity {
     }
 
     private void updateStatsView(User user) {
-        TextView statsView = findViewById(R.id.statistics_text_view);
-        statsView.setText(Html.fromHtml(String.format(getString(R.string.statistics_win_loss_text), color, user.getWins(), color, user.getLosses()), Html.FROM_HTML_MODE_LEGACY));
+        TextView winsView = findViewById(R.id.wins_text_view);
+        TextView lossesView = findViewById(R.id.losses_text_view);
+        winsView.setText(Html.fromHtml(String.format(getString(R.string.statistics_win_text), color, user.getWins()), Html.FROM_HTML_MODE_LEGACY));
+        lossesView.setText(Html.fromHtml(String.format(getString(R.string.statistics_loss_text), color, user.getLosses()), Html.FROM_HTML_MODE_LEGACY));
     }
 
     private void getMatches() {
@@ -127,35 +131,39 @@ public class UserStatisticsActivity extends SetThemeActivity {
             public void setMatch(Match match) {
                 String email = GoogleSignIn.getLastSignedInAccount(UserStatisticsActivity.this).getEmail();
                 boolean isPlayerOne = email.equals(match.getPlayerOne());
-                setScoreView(match, isPlayerOne);
-                setResultView(match.getWinner().equals(match.getPlayerOne()), isPlayerOne);
+                setResultView(match, isPlayerOne);
                 setDateView(match.getDate());
                 setOpponentView(isPlayerOne ? match.getPlayerTwoName() : match.getPlayerOneName());
             }
 
-            private void setScoreView(Match match, boolean isPlayerOne) {
-                TextView scoreTextView = view.findViewById(R.id.score_text_view);
-
-                if (isPlayerOne) {
-                    scoreTextView.setText(Html.fromHtml(String.format(getString(R.string.ships_sunk_text), color, match.getPlayerOneScore(), match.getPlayerTwoScore()), FROM_HTML_MODE_LEGACY));
-                } else {
-                    scoreTextView.setText(Html.fromHtml(String.format(getString(R.string.ships_sunk_text), color, match.getPlayerTwoScore(), match.getPlayerOneScore()), FROM_HTML_MODE_LEGACY));
-                }
-            }
-
-            private void setResultView(boolean winnerIsPlayerOne, boolean isPlayerOne) {
+            private void setResultView(Match match, boolean isPlayerOne) {
+                boolean winnerIsPlayerOne = match.getWinner().equals(match.getPlayerOne());
                 TextView resultView = view.findViewById(R.id.result_text_view);
+                TextView scoreTextView = view.findViewById(R.id.score_text_view);
                 String winOrLossMessage;
-                int colorId;
+                @ColorRes int playerColourRes, opponentColourRes;
+                @ColorInt int playerColour, opponentColour;
 
                 if ((isPlayerOne && winnerIsPlayerOne) || (!isPlayerOne && !winnerIsPlayerOne)) {
                     winOrLossMessage = "Win";
-                    colorId = R.color.winning_green;
+                    playerColourRes = R.color.winning_green;
                 } else {
                     winOrLossMessage = "Loss";
-                    colorId = R.color.losing_red;
+                    playerColourRes = R.color.losing_red;
                 }
-                resultView.setText(Html.fromHtml(String.format(getString(R.string.match_result_text), getColor(colorId), winOrLossMessage), Html.FROM_HTML_MODE_LEGACY));
+                opponentColourRes = playerColourRes == R.color.winning_green ? R.color.losing_red : R.color.winning_green;
+                playerColour = getColor(playerColourRes);
+                opponentColour = getColor(opponentColourRes);
+
+                if (isPlayerOne) {
+                    scoreTextView.setText(Html.fromHtml(String.format(getString(R.string.hits_text),
+                            color, playerColour, match.getPlayerOneScore(), opponentColour, match.getPlayerTwoScore()), FROM_HTML_MODE_LEGACY));
+                } else {
+                    scoreTextView.setText(Html.fromHtml(String.format(getString(R.string.hits_text),
+                            color, playerColour, match.getPlayerTwoScore(), opponentColour, match.getPlayerOneScore()), FROM_HTML_MODE_LEGACY));
+                }
+
+                resultView.setText(Html.fromHtml(String.format(getString(R.string.match_result_text), playerColour, winOrLossMessage), Html.FROM_HTML_MODE_LEGACY));
             }
 
             private void setDateView(String date) {

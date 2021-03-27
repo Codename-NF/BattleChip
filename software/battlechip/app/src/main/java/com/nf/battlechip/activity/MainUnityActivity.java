@@ -1,6 +1,8 @@
 package com.nf.battlechip.activity;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.ViewGroup;
@@ -35,4 +37,10 @@ public class MainUnityActivity extends UnityPlayerActivity {
         super.onDestroy();
         instance = null;
     }
+
+    public long getColor() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        return preferences.getLong("color", R.color.purple_500);
+    }
+
 }

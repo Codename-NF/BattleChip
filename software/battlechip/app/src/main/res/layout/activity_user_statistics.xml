@@ -34,7 +34,7 @@
         app:layout_constraintVertical_bias="0.05" />
 
     <TextView
-        android:id="@+id/statistics_text_view"
+        android:id="@+id/wins_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="20sp"
@@ -42,6 +42,15 @@
         app:layout_constraintStart_toStartOf="@+id/user_name_text_view"
         app:layout_constraintTop_toBottomOf="@+id/user_name_text_view"
         app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/losses_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/wins_text_view"
+        app:layout_constraintTop_toBottomOf="@+id/user_name_text_view" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/matches_recycler_view"
@@ -52,8 +61,10 @@
         app:layout_constraintHeight_percent="0.6"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/statistics_text_view"
+        app:layout_constraintTop_toBottomOf="@+id/wins_text_view"
         app:layout_constraintVertical_bias="0.2"
-        app:layout_constraintWidth_percent="0.75" />
+        app:layout_constraintWidth_percent="0.75">
+
+    </androidx.recyclerview.widget.RecyclerView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
