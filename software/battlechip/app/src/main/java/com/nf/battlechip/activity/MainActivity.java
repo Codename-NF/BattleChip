@@ -98,9 +98,9 @@ public class MainActivity extends SetThemeActivity implements ActivityCompat.OnR
             String color = (String) checkedChip.getTag(R.string.color_key);
             String themeId = (String) checkedChip.getTag(R.string.theme_key);
             PreferenceManager.getDefaultSharedPreferences(this).edit()
-                    .putInt("theme", Integer.parseInt(themeId.substring(1))).apply();
+                    .putInt("theme", Integer.parseInt(themeId.substring(1))).apply(); // remove @ symbol with substring
             PreferenceManager.getDefaultSharedPreferences(this).edit()
-                    .putString("color", color).apply();
+                    .putLong("color", Long.parseLong(color.substring(1).toUpperCase(), 16)).apply();
             recreate();
             dialog.dismiss();
         });
