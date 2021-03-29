@@ -3,6 +3,7 @@
 #include "structs.h"
 #include "inputs.h"
 #include "game.h"
+#include "Graphics.h"
 /**
  * 
  * fyi setupvalues only work for a single ship, i'm guessing you're expecting bluetooth to pass in a list of those?
@@ -76,6 +77,7 @@ int main () {
         return 0;
     }
     else { // dealing with UI / BT
+        blankscreen( BLUE );
         int player_num;
         bool single_player = false;
         createmessage input1 = create_lobby();

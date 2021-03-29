@@ -9,6 +9,7 @@
 #include "constants.h"
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
+#include "Graphics.h"
 
 using namespace std;
 
@@ -400,8 +401,10 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
             else {
                 // Get input from HARDWARE AI algorithm 
                 // TODO 
-                //send_information_to_AI(AI);
-                int magic_number = 99;//some_function_from_AI(AI);
+                set<box> shots_with_ships;
+                create_shots_with_ships(&((*p2)->boxes_hit), &shots_with_ships);
+                send_information_to_AI((*p2)->boxes_hit, (*p2)->ships_alive, shots_with_ships);
+                int magic_number = 99;//some_input_function_from_AI();
                 inputs.x = magic_number % 10;
                 inputs.y = magic_number / 10;
                 inputs.device_num = 2;
@@ -441,10 +444,19 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
                 }
                 send_result_message_BT(current_attacking, x_in, y_in, game_finished, status, sunk_ship.start_box.x, sunk_ship.start_box.y, sunk_ship.size, sunk_ship.orientation);
                 send_targeted_message_BT(next_up, x_in, y_in, game_finished, status, sunk_ship.start_box.x, sunk_ship.start_box.y, sunk_ship.size, sunk_ship.orientation);
+                squaremappership(next_up, sunk_ship.start_box.x, sunk_ship.start_box.y, sunk_ship.size, sunk_ship.orientation, game_finished, MAGENTA);
+                // TODO: game over call to VGA 
                 continue;
             }
             send_result_message_BT(current_attacking, x_in, y_in, game_finished, status);
             send_targeted_message_BT(next_up, x_in, y_in, game_finished, status);
+            if (status == HIT_STATUS_CODE) {
+                squaremapper(x_in, y_in, next_up, RED);
+            }
+            else {
+                squaremapper(x_in, y_in, next_up, WHITE);
+            }
+            
 
         }
 
