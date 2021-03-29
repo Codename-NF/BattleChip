@@ -47,6 +47,14 @@ struct ship {
             this->afloat = true;
             this->hit_count = 0;
         }
+        ship(int x, int y, int size, int orientation) {
+            this->start_box = box(x,y);
+            this->size = size;
+            this->orientation = orientation;
+            this->afloat = true;
+            this->hit_count = 0;
+
+        }
 } ;
 
 struct player {
@@ -65,6 +73,7 @@ struct player {
                 this->ships_list.push_back(ship());
             }
             this->player_name = "";
+            this->player_email = "";
             this->player_num = player_num;
             this->remaining_ships = NUM_OF_SHIPS;
             this->all_boxes_on_board = {};
@@ -112,10 +121,12 @@ struct shootvalues {
 };
 
 struct createmessage {
+    string keywrod;
     int numplayer;
     string email;
 
-    createmessage(int numplayer, string email) {
+    createmessage(string keyword, int numplayer, string email) {
+        this->keywrod = keyword;
         this->numplayer = numplayer;
         this->email = email;
     }

@@ -64,7 +64,7 @@ shootvalues ask_for_shoot(int player_num) {
 Format: 
 “placement 2 3 3 1 \n7 2 2 2 \n5 5 4 2~”
 */
-void get_placement_message_BT(list<setupvalues> *list_setupval, string inputstring, int device_num) {
+int get_placement_message_BT(list<setupvalues> *list_setupval, int device_num) {
     //string input = inputstring;
     char receive_char[256];
     if (device_num == 1) {
@@ -82,6 +82,9 @@ void get_placement_message_BT(list<setupvalues> *list_setupval, string inputstri
     // dealing the keyword placement in front of the message
     string keyword;
     ss >> keyword;
+    if (keyword != "placement") {
+        return FAILURE;
+    }
     
     for (int i = 0; i < NUM_OF_SHIPS; i++) {
 
@@ -94,6 +97,7 @@ void get_placement_message_BT(list<setupvalues> *list_setupval, string inputstri
         // std::cout << "orientation: " << orientation << '\n';
         // std::cout << ss.str() << endl; // converting string stream to string 
     }
+    return SUCCESS;
 }
 
 /*
@@ -158,53 +162,61 @@ void send_game_start_status_BT(bool start1) {
 
 /*
 Format: (the result for attacking)
-“result xCoordinate yCoordinate hitStatus gameStatus~”
+“result xCoordinate yCoordinate gamestatus hitstatus~”
 */
-void send_result_message_BT(int device_num, int x, int y, int hitstatus, int gamestatus) {
+void send_result_message_BT(int device_num, int x, int y, int gamestatus, int hitstatus) {
     string message = "result ";
 
     message += to_string(x);
     message += " ";
     message += to_string(y);
     message += " ";
+    message += to_string(gamestatus);
+    message += " ";
+    message += to_string(hitstatus);
+
+    message += "~";
+
+    int n = message.length();
+ 
+    // declaring character array with space for termination character 
+    char message_char[n + 1];
+ 
+    // copying the contents of the string to char array
+    strcpy(message_char, message.c_str());
+
+    if (device_num == 1) {
+        BT_send_0(message_char);
+    }
+    else {
+        BT_send_1(message_char);
+    }
+
+
+}
+
+/*
+Format: (the result for attacking)
+“targeted xCoordinate yCoordinate gameStatus hitstatus (destroyedShipXCoordinate destroyedShipYCoordinate shipLength shipOrientation)~”
+*/
+void send_result_message_BT(int device_num, int x, int y, int gamestatus, int hitstatus, int destroyed_start_x, int destroyed_start_y, int length, int orientation) {
+    string message = "result ";
+
+    message += to_string(x);
+    message += " ";
+    message += to_string(y);
+    message += " ";
+    message += to_string(gamestatus);
+    message += " ";
     message += to_string(hitstatus);
     message += " ";
-    message += to_string(gamestatus);
-
-    message += "~";
-
-    int n = message.length();
- 
-    // declaring character array with space for termination character 
-    char message_char[n + 1];
- 
-    // copying the contents of the string to char array
-    strcpy(message_char, message.c_str());
-
-    if (device_num == 1) {
-        BT_send_0(message_char);
-    }
-    else {
-        BT_send_1(message_char);
-    }
-
-
-}
-
-/*
-Format: (the result of being attacked)
-“targeted xCoordinate yCoordinate gameStatus shipStatus (destroyedShipXCoordinate destroyedShipYCoordinate shipLength shipOrientation)~”
-*/
-void send_targeted_message_BT(int device_num, int x, int y, int gamestatus, int shipstatus) {
-    string message = "targeted ";
-
-    message += to_string(x);
+    message += to_string(destroyed_start_x);
     message += " ";
-    message += to_string(y);
+    message += to_string(destroyed_start_y);
     message += " ";
-    message += to_string(gamestatus);
+    message += to_string(length);
     message += " ";
-    message += to_string(shipstatus);
+    message += to_string(orientation);
 
     message += "~";
 
@@ -227,9 +239,9 @@ void send_targeted_message_BT(int device_num, int x, int y, int gamestatus, int 
 
 /*
 Format: (the result of being attacked)
-“targeted xCoordinate yCoordinate gameStatus shipStatus (destroyedShipXCoordinate destroyedShipYCoordinate shipLength shipOrientation)~”
+“targeted xCoordinate yCoordinate gameStatus hitstatus (destroyedShipXCoordinate destroyedShipYCoordinate shipLength shipOrientation)~”
 */
-void send_targeted_message_BT(int device_num, int x, int y, int gamestatus, int shipstatus, int destroyed_start_x, int destroyed_start_y, int length, int orientation) {
+void send_targeted_message_BT(int device_num, int x, int y, int gamestatus, int hitstatus) {
     string message = "targeted ";
 
     message += to_string(x);
@@ -238,7 +250,41 @@ void send_targeted_message_BT(int device_num, int x, int y, int gamestatus, int 
     message += " ";
     message += to_string(gamestatus);
     message += " ";
-    message += to_string(shipstatus);
+    message += to_string(hitstatus);
+
+    message += "~";
+
+    int n = message.length();
+ 
+    // declaring character array with space for termination character 
+    char message_char[n + 1];
+ 
+    // copying the contents of the string to char array
+    strcpy(message_char, message.c_str());
+
+    if (device_num == 1) {
+        BT_send_0(message_char);
+    }
+    else {
+        BT_send_1(message_char);
+    }
+
+}
+
+/*
+Format: (the result of being attacked)
+“targeted xCoordinate yCoordinate gameStatus hitstatus (destroyedShipXCoordinate destroyedShipYCoordinate shipLength shipOrientation)~”
+*/
+void send_targeted_message_BT(int device_num, int x, int y, int gamestatus, int hitstatus, int destroyed_start_x, int destroyed_start_y, int length, int orientation) {
+    string message = "targeted ";
+
+    message += to_string(x);
+    message += " ";
+    message += to_string(y);
+    message += " ";
+    message += to_string(gamestatus);
+    message += " ";
+    message += to_string(hitstatus);
     message += " ";
     message += to_string(destroyed_start_x);
     message += " ";
@@ -274,31 +320,25 @@ Format:
 playerEmail is the email of the player
 numPlayers is 1 or 2, 1 for vs AI, 2 for multiplayer
 */
-createmessage get_create_message_BT(int device_num) {
+createmessage get_create_message_BT() {
     char receive_char[256];
 
-    if (device_num == 1) {
-        BT_receive_0(receive_char);
+    
+    if (BT_receive_0(receive_char)) {
+        string input = string(receive_char);
+        stringstream ss;
+
+        ss << input;
+
+        // dealing the keyword placement in front of the message
+        string keyword;
+        string email;
+        int num_players;
+        ss >> keyword >> email >> num_players;
+
+        return createmessage(keyword, num_players, email);
     }
-    else {
-        BT_receive_1(receive_char);
-    }
-
-    string input = string(receive_char);
-    stringstream ss;
-
-    ss << input;
-
-    // dealing the keyword placement in front of the message
-    string keyword;
-    ss >> keyword;
-
-    string email;
-    int num_players;
-
-    ss >> email >> num_players;
-
-    return createmessage(num_players, email);
+    return createmessage("fail", 0, "fail");    
     
 }
 
@@ -310,7 +350,7 @@ status is “1” or “0”
 “0” if a game is already in progress
 Else “1” if multiplayer lobby created successfully
 */
-void send_create_message_response_BT(int device_num, int num_players, int status) {
+void send_create_response_BT(int num_players, int status) {
     string message = "create ";
 
     message += to_string(num_players);
@@ -327,12 +367,58 @@ void send_create_message_response_BT(int device_num, int num_players, int status
     // copying the contents of the string to char array
     strcpy(message_char, message.c_str());
 
-    if (device_num == 1) {
-        BT_send_0(message_char);
+    
+    BT_send_0(message_char);
+    
+}
+
+
+/*
+Format:
+“join playerEmail~”
+*/
+string get_join_message_BT() {
+    char receive_char[256];
+
+    
+    if (BT_receive_1(receive_char)) {
+        string input = string(receive_char);
+        stringstream ss;
+
+        ss << input;
+
+        // dealing the keyword placement in front of the message
+        string keyword;
+        ss >> keyword;
+
+        string email;
+
+        ss >> email;
+
+        return email;
     }
-    else {
-        BT_send_1(message_char);
-    }
+    return "fail";
+    
+}
+
+void send_join_reponse_BT(int status) {
+    string message = "join ";
+
+    message += to_string(status);
+
+    message += "~";
+
+    int n = message.length();
+ 
+    // declaring character array with space for termination character 
+    char message_char[n + 1];
+ 
+    // copying the contents of the string to char array
+    strcpy(message_char, message.c_str());
+
+    
+    BT_send_1(message_char);
+
 }
 
 

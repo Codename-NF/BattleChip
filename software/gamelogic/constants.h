@@ -8,6 +8,8 @@ const int MISS_STATUS_CODE = 0;
 const int BOUNDARY_MIN = 0;
 const int BOUNDARY_MAX = 9;
 const int DEBUG = 1;
+const int SUCCESS = 1;
+const int FAILURE = 0;
 
 enum orientations {VERTICAL = 1, HORIZONTAL = 2};
 

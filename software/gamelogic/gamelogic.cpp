@@ -43,7 +43,8 @@ int main () {
             }
             
             getting_names(&game, player_num);
-            
+            // cout << p1->player_name << endl;
+            // cout << p2->player_name << endl;
             setting_up_ships(&p1, &p2, single_player);
 
 
@@ -74,13 +75,16 @@ int main () {
         
         return 0;
     }
-    else {
+    else { // dealing with UI / BT
         int player_num;
         bool single_player = false;
-        // get player_number from selecting playing mode
-        cout << "How many players? (Enter 1 for Single player or 2 for Multi player)" << endl;
-        cin >> player_num;
+        createmessage input1 = create_lobby();
+        
+        player_num = input1.numplayer;
+
         if (player_num == 2) {
+            string input2 = wait_for_player2();
+
             battleship game = battleship(player_num);
             list<player>::iterator p1, p2;
             for (list<player>::iterator it = game.players.begin(); it != game.players.end(); it++) {
@@ -92,15 +96,18 @@ int main () {
                 }
             }
             
-            getting_names(&game, player_num);
+            setting_emails(&game, player_num, input1.email, input2);
             
-            setting_up_ships(&p1, &p2, single_player);
+            send_ready_messaeg_BT();
+            
+            setting_up_ships_BT(&p1, &p2, single_player);
 
 
-            playing_game(&p1, &p2, single_player);
+            playing_game_BT(&p1, &p2, single_player);
         }
         else {
             // if player_num == 1 -> plyaing with AI
+            reject_player2();
             single_player = true;
             battleship game = battleship(2);
             list<player>::iterator p1, AI;
@@ -113,13 +120,11 @@ int main () {
                 }
             }
             
-            getting_names(&game, player_num);
+            setting_emails(&game, player_num, input1.email);
             
-            setting_up_ships(&p1, &AI, single_player);
+            setting_up_ships_BT(&p1, &AI, single_player);
 
-            AI_setting_up(&AI);
-
-            playing_game(&p1, &AI, single_player);
+            playing_game_BT(&p1, &AI, single_player);
         }
         
         return 0;

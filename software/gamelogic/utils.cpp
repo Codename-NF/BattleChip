@@ -102,7 +102,7 @@ bool not_hit_yet(int x, int y, set<box> boxes) {
     return boxes.find(box(x,y)) == boxes.end();
 }
 
-void change_status_box_all_boxes(int x, int y, set<box> *boxes_hit, list<ship> *ships) {
+ship change_status_box_all_boxes(int x, int y, set<box> *boxes_hit, list<ship> *ships) {
     for (list<ship>::iterator it = ships->begin(); it != ships->end(); it++) {
        if ( contains_box(&(*it), x, y) ) {
            // the box belong to this ship
@@ -116,6 +116,7 @@ void change_status_box_all_boxes(int x, int y, set<box> *boxes_hit, list<ship> *
                    (*boxes_hit).find(box(start_x + i, start_y))->status = SUNK_STATUS_CODE;
                }
            }
+           return ship(start_x, start_y, it->size, it->orientation);
        }
    }
 }
