@@ -402,8 +402,8 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
                 // Get input from HARDWARE AI algorithm 
                 // TODO 
                 set<box> shots_with_ships;
-                create_shots_with_ships(&((*p2)->boxes_hit), &shots_with_ships);
-                send_information_to_AI((*p2)->boxes_hit, (*p2)->ships_alive, shots_with_ships);
+                create_shots_with_ships(&((*p1)->boxes_hit), &shots_with_ships);
+                send_information_to_AI((*p1)->boxes_hit, (*p1)->ships_alive, shots_with_ships);
                 int magic_number = 99;//some_input_function_from_AI();
                 inputs.x = magic_number % 10;
                 inputs.y = magic_number / 10;
