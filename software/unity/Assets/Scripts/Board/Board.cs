@@ -22,8 +22,10 @@ public class Board : MonoBehaviour
     public ShotType[,] mShotsOnMe = new ShotType[10, 10];
     public ShotType[,] mShotsOnOpponent = new ShotType[10, 10];
 
-    // Reference to the cell currently being targetted
+    // Reference to the cells for ship dragging operations
+    public Cell mOriginalCell;
     public Cell mTargetedCell;
+    public Ship mTargetedShip;
 
     public void Create()
     {
@@ -56,6 +58,9 @@ public class Board : MonoBehaviour
         }
 
         mTargetedCell = null;
+        mOriginalCell = null;
+        mTargetedShip = null;
+
         mDoneSetup = true;
     }
 
@@ -63,7 +68,7 @@ public class Board : MonoBehaviour
     {
         // Don't validate until ships have been placed
         if (!mDoneSetup) return false;
-
+        /*
         // Check each cell in the 10x10 board
         for (int i = 0; i < 10; i++)
         {
@@ -75,7 +80,7 @@ public class Board : MonoBehaviour
                     return false;
                 }
             }
-        }
+        } */
         // By this point, there are no cells with overlapping ships
         return true;
     }

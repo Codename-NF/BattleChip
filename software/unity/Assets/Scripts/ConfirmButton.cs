@@ -9,7 +9,7 @@ public class ConfirmButton : MonoBehaviour
 {
     public GameManager mGameManager;
     public Board mBoard;
-    public PieceManager mPieceManager;
+    // public PieceManager mPieceManager;
     
     // Start is called before the first frame update
     void Start()
@@ -32,7 +32,7 @@ public class ConfirmButton : MonoBehaviour
                     // Make confirm button visible
                     GetComponent<Image>().enabled = true;
                     GetComponentInChildren<TextMeshProUGUI>().enabled = true;
-                    GetComponent<Button>().interactable = (mPieceManager.mNoActiveInteraction && mBoard.ValidateShips());
+                    // GetComponent<Button>().interactable = (mPieceManager.mNoActiveInteraction && mBoard.ValidateShips());
                     break;
                 case GameState.Attacking:
                     // Make confirm button visible

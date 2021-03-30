@@ -5,8 +5,11 @@ using UnityEngine.SceneManagement;
 using TMPro;
 public class GameManager : MonoBehaviour
 {
+    // Pieces to be added to the board on initialization
+    public static int[] ShipPieces = { 2, 3, 3, 4, 5 };
+
     public Board mBoard;
-    public PieceManager mPieceManager;
+    // public PieceManager mPieceManager;
     public GameObject mTitle;
     public GameObject mStatus;
     public bool mWaiting;
@@ -19,8 +22,16 @@ public class GameManager : MonoBehaviour
         GlobalState.GameState = GameState.Placement;
         GlobalState.ColorTheme = new ColorTheme();
         mWaiting = false;
+        
+        // Create a board and put pieces on it
         mBoard.Create();
-        mPieceManager.Setup(mBoard);
+
+        for (int i = 0; i < ShipPieces.Length; i++)
+        {
+            // Ship.CreateShip(Board board, int xCoord, int yCoord, int length)
+            Debug.LogFormat("Creating ship of length {0} at {1}, {2}", ShipPieces[i], 0, i * 2);
+            Ship.CreateShip(mBoard, 0, i * 2, ShipPieces[i]);
+        }
     }
 
     public void ConfirmButton()
@@ -30,13 +41,14 @@ public class GameManager : MonoBehaviour
         switch (GlobalState.GameState)
         {
             case GameState.Placement:
-                string exportString = mPieceManager.ExportShips();
-                Debug.Log(exportString); // Debug, Placement
+                // string exportString = mPieceManager.ExportShips();
+                // Debug.Log(exportString); // Debug, Placement
                 mStatus.GetComponent<TextMeshProUGUI>().text = "Placements confirmed. Waiting for opponent...";
 
                 // Send ship placements to Android
-                jc.CallStatic("placement", exportString);
-                
+                // jc.CallStatic("placement", exportString);
+                // jc.Call("getColor");
+
                 mWaiting = true;
                 break;
 
@@ -131,10 +143,10 @@ public class GameManager : MonoBehaviour
                 {
                     int xCoord = int.Parse(msgTokens[1]);
                     int yCoord = int.Parse(msgTokens[2]);
-                    
-                    // Shot hit if the cell has 1 piece on it
-                    bool didHit = (mBoard.mAllCells[xCoord, yCoord].mCurrentPieces.Count == 1);
 
+                    // Shot hit if the cell has 1 piece on it
+                    // bool didHit = (mBoard.mAllCells[xCoord, yCoord].mCurrentPieces.Count == 1);
+                    bool didHit = true;
                     // Update list of shots
                     mBoard.mShotsOnMe[xCoord, yCoord] = (didHit) ? ShotType.Hit : ShotType.Miss;
 
