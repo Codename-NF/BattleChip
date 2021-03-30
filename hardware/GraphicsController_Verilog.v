@@ -52,7 +52,7 @@ module  GraphicsController_Verilog (
 	reg [9:0] curr_base_x, x_square, current_x_square;
 	reg [8:0] y_square, current_y_square;
 	reg blankboard_done, squaremapper_done, squaremapper_start;
-	reg line_done, line_start;
+	reg line_done, line_right_start, line_left_start;
 	reg [8:0] cross_counter;
 
 	// signals to control/select the registers above
@@ -637,21 +637,32 @@ module  GraphicsController_Verilog (
             squaremapper_done <= 1'd0;
             squaremapper_start <= 1'd0;
             line_done <= 1'd0;
-            line_start <= 1'd0;
+            line_right_start <= 1'd0;
+            line_left_start <= 1'd0;
             cross_counter <= 8'd0;
         end
 		else if (CurrentState == CrossBox) begin
 			if (line_done == 1'b0) begin
-				if (line_start == 1'd0) begin
-					line_start <= 1'd1;
+				if (line_right_start == 1'd0) begin
+					line_right_start <= 1'd1;
 					cross_counter <= 1'd1;
 					current_x_square <= curr_base_x + (10'd24 * (X1 % 10'd10));
 					current_y_square <= `BASEY + 9'd24 * (Y1 % 9'd10);
 				end
-				else if (cross_counter >= `SQUARE_SIZE) begin
+				else if (cross_counter >= 2 * `SQUARE_SIZE) begin
 					current_x_square <= 10'd804;
 					cross_counter <= 8'd0;
-					line_done <= 1'd1;
+					line_done <= 1'b1;
+				end 
+				else if (line_left_start == 1'd1) begin
+					current_x_square <= current_x_square - 10'd1;
+                    current_y_square <= current_y_square + 10'd1;
+                    cross_counter <= cross_counter + 8'd1;
+				end
+				else if (cross_counter >= `SQUARE_SIZE) begin
+					current_x_square <= curr_base_x + (10'd24 * (X1 % 10'd10)) + `SQUARE_SIZE - 1;
+					current_y_square <= `BASEY + 9'd24 * (Y1 % 9'd10);
+					line_left_start <= 1'd1;
 				end
                 else begin
                     current_x_square <= current_x_square + 10'd1;

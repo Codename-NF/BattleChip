@@ -29,7 +29,7 @@ void squaremapper(int x, int y, int player, int colour)
     WAIT_FOR_GRAPHICS;              // is graphics ready for new command
     GraphicsX1Reg = x;              // write coords to x1, y1
     GraphicsY1Reg = y;
-    GraphicsX2Reg = player;
+    GraphicsX2Reg = player - 1;
     GraphicsColourReg = colour;
     GraphicsCommandReg = Squaremapper; 
 }
@@ -43,17 +43,17 @@ void squaremappership(int player, int x, int y, int length, int dir, int done, i
     GraphicsY1Reg = y;
     GraphicsX2Reg = player - 1;
     GraphicsColourReg = colour;
-    GraphicsCommandReg = Squaremapper;
-
-    for (int i = 1; i < length; i++) {
+    GraphicsCommandReg = CrossBox;
+    int i = 1;
+    for (i = 1; i < length; i++) {
         if (dir == VERTICAL) {
             WAIT_FOR_GRAPHICS;
             GraphicsY1Reg = y + i;
-            GraphicsCommandReg = Squaremapper;
+            GraphicsCommandReg = CrossBox;
         } else {
             WAIT_FOR_GRAPHICS;
             GraphicsX1Reg = x + i;
-            GraphicsCommandReg = Squaremapper;
+            GraphicsCommandReg = CrossBox;
         }
     }
 

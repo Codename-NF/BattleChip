@@ -26,6 +26,7 @@
 #define DrawLine			3
 #define Blankboard      4
 #define Squaremapper    5
+#define CrossBox        6
 #define	PutAPixel		0xA
 #define	GetAPixel		0xB
 #define	ProgramPaletteColour    0x10
@@ -45,6 +46,9 @@
 #define	YELLOW			5
 #define	CYAN			6
 #define	MAGENTA			7
+
+#define VERTICAL        1
+#define HORIZONTAL      2
 
 /*******************************************************************************************
 * This function writes a single pixel to the x,y coords specified using the specified colour
@@ -75,7 +79,7 @@ void squaremapper(int x, int y, int player, int colour)
     WAIT_FOR_GRAPHICS;              // is graphics ready for new command
     GraphicsX1Reg = x;              // write coords to x1, y1
     GraphicsY1Reg = y;
-    GraphicsX2Reg = player;
+    GraphicsX2Reg = player - 1;
     GraphicsColourReg = colour;
     GraphicsCommandReg = Squaremapper; 
 }
@@ -83,22 +87,23 @@ void squaremapper(int x, int y, int player, int colour)
 void squaremappership(int player, int x, int y, int length, int dir, int done, int colour)
 {
     //dir 1 is down, dir 2 is horizontal
+    //left player is 1, right player is 2
     WAIT_FOR_GRAPHICS;              // is graphics ready for new command
     GraphicsX1Reg = x;              // write coords to x1, y1
     GraphicsY1Reg = y;
-    GraphicsX2Reg = player;
+    GraphicsX2Reg = player - 1;
     GraphicsColourReg = colour;
-    GraphicsCommandReg = Squaremapper;
-
-    for (int i = 1; i < length; i++) {
-        if (dir == 1) {
+    GraphicsCommandReg = CrossBox;
+    int i = 1;
+    for (i = 1; i < length; i++) {
+        if (dir == VERTICAL) {
             WAIT_FOR_GRAPHICS;
             GraphicsY1Reg = y + i;
-            GraphicsCommandReg = Squaremapper;
+            GraphicsCommandReg = CrossBox;
         } else {
             WAIT_FOR_GRAPHICS;
             GraphicsX1Reg = x + i;
-            GraphicsCommandReg = Squaremapper; 
+            GraphicsCommandReg = CrossBox;
         }
     }
 
@@ -243,10 +248,16 @@ int main(void)
     int i;
     printf("Starting...\n");
     blankscreen( BLUE );
-    squaremapper(0,0,0,RED);
-    squaremapper(0,0,1,WHITE);
-    squaremapper(1,1,0,MAGENTA);
-    squaremapper(1,1,1,RED);
+    squaremapper(0,0,1,RED);
+    squaremapper(0,0,2,WHITE);
+    squaremapper(1,1,1,MAGENTA);
+    squaremapper(1,1,2,RED);
+    squaremapper(3,3,1,RED);
+    squaremapper(4,3,1,RED);
+    squaremapper(5,3,1,RED);
+    squaremapper(6,3,1,RED);
+    squaremappership(1, 3, 3, 4, HORIZONTAL, 0, BLACK);
+
     printf("Done...\n");
     return 0 ;
 }
