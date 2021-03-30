@@ -22,6 +22,8 @@ import com.nf.battlechip.BluetoothThread;
 import com.nf.battlechip.R;
 import com.nf.battlechip.UnityMessage;
 
+import java.io.IOException;
+
 public class MainActivity extends SetThemeActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     private final int BACKGROUND_LOCATION_REQUEST_CODE = 1;
@@ -39,20 +41,17 @@ public class MainActivity extends SetThemeActivity implements ActivityCompat.OnR
         findViewById(R.id.app_name_text_view).setOnClickListener(view -> startUnityActivity()); // TODO: remove this Unity shortcut
         findViewById(R.id.options_button).setOnClickListener(view -> showColorDialog());
         findViewById(R.id.single_player_button).setOnClickListener(view -> {
-            BluetoothThread.createInstance(1);
-            UnityMessage.create(email, 1);
-            startLobbyActivity();
+            try {
+                BluetoothThread.createInstance(1);
+                UnityMessage.create(email, 1);
+                startLobbyActivity();
+            } catch (IOException exception) {
+                exception.printStackTrace();
+                Toast.makeText(this, "Failed to connect to Bluetooth", Toast.LENGTH_SHORT).show();
+            }
         });
         findViewById(R.id.multi_player_button).setOnClickListener(view -> showMultiplayerDialog(email));
         findViewById(R.id.player_stats_button).setOnClickListener(view -> startActivity(new Intent(this, UserStatisticsActivity.class)));
-        findViewById(R.id.bluetooth_test_button).setOnClickListener(view -> {
-            BluetoothThread.createInstance(1);
-            BluetoothThread thread = BluetoothThread.getInstance();
-            thread.startReading();
-            if (thread.isValidThread()) {
-                thread.write("Test message~".getBytes());
-            }
-        });
     }
 
     @Override
@@ -70,14 +69,24 @@ public class MainActivity extends SetThemeActivity implements ActivityCompat.OnR
         builder.setMessage("Do you want to create or join a lobby?");
         builder.setNeutralButton("Cancel", ((dialog, which) -> dialog.dismiss()));
         builder.setNegativeButton("Join", ((dialog, which) -> {
-            BluetoothThread.createInstance(2);
-            UnityMessage.join(email);
-            startLobbyActivity();
+            try {
+                BluetoothThread.createInstance(2);
+                UnityMessage.join(email);
+                startLobbyActivity();
+            } catch (IOException exception) {
+                exception.printStackTrace();
+                Toast.makeText(this, "Failed to connect to Bluetooth", Toast.LENGTH_SHORT).show();
+            }
         }));
         builder.setPositiveButton("Create", ((dialog, which) -> {
-            BluetoothThread.createInstance(1);
-            UnityMessage.create(email, 2);
-            startLobbyActivity();
+            try {
+                BluetoothThread.createInstance(1);
+                UnityMessage.create(email, 2);
+                startLobbyActivity();
+            } catch (IOException exception) {
+                exception.printStackTrace();
+                Toast.makeText(this, "Failed to connect to Bluetooth", Toast.LENGTH_SHORT).show();
+            }
         }));
         builder.create().show();
     }

@@ -18,7 +18,6 @@ public class BluetoothThread {
 
     private static final String BLUETOOTH_DEBUG = "Bluetooth";
     private static BluetoothThread instance = null;
-    private static Thread readingThread = null;
 
     private static final Set<String> CHIP_ONE_MAC_IDS = new HashSet<>(Arrays.asList("20:18:11:21:24:72", "B8:9A:2A:30:2B:35")); // TODO: rely only on device name?
     private static final Set<String> CHIP_ONE_DEVICE_NAMES = new HashSet<>(Arrays.asList("hc01.com HC-05"));
@@ -29,9 +28,9 @@ public class BluetoothThread {
     private BluetoothSocket bluetoothSocket;
     private InputStream inputStream;
     private OutputStream outputStream;
-    private int chipId;
+    private final int chipId;
 
-    BluetoothThread(int chipId) {
+    BluetoothThread(int chipId) throws IOException {
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
         // List all devices
         for (BluetoothDevice device : adapter.getBondedDevices()) {
@@ -39,35 +38,31 @@ public class BluetoothThread {
         }
         Optional<BluetoothDevice> device = adapter.getBondedDevices().stream()
                 .filter(chipId == 1 ? BluetoothThread::isChipOneDevice : BluetoothThread::isChipTwoDevice).findAny();
-        bluetoothSocket = null;
-        inputStream = null;
-        outputStream = null;
-
         // create socket
         try {
             bluetoothSocket = device.isPresent() ? device.get().createRfcommSocketToServiceRecord(SERVICE_UUID)
                     : null;
-            Log.d(BLUETOOTH_DEBUG, device.isPresent() ? "Connected " + bluetoothSocket.toString() : "Failed");
+            if (bluetoothSocket == null) {
+                Log.d(BLUETOOTH_DEBUG, "Failed to find device\n");
+                throw new IOException();
+            }
         } catch (IOException e) {
             Log.d(BLUETOOTH_DEBUG, "Socket creation failed\n" + e.toString());
+            throw e;
         }
 
         // connect socket
-        if (bluetoothSocket != null) {
-            try {
-                bluetoothSocket.connect();
-                // get streams
-                try {
-                    inputStream = bluetoothSocket.getInputStream();
-                    outputStream = bluetoothSocket.getOutputStream();
-                } catch (IOException e) {
-                    Log.d(BLUETOOTH_DEBUG, "Exception getting streams\n" + e.toString());
-                }
-            } catch (IOException exception) {
-                close();
-            }
-
+        try {
+            bluetoothSocket.connect();
+            // get streams
+            inputStream = bluetoothSocket.getInputStream();
+            outputStream = bluetoothSocket.getOutputStream();
+        } catch (IOException e) {
+            Log.d(BLUETOOTH_DEBUG, "Exception getting connection/retrieving streams\n" + e.toString());
+            close();
+            throw e;
         }
+        this.chipId = chipId;
     }
 
     private static boolean isChipOneDevice(BluetoothDevice device) {
@@ -80,7 +75,7 @@ public class BluetoothThread {
                 || CHIP_TWO_DEVICE_NAMES.contains(device.getName());
     }
 
-    public static void createInstance(int chipId) {
+    public static void createInstance(int chipId) throws IOException {
         if (instance != null) {
             instance.close();
         }
@@ -89,20 +84,21 @@ public class BluetoothThread {
     }
 
     public static BluetoothThread getInstance() {
-        if (instance != null && !instance.isValidThread()) {
-            instance = new BluetoothThread(instance.chipId);
+        if (instance != null && instance.isInvalidThread()) {
+            try {
+                instance = new BluetoothThread(instance.chipId);
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
         }
         return instance;
     }
 
     public void startReading() {
-        if (readingThread == null) {
-            if (bluetoothSocket != null && bluetoothSocket.isConnected()) {
-                readingThread = new Thread(this::read);
-                readingThread.start();
-            } else {
-                Log.d(BLUETOOTH_DEBUG, "Can't read, socket not connected");
-            }
+        if (bluetoothSocket.isConnected()) {
+            new Thread(this::read).start();
+        } else {
+            Log.d(BLUETOOTH_DEBUG, "Can't read, socket not connected");
         }
     }
 
@@ -126,17 +122,16 @@ public class BluetoothThread {
             }
         } catch (IOException e) {
             close();
-            readingThread = null;
             Log.d(BLUETOOTH_DEBUG, "Read failed, exiting\n" + e.toString());
         }
     }
 
-    public boolean isValidThread() {
-        return bluetoothSocket != null && inputStream != null && outputStream != null;
+    public boolean isInvalidThread() {
+        return !bluetoothSocket.isConnected() || inputStream == null || outputStream == null;
     }
 
     public void write(byte[] bytes) {
-        if (!isValidThread()) {
+        if (isInvalidThread()) {
             Log.d(BLUETOOTH_DEBUG, "Can't write, invalid thread");
         } else {
             try {
@@ -150,17 +145,13 @@ public class BluetoothThread {
     }
 
     public void close() {
-        if (bluetoothSocket != null) {
-            try {
-                bluetoothSocket.close();
-            } catch (IOException e) {
-                Log.d(BLUETOOTH_DEBUG, "Failed to close socket\n" + e.toString());
-            } finally {
-                instance = null;
-                inputStream = null;
-                outputStream = null;
-                bluetoothSocket = null;
-            }
+        try {
+            bluetoothSocket.close();
+        } catch (IOException e) {
+            Log.d(BLUETOOTH_DEBUG, "Failed to close socket\n" + e.toString());
+        } finally {
+            inputStream = null;
+            outputStream = null;
         }
     }
 }
