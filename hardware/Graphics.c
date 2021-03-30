@@ -37,10 +37,11 @@ void squaremapper(int x, int y, int player, int colour)
 void squaremappership(int player, int x, int y, int length, int dir, int done, int colour)
 {
     //dir 1 is down, dir 2 is horizontal
+    //left player is 1, right player is 2
     WAIT_FOR_GRAPHICS;              // is graphics ready for new command
     GraphicsX1Reg = x;              // write coords to x1, y1
     GraphicsY1Reg = y;
-    GraphicsX2Reg = player;
+    GraphicsX2Reg = player - 1;
     GraphicsColourReg = colour;
     GraphicsCommandReg = Squaremapper;
 
