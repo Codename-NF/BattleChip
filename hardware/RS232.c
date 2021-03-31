@@ -12,6 +12,9 @@
 **  Refer to UART data sheet for details of registers and programming
 ***************************************************************************/
 
+static const char dofile[] = "dofile(\"send_text_message.lua\")\n";
+static const char checkthewifi[] = "check_wifi()\n";
+
 int main(void) {
     int i = 0;
     // *WIFI_ENABLE = 1;
@@ -21,6 +24,7 @@ int main(void) {
     Init_RS232();
     RS232Flush();
     *WIFI_RESET = 0;
+    char hello;
     for (i = 0; i < 20; i++) {
         printf("1\n");
     }
@@ -29,18 +33,24 @@ int main(void) {
         printf("2\n");
     }
     RS232Flush();
-    char myString[3];
-    myString[2] = '\0';
-    printf("Hello\n");
-    char hello = '0';
-    putcharRS232('A');
-    putcharRS232('T');
-    putcharRS232('\r');
-    putcharRS232('\n');
     
-    while (1) {
-                
-        printf("Sent commands... \n");
+    i = 0;
+    while (dofile[i] != '\0') {
+        putcharRS232(dofile[i]);
+        i++;
+    }
+    for (i = 0; i < 5; i++) {
+        printf("1\n");
+    }
+    RS232Flush();
+    i = 0;
+    while (checkthewifi[i] != '\0') {
+        putcharRS232(checkthewifi[i]);
+        i++;
+    }
+    hello = 'a';
+
+    while (hello != '\n') {
         hello = getcharRS232();
         if (hello == '\n') {
             printf("Received new line\n");
@@ -49,20 +59,40 @@ int main(void) {
         } else {
             printf("%c\n", hello);
         }
-        myString[0] = hello;
+    }
+
+    for (i = 0; i < 20; i++) {
+        printf("1\n");
+    }
+
+    i = 0;
+    while (checkthewifi[i] != '\0') {
+        putcharRS232(checkthewifi[i]);
+        i++;
+    }
+
+    char thirdlast = 'h';
+    char secondlast = 'i';
+    
+    while (1) {
+        thirdlast = secondlast;
+        secondlast = hello;                
         hello = getcharRS232();
-        if (hello == '\r' || hello == '\n') {
+        if (hello == '\n') {
             printf("Received new line\n");
+        } else if (hello == '\r') {
+            printf("Received backslash r line\n");
         } else {
             printf("%c\n", hello);
         }
-        myString[1] = hello;
-        if (myString[0] == 'O' && myString[1] == 'K') {
+
+        if (hello == 'd' && secondlast == 'e' && thirdlast == 'u') {
             break;
         }
+
+        
     }
-    printf("My string is: %s\n", myString);
-    printf("%d\n", RS232TestForReceivedData());
+    printf("All done %d\n", RS232TestForReceivedData());
     RS232Flush();
     return 0;
 }
