@@ -12,6 +12,7 @@ public enum CellState
     Targeted,
     Missed,
     Hit,
+    Sunk,
 }
 
 public class Cell : EventTrigger
@@ -46,9 +47,11 @@ public class Cell : EventTrigger
     {
         int xCoord = mBoardPosition.x;
         int yCoord = mBoardPosition.y;
+        Color32 tempColor;
 
         // Update the currently targeted cell (the cell that is being hovered over)
-        if (RectTransformUtility.RectangleContainsScreenPoint(mRectTransform, Input.mousePosition))
+        if (RectTransformUtility.RectangleContainsScreenPoint(mRectTransform, Input.mousePosition) &&
+            !GlobalState.WaitingForPush && !GlobalState.GameIsPaused)
         {
             mBoard.mTargetedCell = this;
         }
@@ -81,15 +84,24 @@ public class Cell : EventTrigger
             {
                 mCellState = CellState.Hit;
             }
+            else if (mBoard.mShotsOnMe[xCoord, yCoord] == ShotType.Sunk)
+            {
+                mCellState = CellState.Sunk;
+            }
             else if (mBoard.mShotsOnMe[xCoord, yCoord] == ShotType.Miss)
             {
                 mCellState = CellState.Missed;
             }
-            /*
-            else if (mCurrentPieces.Count == 1)
+            else if (mIncludedShips.Count == 1)
             {
                 mCellState = CellState.Occupied;
-            }*/
+            }
+            else if (mIncludedShips.Count > 1) 
+            {
+                // This shouldn't occur on the defence screen
+                // This is here for debugging purposes
+                mCellState = CellState.Targeted;
+            }
             else
             {
                 mCellState = CellState.Default;
@@ -105,10 +117,6 @@ public class Cell : EventTrigger
             else if (mIncludedShips.Count == 1)
             {
                 mCellState = CellState.Occupied;
-            }
-            else if (RectTransformUtility.RectangleContainsScreenPoint(mRectTransform, Input.mousePosition))
-            {
-                mCellState = CellState.Missed;
             }
             else
             {
@@ -131,10 +139,37 @@ public class Cell : EventTrigger
                 mImage.color = new Color32(255, 255, 255, 255);
                 break;
             case CellState.Hit: // This cell was shot (and hit a ship)
-                mImage.color = GlobalState.ColorTheme.CellPieceColor;
+                if (GlobalState.GameState == GameState.Attacking)
+                {
+                    // Cell shows a hit on the opponent
+                    tempColor = GlobalState.ColorTheme.CellEnemyColor;
+                    tempColor.a = 100;
+                }
+                else 
+                {
+                    // Cell shows a hit on the player
+                    tempColor = GlobalState.ColorTheme.CellPieceColor;
+                    tempColor.a = 100;
+                }
+                mImage.color = tempColor;
+                break;
+            case CellState.Sunk: // This cell was shot (and hit a ship)
+                if (GlobalState.GameState == GameState.Attacking)
+                {
+                    // Cell shows a hit on the opponent
+                    tempColor = GlobalState.ColorTheme.CellEnemyColor;
+                    tempColor.a = 50;
+                }
+                else 
+                {
+                    // Cell shows a hit on the player
+                    tempColor = GlobalState.ColorTheme.CellPieceColor;
+                    tempColor.a = 50;
+                }
+                mImage.color = tempColor;
                 break;
             case CellState.Missed: // This cell was shot (but it was empty)
-                mImage.color = new Color32(255, 255, 255, 10);
+                mImage.color = new Color32(0, 0, 0, 0);
                 break;
             default: // Original checkerboard color
                 if (mBoardPosition.x % 2 != mBoardPosition.y % 2)
@@ -152,44 +187,47 @@ public class Cell : EventTrigger
     public override void OnPointerUp(PointerEventData eventData)
     {
         base.OnPointerUp(eventData);
-
-        if (!mWasDragged)
+        if (GlobalState.GameState == GameState.Placement)
         {
-            mIncludedShips[0].Rotate(this);
+            if (!mWasDragged && !GlobalState.WaitingForPush)
+            {
+                mIncludedShips[0].Rotate(this);
+            }
+            mBoard.mTargetedShip = null;
+            mWasDragged = false;
         }
-        mBoard.mTargetedShip = null;
-        mWasDragged = false;
-        /*
-        // If this cell was clicked while we are attacking
-        if (GlobalState.GameState == GameState.Attacking &&
-            RectTransformUtility.RectangleContainsScreenPoint(this.mRectTransform, Input.mousePosition) && 
-            this.mCellState == CellState.Default)
-        {
-            // Replace the board's current target with this cell
-            mBoard.mTargetedCell = this;
-        }
-        mBoard.mOriginalCell = null; */
     }
 
     public override void OnPointerDown(PointerEventData eventData)
     {
         base.OnPointerDown(eventData);
-        mBoard.mOriginalCell = this;
-        mBoard.mTargetedShip = (mIncludedShips.Count > 0) ? mIncludedShips[0] : null;
-        mWasDragged = false;
-        // mBoard.mTargetedCell = this;
-        // Debug.LogFormat("Cell {0},{1} detected a MousePointerDown event", mBoardPosition.x, mBoardPosition.y);
+        if (!GlobalState.WaitingForPush)
+        {
+            if (GlobalState.GameState == GameState.Placement)
+            {
+                mBoard.mOriginalCell = this;
+                mBoard.mTargetedShip = (mIncludedShips.Count > 0) ? mIncludedShips[0] : null;
+                mWasDragged = false;
+            }
+            else if (GlobalState.GameState == GameState.Attacking)
+            {
+                if (mCellState == CellState.Default)
+                {
+                    mBoard.mTargetedCell = this;
+                }
+            }
+        }
     }
 
     /* Cell detects dragging and moves ship when current cell != the cell hovered by the player */
     public override void OnDrag(PointerEventData eventData)
     {
         base.OnDrag(eventData);
-
-        mWasDragged = true;
         // Only allow dragging of ships during placement phase of the game
-        if (GlobalState.GameState == GameState.Placement)
+        if (GlobalState.GameState == GameState.Placement && !GlobalState.WaitingForPush)
         {
+            mWasDragged = true;
+
             // Compute delta between old cell and new cell
             int xOriginal = mBoard.mOriginalCell.mBoardPosition.x;
             int yOriginal = mBoard.mOriginalCell.mBoardPosition.y;
@@ -198,11 +236,10 @@ public class Cell : EventTrigger
             int xDelta = xNew - xOriginal;
             int yDelta = yNew - yOriginal;
 
-            Debug.LogFormat("Delta is {0},{1}", xDelta, yDelta);
+            // Debug.LogFormat("Delta is {0},{1}", xDelta, yDelta);
             // If player dragged between two different tiles
-            if (xDelta != 0 || yDelta != 0)
+            if ((xDelta != 0 || yDelta != 0) && mBoard.mTargetedShip != null)
             {
-                
                 // If ship was moved successfully
                 if (mBoard.mTargetedShip.Move(xDelta, yDelta))
                 {
@@ -210,7 +247,6 @@ public class Cell : EventTrigger
                     mBoard.mOriginalCell = mBoard.mTargetedCell;
                 }
             }
-            // Debug.LogFormat("OnDrag: {0}, {1}", mBoardPosition.x, mBoardPosition.y)
         }
     }
 }

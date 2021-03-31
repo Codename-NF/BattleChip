@@ -19,7 +19,7 @@ public class BluetoothThread {
     private static final String BLUETOOTH_DEBUG = "Bluetooth";
     private static BluetoothThread instance = null;
 
-    private static final Set<String> CHIP_ONE_MAC_IDS = new HashSet<>(Arrays.asList("20:18:11:21:24:72", "B8:9A:2A:30:2B:35")); // TODO: rely only on device name?
+    private static final Set<String> CHIP_ONE_MAC_IDS = new HashSet<>(Arrays.asList("20:18:11:21:24:72", "B8:9A:2A:30:2B:35", "34:F6:4B:D7:53:65")); // TODO: rely only on device name?
     private static final Set<String> CHIP_ONE_DEVICE_NAMES = new HashSet<>(Arrays.asList("hc01.com HC-05"));
     private static final Set<String> CHIP_TWO_MAC_IDS = new HashSet<>(); // TODO: fill
     private static final Set<String> CHIP_TWO_DEVICE_NAMES = new HashSet<>(); // TODO: fill
