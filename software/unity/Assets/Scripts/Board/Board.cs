@@ -7,6 +7,7 @@ public enum ShotType {
     None,
     Miss,
     Hit,
+    Sunk,
 }
 
 public class Board : MonoBehaviour
@@ -22,9 +23,12 @@ public class Board : MonoBehaviour
     public ShotType[,] mShotsOnMe = new ShotType[10, 10];
     public ShotType[,] mShotsOnOpponent = new ShotType[10, 10];
 
-    // Reference to the cell currently being targetted
+    // Reference to the cells for ship dragging operations
+    public Cell mOriginalCell;
     public Cell mTargetedCell;
+    public Ship mTargetedShip;
 
+    /* Setup function to initialize the board and its cells */
     public void Create()
     {
         // Create a 10x10 board of cells
@@ -55,10 +59,16 @@ public class Board : MonoBehaviour
             }
         }
 
+        // Initialize reference to null
         mTargetedCell = null;
+        mOriginalCell = null;
+        mTargetedShip = null;
+
+        // Indicate that setup is complete
         mDoneSetup = true;
     }
 
+    /* Returns true if no ships overlap, false otherwise */
     public bool ValidateShips()
     {
         // Don't validate until ships have been placed
@@ -70,7 +80,7 @@ public class Board : MonoBehaviour
             for (int j = 0; j < 10; j++)
             {
                 // If cell is occupied by more than one ship
-                if (mAllCells[i, j].mCurrentPieces.Count > 1)
+                if (mAllCells[i, j].mIncludedShips.Count > 1)
                 {
                     return false;
                 }

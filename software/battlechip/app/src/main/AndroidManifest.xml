@@ -15,6 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BattleChip"
         android:usesCleartextTraffic="true">
+        <activity android:name=".activity.LobbyActivity"/>
         <activity android:name=".activity.UserStatisticsActivity" />
         <activity android:name=".activity.LoginActivity">
             <intent-filter>

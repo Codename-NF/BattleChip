@@ -12,9 +12,16 @@
     <string name="color_key">color</string>
     <string name="theme_key">theme</string>
     <string name="statistics_name_text">&lt;b&gt;&lt;font color=%d&gt;Name: &lt;/font&gt;&lt;/b&gt;%s %s</string>
-    <string name="statistics_win_loss_text">&lt;b&gt;&lt;font color=%d&gt;Wins: &lt;/font&gt;&lt;/b&gt;%d&lt;br&gt;
-        &lt;b&gt;&lt;font color=%d&gt;Losses: &lt;/font&gt;&lt;/b&gt;%d</string>
+    <string name="statistics_win_text">&lt;b&gt;&lt;font color=%d&gt;Wins: &lt;/font&gt;&lt;/b&gt;%d</string>
+    <string name="statistics_loss_text">&lt;b&gt;&lt;font color=%d&gt;Losses: &lt;/font&gt;&lt;/b&gt;%d</string>
     <string name="match_result_text">&lt;b&gt;&lt;font color=%d&gt;%s &lt;/font&gt;&lt;/b&gt;</string>
-    <string name="ships_sunk_text">&lt;b&gt;&lt;font color=%d&gt;Ships sunk: &lt;/font&gt;&lt;/b&gt;%d to %d</string>
+    <string name="hits_text">&lt;b&gt;&lt;font color=%d&gt;Hits: &lt;/font&gt;&lt;/b&gt;&lt;b&gt;&lt;font color=%d&gt;%d&lt;/font&gt;&lt;/b&gt; - &lt;b&gt;&lt;font color=%d&gt;%d&lt;/font&gt;&lt;/b&gt;</string>
     <string name="opponent_text">&lt;b&gt;&lt;font color=%d&gt;Opponent: &lt;/font&gt;&lt;/b&gt;%s</string>
+    <string name="lobby_text">
+        Waiting for opponent to join!\n
+        Please have your opponent connect to the other Bluetooth device on the console</string>
+    <string name="return_to_main_menu_button_label">Return to main menu</string>
+    <string name="failed_to_create_game_text">
+        Failed to create/join game.
+    </string>
 </resources>
