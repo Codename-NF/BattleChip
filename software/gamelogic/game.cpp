@@ -378,6 +378,7 @@ void setting_up_ships_BT(list<player>::iterator *p1, list<player>::iterator *p2,
     }
 
 }
+
 void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, bool single_player_mode) {
     bool game_finished = false;
 
@@ -409,6 +410,20 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
             }
             
         }
+
+        // check for forfeit 
+        // TODO: send to VGA as well 
+        if (inputs.p1_forfeit) {
+            game_finished = true;
+            send_win_by_forfiet_BT(PLAYER2);
+            break;
+        }
+        if (inputs.p2_forfeit) {
+            game_finished = true;
+            send_win_by_forfiet_BT(PLAYER1);
+            break;
+        }
+
         
         int x_in = inputs.x;
         int y_in = inputs.y;

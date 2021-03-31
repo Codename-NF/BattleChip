@@ -117,12 +117,31 @@ Format:
 shootvalues get_shoot_message_BT(int device_num) {
     int x,y;
 
-    char receive_char[256];
+    char receive_char[BT_RECEIVE_SIZE];
+    char forfeit_char[BT_RECEIVE_SIZE];
+    int success = 0;
     if (device_num == 1) {
         BT_receive_0(receive_char);
+        success = BT_receive_1(forfeit_char);
     }
     else {
         BT_receive_1(receive_char);
+        success = BT_receive_0(forfeit_char);
+    }
+
+    // checking for forfeit messages at the beginning of each turn 
+    if (receive_char[0] = 'f') {
+        if (device_num == 1) {
+            return shootvalues(true, false);
+        }
+        return shootvalues(false, true);
+    }
+
+    if (success && forfeit_char[0] == 'f') {
+        if (device_num == 1) {
+            return shootvalues(false, true);
+        }
+        return shootvalues(true, false);
     }
 
     string input = string(receive_char);
@@ -432,4 +451,13 @@ Sent when the multiplayer lobby is full and the players may begin placement
 void send_ready_messaeg_BT() {
     BT_send_0("ready~");
     BT_send_1("ready~");
+}
+
+void send_win_by_forfiet_BT(int device_num) {
+    if (device_num == 1) {
+        BT_send_0("f~");
+    }
+    else {
+        BT_send_1("f~");
+    }
 }

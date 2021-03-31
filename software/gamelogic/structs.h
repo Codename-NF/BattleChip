@@ -111,11 +111,18 @@ struct shootvalues {
     int x;
     int y;
     int device_num;
+    bool p1_forfeit = false;
+    bool p2_forfeit = false;
 
     shootvalues(int x, int y, int device_num) {
         this->x = x;
         this->y = y;
         this->device_num = device_num;
+    }
+
+    shootvalues(bool p1_forfeit, bool p2_forfeit) {
+        this->p1_forfeit = p1_forfeit;
+        this->p2_forfeit = p2_forfeit;
     }
 };
 

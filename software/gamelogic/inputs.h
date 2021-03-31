@@ -30,3 +30,5 @@ int get_join_message_BT();
 void send_join_reponse_BT(int status);
 
 void send_ready_messaeg_BT();
+
+void send_win_by_forfiet_BT(int device_num);
