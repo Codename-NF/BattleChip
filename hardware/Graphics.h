@@ -29,6 +29,7 @@ extern "C" {
 #define DrawLine			3
 #define Blankboard      4
 #define Squaremapper    5
+#define CrossBox		6
 #define	PutAPixel		0xA
 #define	GetAPixel		0xB
 #define	ProgramPaletteColour    0x10
