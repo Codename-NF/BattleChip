@@ -12,8 +12,8 @@
 
 int main(void) {
     Init_RS232();
-    RS232Flush_0();
-    RS232Flush_1();
+    // RS232Flush_0();
+    // RS232Flush_1();
     char receive_char_0[256];
     char receive_char_1[256];
     receive_char_0[0] = 1;
@@ -71,6 +71,8 @@ void Init_RS232(void)
     // Now Clear all bits in the FiFo control registers
     *RS232_FifoControlReg_0 = 0;
     *RS232_FifoControlReg_1 = 0;
+    RS232Flush_0();
+    RS232Flush_1();
 }
 
 int putcharRS232_0(int c)
@@ -161,19 +163,19 @@ int BT_receive_0(char *receive_char)
     }
 
     int x;
-    for(x = receive_char[0];RS232TestForReceivedData_0();x++) {
+    for(x = 0;RS232TestForReceivedData_0();x++) {
         receive_char[x] = getcharRS232_0();
-        putcharRS232_0(receive_char[x]);
+        // putcharRS232_1(receive_char[x]);
     }
 
     if (receive_char[x-1] == '~') {
-        receive_char[0] = 1;
+        // receive_char[0] = 1;
         receive_char[x] = '\0';
         RS232Flush_0();
         return 1;
     }
-    receive_char[0] = x;
-    return 0;
+    // receive_char[0] = x;
+    return 2;
 }
 int BT_receive_1(char *receive_char)
 {
@@ -182,17 +184,17 @@ int BT_receive_1(char *receive_char)
     }
 
     int x;
-    for(x = receive_char[0];RS232TestForReceivedData_1();x++) {
+    for(x = 0;RS232TestForReceivedData_1();x++) {
         receive_char[x] = getcharRS232_1();
-        putcharRS232_1(receive_char[x]);
+        // putcharRS232_1(receive_char[x]);
     }
 
     if (receive_char[x-1] == '~') {
-        receive_char[0] = 1;
+        // receive_char[0] = 1;
         receive_char[x] = '\0';
         RS232Flush_1();
         return 1;
     }
-    receive_char[0] = x;
-    return 0;
+    // receive_char[0] = x;
+    return 2;
 }
