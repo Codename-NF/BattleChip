@@ -59,8 +59,8 @@ struct ship {
 
 struct player {
     public: 
-        string player_name; // probably don't need this 
-        string player_email;
+        string player_name; // for CLI only
+        int player_id;
         int player_num;
         list<ship> ships_list;
         set<box> boxes_hit;
@@ -73,7 +73,6 @@ struct player {
                 this->ships_list.push_back(ship());
             }
             this->player_name = "";
-            this->player_email = "";
             this->player_num = player_num;
             this->remaining_ships = NUM_OF_SHIPS;
             this->all_boxes_on_board = {};
@@ -121,14 +120,14 @@ struct shootvalues {
 };
 
 struct createmessage {
-    string keywrod;
+    char keywrod;
     int numplayer;
-    string email;
+    int playerid;
 
-    createmessage(string keyword, int numplayer, string email) {
+    createmessage(char keyword, int numplayer, int playerid) {
         this->keywrod = keyword;
         this->numplayer = numplayer;
-        this->email = email;
+        this->playerid = playerid;
     }
 };
 // ******************* bluetooth place holder *******************

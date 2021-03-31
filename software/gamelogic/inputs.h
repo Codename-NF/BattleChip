@@ -25,7 +25,7 @@ createmessage get_create_message_BT();
 
 void send_create_response_BT(int num_players, int status);
 
-string get_join_message_BT();
+int get_join_message_BT();
 
 void send_join_reponse_BT(int status);
 

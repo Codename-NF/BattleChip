@@ -62,7 +62,7 @@ void setting_up_ships(list<player>::iterator *p1, list<player>::iterator *p2, bo
         int length = inputs.size;
         int orientation = inputs.orientation;
         bool came_from_player1;
-        if (inputs.device_num == 1) {
+        if (inputs.device_num == PLAYER1) {
             came_from_player1 = true;
         }
         else {
@@ -205,9 +205,6 @@ void playing_game(list<player>::iterator *p1, list<player>::iterator *p2, bool s
 
 void AI_setting_up(list<player>::iterator *AI) {
     list<ship>::iterator ships_being_set_up = (*AI)->ships_list.begin();
-    (*AI)->player_name = "Milo";
-
-    cout << "AI name is " << (*AI)->player_name << endl;
 
     // setting up ships 
     // keep getting random place until it works? 
@@ -263,15 +260,15 @@ void AI_setting_up(list<player>::iterator *AI) {
 createmessage create_lobby() {
     createmessage input1 = get_create_message_BT();
 
-    while(input1.keywrod == "fail") {
-        string input2 = get_join_message_BT();
-        if (input2 != "fail") {
+    while(input1.keywrod == 'f') {
+        int input2 = get_join_message_BT();
+        if (input2 == -1) {
             send_join_reponse_BT(FAILURE);
         }
         input1 = get_create_message_BT();
     }
 
-    if (input1.keywrod == "create") {
+    if (input1.keywrod == 'c') {
         send_create_response_BT(input1.numplayer, SUCCESS);
     }
     else {
@@ -281,35 +278,35 @@ createmessage create_lobby() {
     return input1;
 }
 
-string wait_for_player2() {
-    string input2;
+int wait_for_player2() {
+    int input2;
 
     do {
         input2 = get_join_message_BT();
     }
-    while (input2 == "fail");
+    while (input2 == -1);
 
     send_join_reponse_BT(SUCCESS);
     return input2;
 }
 
 void reject_player2() {
-    string input2 = get_join_message_BT();
-    if (input2 != "fail") {
+    int input2 = get_join_message_BT();
+    if (input2 != -1) {
         send_join_reponse_BT(FAILURE);
     }
 }
 
-void setting_emails(battleship *game, string email1) {
+void setting_player_id(battleship *game, int player1_id) {
     list<player>::iterator player_it = (*game).players.begin();
-    player_it->player_email = email1;
+    player_it->player_id = player1_id;
 
 }
-void setting_emails(battleship *game, string email1, string email2) {
+void setting_player_id(battleship *game, int player1_id, int player2_id) {
     list<player>::iterator player_it = (*game).players.begin();
-    player_it->player_email = email1;
+    player_it->player_id = player1_id;
     player_it++;
-    player_it->player_email = email2;
+    player_it->player_id = player2_id;
 }
 
 void assign_ship(list<player>::iterator *player, list<setupvalues>::iterator it) {
@@ -403,7 +400,7 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
                 // TODO 
                 set<box> shots_with_ships;
                 create_shots_with_ships(&((*p1)->boxes_hit), &shots_with_ships);
-                send_information_to_AI((*p1)->boxes_hit, (*p1)->ships_alive, shots_with_ships);
+                //send_information_to_AI((*p1)->boxes_hit, (*p1)->ships_alive, shots_with_ships);
                 int magic_number = 99;//some_input_function_from_AI();
                 inputs.x = magic_number % 10;
                 inputs.y = magic_number / 10;
@@ -444,17 +441,17 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
                 }
                 send_result_message_BT(current_attacking, x_in, y_in, game_finished, status, sunk_ship.start_box.x, sunk_ship.start_box.y, sunk_ship.size, sunk_ship.orientation);
                 send_targeted_message_BT(next_up, x_in, y_in, game_finished, status, sunk_ship.start_box.x, sunk_ship.start_box.y, sunk_ship.size, sunk_ship.orientation);
-                squaremappership(next_up, sunk_ship.start_box.x, sunk_ship.start_box.y, sunk_ship.size, sunk_ship.orientation, game_finished, MAGENTA);
-                // TODO: game over call to VGA 
+                squaremapper(x_in, y_in, next_up, HIT_COLOR);
+                squaremappership(next_up, sunk_ship.start_box.x, sunk_ship.start_box.y, sunk_ship.size, sunk_ship.orientation, game_finished, SUNK_CROSS_COLOR);
                 continue;
             }
             send_result_message_BT(current_attacking, x_in, y_in, game_finished, status);
             send_targeted_message_BT(next_up, x_in, y_in, game_finished, status);
             if (status == HIT_STATUS_CODE) {
-                squaremapper(x_in, y_in, next_up, RED);
+                squaremapper(x_in, y_in, next_up, HIT_COLOR);
             }
             else {
-                squaremapper(x_in, y_in, next_up, WHITE);
+                squaremapper(x_in, y_in, next_up, MISS_COLOR);
             }
             
 

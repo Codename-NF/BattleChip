@@ -3,27 +3,9 @@
 #include "structs.h"
 #include "inputs.h"
 #include "game.h"
+#include "RS232.h"
 #include "Graphics.h"
-/**
- * 
- * fyi setupvalues only work for a single ship, i'm guessing you're expecting bluetooth to pass in a list of those?
- * Why don't you just make it contain a ship anyways...
- * 
- * 
- * 
- * */
 
-/**
- * For AI(Eleiah):
- * 1. Boxes that's already hit (probably 1 update at a time instead of putting all in memory)
- * 2. Hit status
- * 3. Remaining ships
- * 
- * 
- * For display(Mario):
- * 1. Places hit
- * 2. Hit Stuats 
- **/
 int main () {
     if (DEBUG) { // CMD playing debug only 
         int player_num;
@@ -35,19 +17,17 @@ int main () {
             battleship game = battleship(player_num);
             list<player>::iterator p1, p2;
             for (list<player>::iterator it = game.players.begin(); it != game.players.end(); it++) {
-                if (it->player_num == 1) {
+                if (it->player_num == PLAYER1) {
                     p1 = it;
                 }
-                else if (it->player_num == 2) {
+                else if (it->player_num == PLAYER2) {
                     p2 = it;
                 }
             }
             
             getting_names(&game, player_num);
-            // cout << p1->player_name << endl;
-            // cout << p2->player_name << endl;
+            
             setting_up_ships(&p1, &p2, single_player);
-
 
             playing_game(&p1, &p2, single_player);
         }
@@ -57,10 +37,10 @@ int main () {
             battleship game = battleship(2);
             list<player>::iterator p1, AI;
             for (list<player>::iterator it = game.players.begin(); it != game.players.end(); it++) {
-                if (it->player_num == 1) {
+                if (it->player_num == PLAYER1) {
                     p1 = it;
                 }
-                else if (it->player_num == 2) {
+                else if (it->player_num == PLAYER2) {
                     AI = it;
                 }
             }
@@ -77,6 +57,7 @@ int main () {
         return 0;
     }
     else { // dealing with UI / BT
+        Init_RS232();
         blankscreen( BLUE );
         int player_num;
         bool single_player = false;
@@ -85,20 +66,20 @@ int main () {
         player_num = input1.numplayer;
 
         if (player_num == 2) {
-            string input2 = wait_for_player2();
+            int input2 = wait_for_player2();
 
             battleship game = battleship(player_num);
             list<player>::iterator p1, p2;
             for (list<player>::iterator it = game.players.begin(); it != game.players.end(); it++) {
-                if (it->player_num == 1) {
+                if (it->player_num == PLAYER1) {
                     p1 = it;
                 }
-                else if (it->player_num == 2) {
+                else if (it->player_num == PLAYER2) {
                     p2 = it;
                 }
             }
             
-            setting_emails(&game, player_num, input1.email, input2);
+            setting_player_id(&game, player_num, input1.playerid, input2);
             
             send_ready_messaeg_BT();
             
@@ -114,15 +95,15 @@ int main () {
             battleship game = battleship(2);
             list<player>::iterator p1, AI;
             for (list<player>::iterator it = game.players.begin(); it != game.players.end(); it++) {
-                if (it->player_num == 1) {
+                if (it->player_num == PLAYER1) {
                     p1 = it;
                 }
-                else if (it->player_num == 2) {
+                else if (it->player_num == PLAYER2) {
                     AI = it;
                 }
             }
             
-            setting_emails(&game, player_num, input1.email);
+            setting_player_id(&game, player_num, input1.playerid);
             
             setting_up_ships_BT(&p1, &AI, single_player);
 
