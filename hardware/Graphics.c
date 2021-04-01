@@ -59,6 +59,131 @@ void squaremappership(int player, int x, int y, int length, int dir, int done, i
 
 }
 
+void outgraphicschar(int x, int y, int colour, int backgroundcolour, int c, int Erase) {
+    register int    row,
+                    column,
+                    theX = x,
+                    theY = y ;
+    register int    pixels ;
+    register char   theColour = colour  ;
+    register int    BitMask,
+                    theCharacter = c,
+                    j,
+                    theRow, theColumn;
+
+
+    if(((short)(x) > (short)(XRES-1)) || ((short)(y) > (short)(YRES-1)))  // if start off edge of screen don't bother
+        return ;
+
+    if(((short)(theCharacter) >= (short)(' ')) && ((short)(theCharacter) <= (short)('~'))) {            // if printable character
+        theCharacter -= 0x20 ;                                                                          // subtract hex 20 to get index of first printable character (the space character)
+        theRow = FONT2_YPIXELS;
+        theColumn = FONT2_XPIXELS;
+
+        for(row = 0; row < theRow ; row ++) {
+            pixels = Font10x14[theCharacter][row] ;                                         // get the pixels for row 0 of the character to be displayed
+            BitMask = 512 ;                                                                     // set of hex 200 i.e. bit 7-0 = 0010 0000 0000
+            for(column = 0; column < theColumn;   )     {
+                if((pixels & BitMask))                                                      // if valid pixel, then write it
+                    WriteAPixel(theX+column, theY+row, theColour) ;
+                else {                                                                      // if not a valid pixel, do we erase or leave it along (no erase)
+                    if(Erase == 1)
+                        WriteAPixel(theX+column, theY+row, backgroundcolour) ;
+                    // else leave it alone
+                }
+                    column ++ ;
+                BitMask = BitMask >> 1 ;
+            }
+        }
+    }
+
+}
+
+void winnermessage(int winner, int colour, int background) {
+    int current_x = 0;
+    int current_y = YBASE - (2 * FONT2_YPIXELS);
+    char current_letter = 'P';
+    int i = 0;
+
+    if (winner == 1) {
+        current_x = XBASE1 + 2 * (SQUARESIZE + SPACESIZE);
+        while (P1WINS[i] != '\0') {
+            outgraphicschar(current_x, current_y, colour, background, P1WINS[i], 0);
+            i++;
+            current_x += FONT2_XPIXELS;
+        }
+    } else {
+        current_x = XBASE2 + 2 * (SQUARESIZE + SPACESIZE);
+        while (P2WINS[i] != '\0') {
+            outgraphicschar(current_x, current_y, colour, background, P2WINS[i], 0);
+            i++;
+            current_x += FONT2_XPIXELS;
+        }
+    }
+}
+
+void writecoords() {
+    int current_x = 0;
+    int current_y = 0;
+    int i = 0;
+    int colour = LIME;
+    int background = BLACK;
+
+    //LEFT BOARD
+    current_x = XBASE1 + 5;
+    current_y = YBASE;
+    while (COLCOOR[i] != '\0') {
+        outgraphicschar(current_x, current_y, colour, background, COLCOOR[i], 0);
+        i++;
+        current_x += (SQUARESIZE + SPACESIZE);
+    }
+    current_x = XBASE1 - SQUARESIZE;
+    current_y = YBASE + SQUARESIZE + 3;
+    i = 0;
+    while (ROWCOOR[i] != '\0') {
+        outgraphicschar(current_x, current_y, colour, background, ROWCOOR[i], 0);
+        i++;
+        current_y += (SQUARESIZE + SPACESIZE);
+    }
+    outgraphicschar(current_x - FONT2_XPIXELS, current_y, colour, background, '1', 0);
+    outgraphicschar(current_x, current_y, colour, background, '0', 0);
+
+    //RIGHT BOARD
+    i = 0;
+    current_x = XBASE2 + 5;
+    current_y = YBASE;
+    while (COLCOOR[i] != '\0') {
+        outgraphicschar(current_x, current_y, colour, background, COLCOOR[i], 0);
+        i++;
+        current_x += (SQUARESIZE + SPACESIZE);
+    }
+    current_x = XBASE2 - SQUARESIZE;
+    current_y = YBASE + SQUARESIZE + 3;
+    i = 0;
+    while (ROWCOOR[i] != '\0') {
+        outgraphicschar(current_x, current_y, colour, background, ROWCOOR[i], 0);
+        i++;
+        current_y += (SQUARESIZE + SPACESIZE);
+    }
+    outgraphicschar(current_x - FONT2_XPIXELS, current_y, colour, background, '1', 0);
+    outgraphicschar(current_x, current_y, colour, background, '0', 0);
+
+
+}
+
+void blankscreen(int Colour)
+{
+    WAIT_FOR_GRAPHICS;              // is graphics ready for new command
+
+    GraphicsX1Reg = 0;              // write coords to x1, y1
+    GraphicsY1Reg = 0;
+    GraphicsColourReg = Colour;
+    GraphicsCommandReg = Blankboard;
+    writecoords();
+    winnermessage(1, 0, 0);
+    winnermessage(2, 0, 0); 
+}
+
 /*********************************************************************************************
 * This function read a single pixel from the x,y coords specified and returns its colour
 * Note returned colour is a byte and represents a palette number (0-255) not a 24 bit RGB value
