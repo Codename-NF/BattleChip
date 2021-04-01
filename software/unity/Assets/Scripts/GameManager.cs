@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 public class GameManager : MonoBehaviour
@@ -15,9 +16,13 @@ public class GameManager : MonoBehaviour
     public List<Ship> mShips;
     public ParticleSystem mBackground;
 
+    private bool mAllowStatusUpdates;
+    private int mPlayerShipsRemaining;
+
     // Start is called before the first frame update
     void Start()
     {
+        mAllowStatusUpdates = false;
         GlobalState.GameState = GameState.Placement;
         GlobalState.ColorTheme = new ColorTheme();
         GlobalState.WaitingForPush = false;
@@ -64,6 +69,18 @@ public class GameManager : MonoBehaviour
             // Ship.CreateShip(Board board, int xCoord, int yCoord, int length)
             Debug.LogFormat("Creating ship of length {0} at {1}, {2}", ShipPieces[i], 0, i * 2);
             mShips.Add(Ship.CreateShip(mBoard, 0, i * 2, ShipPieces[i]));
+        }
+
+        mPlayerShipsRemaining = mShips.Count;
+        mAllowStatusUpdates = true;
+    }
+
+    private void Update()
+    {
+        if (mAllowStatusUpdates && !mBoard.ValidateShips() && GlobalState.GameState == GameState.Placement)
+        {
+            mAllowStatusUpdates = false; // Only run one of these threads at a time
+            StartCoroutine(UpdatePlacementMessage());
         }
     }
 
@@ -135,7 +152,7 @@ public class GameManager : MonoBehaviour
                     if (bool.Parse(msgTokens[1]))
                     {
                         // Prepare attack screen
-                        mTitle.GetComponent<TextMeshProUGUI>().text = "Your turn to attack!";
+                        mTitle.GetComponent<TextMeshProUGUI>().text = "Your Turn to Attack!";
                         mStatus.GetComponent<TextMeshProUGUI>().text = "Tap the tile you want to strike.";
                         GlobalState.GameState = GameState.Attacking;
 
@@ -144,8 +161,8 @@ public class GameManager : MonoBehaviour
                     else
                     {
                         // Prepare defending screen
-                        mTitle.GetComponent<TextMeshProUGUI>().text = "Opponent's turn...";
-                        mStatus.GetComponent<TextMeshProUGUI>().text = "Your opponent attacking!";
+                        mTitle.GetComponent<TextMeshProUGUI>().text = "Opponent's Turn...";
+                        mStatus.GetComponent<TextMeshProUGUI>().text = "Your opponent is attacking!";
                         GlobalState.GameState = GameState.Defending;
 
                         GlobalState.WaitingForPush = true;
@@ -158,23 +175,57 @@ public class GameManager : MonoBehaviour
                 {
                     int xCoord = int.Parse(msgTokens[1]);
                     int yCoord = int.Parse(msgTokens[2]);
-                    bool didHit = bool.Parse(msgTokens[3]);
-
-                    // Update board with shot status
-                    mBoard.mShotsOnOpponent[xCoord, yCoord] = (didHit) ? ShotType.Hit : ShotType.Miss;
+                    int gameStatus = int.Parse(msgTokens[3]); // 1 == gameover
+                    int hitStatus = int.Parse(msgTokens[4]); // 0 == miss, 1 == hit, 2 == sunk
                     mBoard.mTargetedCell = null;
 
-                    if (didHit)
+                    // Update the player's history of shots on the opponent
+                    switch (hitStatus)
                     {
-                        mStatus.GetComponent<TextMeshProUGUI>().text = "Success! You hit a ship!";
+                        case 0:
+                            mStatus.GetComponent<TextMeshProUGUI>().text = "Missed! The shot did not connect!";
+                            mBoard.mShotsOnOpponent[xCoord, yCoord] = ShotType.Miss;
+                            break;
+                        case 1:
+                            mStatus.GetComponent<TextMeshProUGUI>().text = "Success! You hit a ship!";
+                            mBoard.mShotsOnOpponent[xCoord, yCoord] = ShotType.Hit;
+                            break;
+                        case 2:
+                            mStatus.GetComponent<TextMeshProUGUI>().text = "Nice! You sunk a ship!";
+                            // Get the ship's position, update each of it's cells to 'sunk'
+                            
+                            int shipX = int.Parse(msgTokens[5]);
+                            int shipY = int.Parse(msgTokens[6]);
+                            int shipL = int.Parse(msgTokens[7]);
+                            int shipO = int.Parse(msgTokens[8]); // Vertical == 1, Horizontal == 2
+                            
+                            for (int i = 0; i < shipL; i++)
+                            {
+                                // Update cell to sunk
+                                mBoard.mShotsOnOpponent[shipX, shipY] = ShotType.Sunk;
+                                if (shipO == 2)
+                                {
+                                    shipX++;
+                                }
+                                else
+                                {
+                                    shipY--;
+                                }
+                            }
+                            break;
+                        default:
+                            Debug.Log("Error: Bad hitStatus value");
+                            break;
                     }
-                    else
+                    
+                    if (gameStatus == 1) // If player sunk the opponent's last ship
                     {
-                        mStatus.GetComponent<TextMeshProUGUI>().text = "Missed! The shot did not connect!";
+                        StartCoroutine(EndTheGame("win"));
                     }
-
-                    // Wait a moment, then switch state to opponent's turn
-                    StartCoroutine(ProcessPlayerAttackResult());
+                    else // Wait a moment, then switch state to opponent's turn
+                    {
+                        StartCoroutine(ProcessPlayerAttackResult());
+                    }
                 }
                 break;
 
@@ -196,6 +247,7 @@ public class GameManager : MonoBehaviour
                         if (mBoard.mAllCells[xCoord, yCoord].mIncludedShips[0].HasShipSunk())
                         {
                             mStatus.GetComponent<TextMeshProUGUI>().text = "Oof! Our ship at (" + xCoord + ", " + yCoord + ") has sunk!";
+                            mPlayerShipsRemaining--;
                         }
                         else
                         {
@@ -207,9 +259,20 @@ public class GameManager : MonoBehaviour
                         mStatus.GetComponent<TextMeshProUGUI>().text = "Whew! Your opponent missed!";
                     }
 
-                    // Wait a moment, then switch state to player's turn
-                    StartCoroutine(ProcessOpponentAttack());
+                    if (mPlayerShipsRemaining < 1)
+                    {
+                        StartCoroutine(EndTheGame("loss"));
+                    }
+                    else
+                    {
+                        // Wait a moment, then switch state to player's turn
+                        StartCoroutine(ProcessOpponentAttack());
+                    }
+                    
                 }
+                break;
+            case "f": // Opponent forfeited
+                StartCoroutine(EndTheGame("opponentForfeit"));
                 break;
 
             default:
@@ -224,7 +287,7 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(3);
         
         // Prepare attack screen
-        mTitle.GetComponent<TextMeshProUGUI>().text = "Your turn to attack!";
+        mTitle.GetComponent<TextMeshProUGUI>().text = "Your Turn to Attack!";
         mStatus.GetComponent<TextMeshProUGUI>().text = "Tap the tile you want to strike.";
         GlobalState.GameState = GameState.Attacking;
 
@@ -238,10 +301,36 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(3);
 
         // Prepare defending screen
-        mTitle.GetComponent<TextMeshProUGUI>().text = "Opponent's turn...";
-        mStatus.GetComponent<TextMeshProUGUI>().text = "Your opponent attacking!";
+        mTitle.GetComponent<TextMeshProUGUI>().text = "Opponent's Turn...";
+        mStatus.GetComponent<TextMeshProUGUI>().text = "Your opponent is attacking!";
         GlobalState.GameState = GameState.Defending;
 
         GlobalState.WaitingForPush = true;
+    }
+
+    private IEnumerator UpdatePlacementMessage()
+    {
+        // Wait half a second
+        yield return new WaitForSeconds(1);
+
+        // If there is still a collision, update status;
+        if (!mBoard.ValidateShips() && GlobalState.GameState == GameState.Placement)
+        {
+            mStatus.GetComponent<TextMeshProUGUI>().text = "Make sure no ships overlap!";
+        }
+        else
+        {
+            mStatus.GetComponent<TextMeshProUGUI>().text = "Press confirm when ready";
+        }
+        mAllowStatusUpdates = true; // Allow another one of these threads to run
+    }
+
+    private IEnumerator EndTheGame(string result)
+    {
+        // Wait half a second
+        yield return new WaitForSeconds(2);
+
+        PlayerPrefs.SetString("result", result);
+        SceneManager.LoadScene(1); // Gameover scene has index 1
     }
 }

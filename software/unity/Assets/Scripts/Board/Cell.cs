@@ -68,6 +68,10 @@ public class Cell : EventTrigger
             {
                 mCellState = CellState.Missed;
             }
+            else if (mBoard.mShotsOnOpponent[xCoord, yCoord] == ShotType.Sunk)
+            {
+                mCellState = CellState.Sunk;
+            }
             else if (mBoard.mTargetedCell == this)
             {
                 mCellState = CellState.Targeted;

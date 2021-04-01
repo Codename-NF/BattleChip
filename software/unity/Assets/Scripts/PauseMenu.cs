@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PauseMenu : MonoBehaviour
 {
@@ -41,6 +42,8 @@ public class PauseMenu : MonoBehaviour
         Debug.Log("Forfeiting Game");
         AndroidJavaClass jc = new AndroidJavaClass("com.nf.battlechip.UnityMessage");
         jc.CallStatic("forfeit");
-        Application.Quit();
+
+        PlayerPrefs.SetString("result", "playerForfeit");
+        SceneManager.LoadScene(1); // Gameover scene has index 1
     }
 }
