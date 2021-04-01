@@ -152,6 +152,10 @@ int get_shoot_message_BT(shootvalues *input, int device_num) {
         return SUCCESS;
     }
 
+    if (receive_char[0] == 's') {
+        return FAILURE;
+    }
+
     (*input).x = receive_char[2];
     (*input).y = receive_char[4];
     (*input).device_num = device_num;
