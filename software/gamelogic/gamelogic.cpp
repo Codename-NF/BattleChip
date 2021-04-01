@@ -3,7 +3,7 @@
 #include "structs.h"
 #include "inputs.h"
 #include "game.h"
-#include "RS232.h"
+//#include "RS232.h"
 #include "Graphics.h"
 #include "Wifi.h"
 

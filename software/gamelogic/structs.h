@@ -177,6 +177,12 @@ struct shootvalues {
         this->p1_forfeit = p1_forfeit;
         this->p2_forfeit = p2_forfeit;
     }
+
+    shootvalues() {
+        this->x = -1;
+        this->y = -1;
+        this->device_num = -1;
+    }
 };
 
 /**
