@@ -145,11 +145,11 @@ public class GameManager : MonoBehaviour
         string[] msgTokens = message.Split(' ');
         switch(msgTokens[0])
         {
-            case "gameStart":
+            case "start":
                 if (GlobalState.GameState == GameState.Placement && GlobalState.WaitingForPush)
                 {
                     // If player is first
-                    if (bool.Parse(msgTokens[1]))
+                    if (int.Parse(msgTokens[1]) == 1)
                     {
                         // Prepare attack screen
                         mTitle.GetComponent<TextMeshProUGUI>().text = "Your Turn to Attack!";
