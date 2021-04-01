@@ -41,7 +41,7 @@ public class Board : MonoBehaviour
 
                 // Place the cell by taking it's (x,y) and scaling it to the screen
                 RectTransform rectTransform = newCell.GetComponent<RectTransform>();
-                rectTransform.anchoredPosition = new Vector2((x * 95) + 15, (y * 95) + 50);
+                rectTransform.anchoredPosition = new Vector2((x * 95) + 15, ((9 - y) * 95) + 50);
 
                 // Call the cell's setup function
                 mAllCells[x, y] = newCell.GetComponent<Cell>();
