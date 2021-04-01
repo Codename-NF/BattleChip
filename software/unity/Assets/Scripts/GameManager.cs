@@ -10,11 +10,9 @@ public class GameManager : MonoBehaviour
     public static int[] ShipPieces = { 2, 3, 3, 4, 5 };
 
     public Board mBoard;
-    // public PieceManager mPieceManager;
     public GameObject mTitle;
     public GameObject mStatus;
-
-    // public GameState mGameState;
+    public List<Ship> mShips;
 
     // Start is called before the first frame update
     void Start()
@@ -54,14 +52,16 @@ public class GameManager : MonoBehaviour
         // Create a board and put pieces on it
         mBoard.Create();
 
+        mShips = new List<Ship>();
         for (int i = 0; i < ShipPieces.Length; i++)
         {
             // Ship.CreateShip(Board board, int xCoord, int yCoord, int length)
             Debug.LogFormat("Creating ship of length {0} at {1}, {2}", ShipPieces[i], 0, i * 2);
-            Ship.CreateShip(mBoard, 0, i * 2, ShipPieces[i]);
+            mShips.Add(Ship.CreateShip(mBoard, 0, i * 2, ShipPieces[i]));
         }
     }
 
+    // Logic used by the confirm button based on GameManager's state
     public void ConfirmButton()
     {
         AndroidJavaClass jc = new AndroidJavaClass("com.nf.battlechip.UnityMessage");
@@ -69,12 +69,12 @@ public class GameManager : MonoBehaviour
         switch (GlobalState.GameState)
         {
             case GameState.Placement:
-                // string exportString = mPieceManager.ExportShips();
-                // Debug.Log(exportString); // Debug, Placement
+                string exportString = CreatePlacementString(mShips);
+                Debug.Log(exportString); // Debug, Placement
                 mStatus.GetComponent<TextMeshProUGUI>().text = "Placements confirmed. Waiting for opponent...";
 
                 // Send ship placements to Android
-                // jc.CallStatic("placement", exportString);
+                jc.CallStatic("placement", exportString);
 
                 GlobalState.WaitingForPush = true;
                 break;
@@ -100,21 +100,23 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // Basic Communication
-    void ReceiveBluetoothMessageFromConsole(string message)
+    /* Get string representing ship placements */
+    private string CreatePlacementString(List<Ship> shipsToExport)
     {
-        Debug.Log("Received: " + message);
-        // TODO: REPLACE THIS WITH ACTUAL PROCESSING
+        string exportString = "";
+        for (int i = 0; i < shipsToExport.Count; i++)
+        {
+            if (i > 0)
+            {
+                exportString += " ";
+            }
+            exportString += shipsToExport[i].ExportShip();
+        }
+        return exportString;
     }
 
-    void SendPlacementMessage(string message) {
-        Debug.Log("Sending: " + message);
-        AndroidJavaClass jc = new AndroidJavaClass("com.nf.battlechip.UnityMessage");
-        jc.CallStatic("placement", message);
-    }
-
-    // Android Studio to Unity functions (Android studio calls these)
-    void AndroidToUnity(string message)
+    /* Android Studio to Unity functions (Android studio calls these) */
+    public void AndroidToUnity(string message)
     {
         Debug.Log("RECEIVED:\n" + message);
         string[] msgTokens = message.Split(' ');
@@ -210,7 +212,7 @@ public class GameManager : MonoBehaviour
     }
 
     /* Display the opponent's shot on player, wait three seconds, the swap to attack */
-    IEnumerator ProcessOpponentAttack()
+    private IEnumerator ProcessOpponentAttack()
     {
         // Wait 3 seconds
         yield return new WaitForSeconds(3);
@@ -224,7 +226,7 @@ public class GameManager : MonoBehaviour
     }
 
     /* Display the opponent's shot on player, wait three seconds, the swap to attack */
-    IEnumerator ProcessPlayerAttackResult()
+    private IEnumerator ProcessPlayerAttackResult()
     {
         // Wait 3 seconds
         yield return new WaitForSeconds(3);
