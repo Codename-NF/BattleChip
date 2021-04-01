@@ -20,7 +20,7 @@ void printdecimal(int x)
   putcharWIFI(c);
 } 
 
-int print_to_board(int p1, int p2, int win, int score1, int score2) {
+void print_to_board(int p1, int p2, int win, int score1, int score2) {
     int args[5] = {p1, p2, win, score1, score2};
     int i = 0;
     int y = 0;

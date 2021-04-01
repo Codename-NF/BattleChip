@@ -25,7 +25,7 @@ int putcharWIFI(int c);
 int getcharWIFI(void);
 int WIFITestForReceivedData(void);
 void WIFIFlush(void);
-int print_to_board(int p1, int p2, int win, int score1, int score2);
+void print_to_board(int p1, int p2, int win, int score1, int score2);
 void printdecimal(int x);
 void postgameresults(int p1, int p2, int winner, int score1, int score2);
 
