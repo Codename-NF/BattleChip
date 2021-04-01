@@ -11,8 +11,12 @@ module.exports = {
         }
         // If not, create a new user from the token info
         else {
+            // Get count of users in DB, assign unique id as count + 1
+            const userCount = await User.countDocuments({});
+            
             const newUser = {
-				first_name: res.locals.firstname,
+				player_id: userCount, // Not userCount + 1 since id is zero indexed
+                first_name: res.locals.firstname,
                 last_name: res.locals.lastname,
                 email: res.locals.email,
 				wins: 0,

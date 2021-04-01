@@ -59,19 +59,20 @@ module.exports = {
     
     createMatch: async (req, res) => {
         // Check if player1 exists
-        const playerOneEmail = req.body.player_one;
-        const playerTwoEmail = req.body.player_two;
+        const playerOneId = req.body.player_one;
         
-        const player1 = await User.findOne({ email: playerOneEmail }).catch(() => null);
+        const player1 = await User.findOne({ player_id: playerOneId }).catch(() => null);
         if (player1) {
             
+            const playerOneEmail = player1.email;
             // If player two is an AI
-            if (req.body.player_two === "AI") {
+            if (req.body.player_two === 0) {
                 // Create a record of the match
+                const winnerEmail = (req.body.winner == playerOneId) ? playerOneEmail : "AI";
                 const newMatch = {
                     player_one: playerOneEmail,
-                    player_two: playerTwoEmail,
-                    winner: req.body.winner,
+                    player_two: "AI",
+                    winner: winnerEmail,
                     player_one_score: req.body.player_one_score,
                     player_two_score: req.body.player_two_score,
                     player_one_name: `${player1.first_name} ${player1.last_name}`,
@@ -81,7 +82,7 @@ module.exports = {
                 await Match.create(newMatch);
                 
                 // Update only player one's personal stats
-                await updateUserRecord(playerOneEmail, (playerOneEmail === req.body.winner));
+                await updateUserRecord(playerOneEmail, (playerOneEmail === winnerEmail));
                 
                 // Respond with a 201
                 res.status(201).send(
@@ -93,13 +94,15 @@ module.exports = {
             // If player two is NOT an AI
             else {
                 // Verify that player two exists as a user
-                const player2 = await User.findOne({ email: playerTwoEmail }).catch(() => null);
+                const player2 = await User.findOne({ player_id: req.body.player_two }).catch(() => null);
                 if (player2) {
+                    const playerTwoEmail = player2.email;
+                    const winnerEmail = (req.body.winner == playerOneId) ? playerOneEmail : playerTwoEmail;
                     // Create a record of the match
                     const newMatch = {
                         player_one: playerOneEmail,
                         player_two: playerTwoEmail,
-                        winner: req.body.winner,
+                        winner: winnerEmail,
                         player_one_score: req.body.player_one_score,
                         player_two_score: req.body.player_two_score,
                         player_one_name: `${player1.first_name} ${player1.last_name}`,
@@ -109,8 +112,8 @@ module.exports = {
                     await Match.create(newMatch);
                     
                     // Update both players' personal stats
-                    await updateUserRecord(playerOneEmail, (playerOneEmail === req.body.winner));
-                    await updateUserRecord(playerTwoEmail, (playerTwoEmail === req.body.winner));
+                    await updateUserRecord(playerOneEmail, (playerOneEmail === winnerEmail));
+                    await updateUserRecord(playerTwoEmail, (playerTwoEmail === winnerEmail));
                     
                     // Respond with a 201
                     res.status(201).send(
@@ -124,7 +127,7 @@ module.exports = {
                     res.status(404).send(
                         {
                             "status" : "ERR",
-                            "message" : req.body.player_two + " is not a user."
+                            "message" : "No user has id" + req.body.player_two.toString()
                         }
                     );
                 }
@@ -135,7 +138,7 @@ module.exports = {
             res.status(404).send(
                 {
                     "status" : "ERR",
-                    "message" : req.body.player_one + " is not a user."
+                    "message" : "No user has id" + req.body.player_one.toString()
                 }
             );
 		}

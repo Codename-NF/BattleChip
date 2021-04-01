@@ -43,9 +43,8 @@ public class MainUnityActivity extends UnityPlayerActivity {
             return 0;
         }
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(instance);
-        long colorVal = instance.getColor(R.color.purple_500);
-        Log.d("color", "" + String.valueOf(colorVal & 0xFFFFFFFFL));
-        return preferences.getLong("color", instance.getColor(R.color.orange_500) & 0xFFFFFFFFL);
+        // bitwise & promotes the color to a long, then removes the leading 1s (makes the number positive)
+        return preferences.getLong("color", instance.getColor(R.color.purple_500) & 0xFFFFFFFFL);
     }
 
 }
