@@ -21,8 +21,8 @@ public class UnityMessage {
             Log.d(UNITY_MESSAGE_DEBUG, "Placement message not properly formatted");
         }
         for (int i = 0; i < splitMessage.length; i += 4) {
-            bytes[i / 4 + 1] = (byte) (Byte.parseByte(splitMessage[i]) + Byte.parseByte(splitMessage[i + 1]) * 10);
-            bytes[i / 4 + 2] = (byte) (Byte.parseByte(splitMessage[i + 2]) * 2 + Byte.parseByte(splitMessage[i + 3]));
+            bytes[i / 2 + 1] = (byte) (Byte.parseByte(splitMessage[i]) + Byte.parseByte(splitMessage[i + 1]) * 10);
+            bytes[i / 2 + 2] = (byte) (Byte.parseByte(splitMessage[i + 2]) * 2 + Byte.parseByte(splitMessage[i + 3]));
         }
         BluetoothThread.getInstance().write(bytes);
     }
