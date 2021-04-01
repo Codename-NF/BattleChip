@@ -2,7 +2,7 @@
 extern "C" {
 #endif
 #include <stdio.h>
-#include "Constants.h"
+#include "constants.h"
 
 // graphics register addresses
 
