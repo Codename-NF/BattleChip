@@ -246,7 +246,8 @@ public class Ship
         string x = mCells[0].mBoardPosition.x + " ";
         string y = mCells[0].mBoardPosition.y + " ";
         string l = mLength + " ";
-        string o = (mOrientation == 2) ? "2" : "1";
+        // Horizontal is now 1, with vertical being 0 (for integration with DE1)
+        string o = (mOrientation == 2) ? "1" : "0"; 
 
         return x + y + l + o;
     }
