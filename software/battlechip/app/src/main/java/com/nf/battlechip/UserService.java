@@ -13,7 +13,7 @@ public interface UserService {
     Call<User> getUser();
 
     @POST("login")
-    Call<Void> login();
+    Call<User> login();
 
     @GET("match")
     Call<Matches> getMatches();

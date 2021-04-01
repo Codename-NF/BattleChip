@@ -16,6 +16,7 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.nf.battlechip.R;
 import com.nf.battlechip.RetrofitHelper;
+import com.nf.battlechip.pojo.User;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -79,13 +80,15 @@ public class LoginActivity extends SetThemeActivity {
 
     private void startMainActivity() {
         RetrofitHelper.initRetrofit(client);
-        Call<Void> login = RetrofitHelper.getUserService().login();
-        login.enqueue(new Callback<Void>() {
+        Call<User> login = RetrofitHelper.getUserService().login();
+        login.enqueue(new Callback<User>() {
             @Override
             @EverythingIsNonNull
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) {
-                    startActivity(new Intent(LoginActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK)
+                            .putExtra("playerId", response.body().getPlayerId()));
                     finish();
                 } else {
                     Log.d(LOGIN_DEBUG_TAG, response.toString());
@@ -95,7 +98,7 @@ public class LoginActivity extends SetThemeActivity {
 
             @Override
             @EverythingIsNonNull
-            public void onFailure(Call<Void> call, Throwable t) {
+            public void onFailure(Call<User> call, Throwable t) {
                 Log.d(LOGIN_DEBUG_TAG, t.toString());
                 Toast.makeText(LoginActivity.this, "Failed to login", Toast.LENGTH_SHORT).show();
             }

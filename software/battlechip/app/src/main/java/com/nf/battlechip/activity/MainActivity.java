@@ -15,7 +15,6 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.nf.battlechip.BluetoothThread;
@@ -32,25 +31,24 @@ public class MainActivity extends SetThemeActivity implements ActivityCompat.OnR
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        int playerId = getIntent().getIntExtra("playerId", 0);
         setContentView(R.layout.activity_main);
         getBackgroundPermissionsIfNecessary();
         setUpBluetooth();
-
-        String email = GoogleSignIn.getLastSignedInAccount(this).getEmail();
 
         findViewById(R.id.app_name_text_view).setOnClickListener(view -> startUnityActivity()); // TODO: remove this Unity shortcut
         findViewById(R.id.options_button).setOnClickListener(view -> showColorDialog());
         findViewById(R.id.single_player_button).setOnClickListener(view -> {
             try {
                 BluetoothThread.createInstance(1);
-                UnityMessage.create(email, 1);
+                UnityMessage.create(playerId, 1);
                 startLobbyActivity();
             } catch (IOException exception) {
                 exception.printStackTrace();
                 Toast.makeText(this, "Failed to connect to Bluetooth", Toast.LENGTH_SHORT).show();
             }
         });
-        findViewById(R.id.multi_player_button).setOnClickListener(view -> showMultiplayerDialog(email));
+        findViewById(R.id.multi_player_button).setOnClickListener(view -> showMultiplayerDialog(playerId));
         findViewById(R.id.player_stats_button).setOnClickListener(view -> startActivity(new Intent(this, UserStatisticsActivity.class)));
     }
 
@@ -64,14 +62,14 @@ public class MainActivity extends SetThemeActivity implements ActivityCompat.OnR
         }
     }
 
-    private void showMultiplayerDialog(String email) {
+    private void showMultiplayerDialog(int playerId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Do you want to create or join a lobby?");
         builder.setNeutralButton("Cancel", ((dialog, which) -> dialog.dismiss()));
         builder.setNegativeButton("Join", ((dialog, which) -> {
             try {
                 BluetoothThread.createInstance(2);
-                UnityMessage.join(email);
+                UnityMessage.join(playerId);
                 startLobbyActivity();
             } catch (IOException exception) {
                 exception.printStackTrace();
@@ -81,7 +79,7 @@ public class MainActivity extends SetThemeActivity implements ActivityCompat.OnR
         builder.setPositiveButton("Create", ((dialog, which) -> {
             try {
                 BluetoothThread.createInstance(1);
-                UnityMessage.create(email, 2);
+                UnityMessage.create(playerId, 2);
                 startLobbyActivity();
             } catch (IOException exception) {
                 exception.printStackTrace();
