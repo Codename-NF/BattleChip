@@ -1,11 +1,11 @@
 -- This information is used by the Wi-Fi dongle to make a wireless connection to the router in the Lab
 -- or if you are using another router e.g. at home, change ID and Password appropriately
-SSID = "M112-PD"
-SSID_PASSWORD = "aiv4aith2Zie4Aeg"
+SSID = "BoosterFam"
+SSID_PASSWORD = "Timmy#01WF"
 
 -- configure ESP as a station
 wifi.setmode(wifi.STATION)
-wifi.sta.config(SSID,SSID_PASSWORD)
+wifi.sta.config{ssid=SSID,pwd=SSID_PASSWORD}
 wifi.sta.autoconnect(1)
 
 
@@ -25,7 +25,7 @@ tmr.delay(1000000) -- wait 1,000,000 us = 1 second
 -- AUTH_TOKEN = "AC******************************36"
 
 -- this is the web address of the server
-HOST = "http://ec2-54-151-115-99.us-west-1.compute.amazonaws.com:9091" 
+HOST = "ec2-54-151-115-99.us-west-1.compute.amazonaws.com" 
 
 -- The following variable defines the endpoint that we will connect to
 URI = "/match"
@@ -34,6 +34,8 @@ URI = "/match"
 function build_post_request(host, uri, data_table)
 
      arg = {}
+
+     print("Begin Post")
 
      for param,value in pairs(data_table) do
           table.insert(arg, "\"" .. param .."\":"..value)
@@ -48,6 +50,8 @@ function build_post_request(host, uri, data_table)
      "Content-Length: "..string.len(json).."\r\n"..
      "\r\n"..
      json
+
+     print("End Post")
      print(request)
      return request
 end
@@ -71,7 +75,7 @@ function send_results(player_one, player_two, winner, player_one_score, player_t
 
      socket = net.createConnection(net.TCP,0)
      socket:on("receive",display)
-     socket:connect(80,HOST)
+     socket:connect(9091,HOST)
 
      socket:on("connection",function(sck)
           post_request = build_post_request(HOST,URI,data)
@@ -91,7 +95,7 @@ function upload_match_results(player_one, player_two, winner, player_one_score, 
  if(ip==nil) then
    print("Connecting...")
  else
-  tmr.stop(0)
+  -- tmr.stop(0)
   print("Connected to AP!")
   print(ip)
   -- send results to the server
