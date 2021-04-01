@@ -496,5 +496,4 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
 
         
     }
-    int score1 = 
 }
