@@ -91,8 +91,8 @@ int get_placement_message_BT(list<setupvalues> *list_setupval, int device_num) {
     }
     for (int i = 1; i < 10; i += 2) {
         int x,y,size, orientation;
-        x = receive_char[i] / 10;
-        y = receive_char[i] % 10;
+        x = receive_char[i] % 10;
+        y = receive_char[i] / 10;
         bitset<8> bitfield(receive_char[i+1]);
         orientation = bitfield[0] + 1;
         size = bitfield[3] * 4 + bitfield[2] * 2 + bitfield[1];
