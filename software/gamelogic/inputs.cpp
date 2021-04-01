@@ -165,12 +165,12 @@ int get_shoot_message_BT(shootvalues *input, int device_num) {
 
 /*
 Format:
-“game start isTurn~”
+“start isTurn~”
 isTurn is 1 if the current player is attacking first, 0 otherwise
 */
 void send_game_start_status_BT(bool start1) {
-    string message_to_1 = "game start ";
-    string message_to_2 = "game start ";
+    string message_to_1 = "start ";
+    string message_to_2 = "start ";
 
     
     message_to_1 += to_string(start1);
