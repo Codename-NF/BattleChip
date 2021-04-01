@@ -5,6 +5,7 @@
 #include "game.h"
 #include "RS232.h"
 #include "Graphics.h"
+#include "Wifi.h"
 
 int main () {
     if (DEBUG) { // CMD playing debug only 
@@ -58,6 +59,7 @@ int main () {
     }
     else { // dealing with UI / BT
         Init_RS232();
+        Init_RS232_WIFI();
         blankscreen( BLUE );
         int player_num;
         bool single_player = false;
