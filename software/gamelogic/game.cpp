@@ -10,6 +10,7 @@
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
 #include "Graphics.h"
+#include "Wifi.h"
 
 using namespace std;
 
