@@ -2,36 +2,70 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GlobalState : MonoBehaviour
+public enum GameState
 {
-    public static GlobalState Instance;
+    Placement,
+    Attacking,
+    Defending,
+};
 
+public static class GlobalState
+{
     // Global state of the Unity application 
-    public ColorTheme savedColorTheme = new ColorTheme();
+    private static ColorTheme colorTheme;
+    private static GameState gameState;
+    private static bool waitingForPush;
+    private static bool gameIsPaused;
 
-    // Singleton logic, only one instance of the state can be active
-    void Awake()
+    // Keeps track of the games state (placement/attack/defend)
+    public static GameState GameState
     {
-        if (Instance == null)
+        get
         {
-            DontDestroyOnLoad(gameObject);
-            Instance = this;
+            return gameState;
         }
-        else if (Instance != this)
+        set
         {
-            Destroy(gameObject);
+            gameState = value;
         }
     }
 
-    // Load global data when object is instantiated on new scene
-    void Start()
+    // Keeps track of the imported color scheme
+    public static ColorTheme ColorTheme
     {
-        savedColorTheme = GlobalState.Instance.savedColorTheme;
+        get
+        {
+            return colorTheme;
+        }
+        set
+        {
+            colorTheme = value;
+        }
     }
 
-    // Save copy of state before switching scenes
-    public void SaveState()
+    // Keeps track of when Unity is waiting for a response
+    public static bool WaitingForPush
     {
-        GlobalState.Instance.savedColorTheme = savedColorTheme;
+        get
+        {
+            return waitingForPush;
+        }
+        set
+        {
+            waitingForPush = value;
+        }
+    }
+
+    // Tracks if Unity UI is in the pause/forfeit menu
+    public static bool GameIsPaused
+    {
+        get
+        {
+            return gameIsPaused;
+        }
+        set
+        {
+            gameIsPaused = value;
+        }
     }
 }

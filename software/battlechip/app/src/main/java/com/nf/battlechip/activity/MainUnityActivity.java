@@ -1,14 +1,15 @@
 package com.nf.battlechip.activity;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.nf.battlechip.BluetoothThread;
 import com.nf.battlechip.R;
-import com.unity3d.player.UnityPlayer;
+import com.nf.battlechip.UnityMessage;
 import com.unity3d.player.UnityPlayerActivity;
 
 public class MainUnityActivity extends UnityPlayerActivity {
@@ -26,20 +27,9 @@ public class MainUnityActivity extends UnityPlayerActivity {
         testButton.setGravity(Gravity.CENTER);
         testButton.setOnClickListener(view -> {
             Log.d("LoggingButton", "Logging button clicked");
-            sendBluetoothMessageToUnity("Test message");
+            UnityMessage.processBluetoothMessage("gameStart true");
         });
         mUnityPlayer.addView(testButton, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-    }
-
-    // Function receives messages from Unity
-    public void sendBluetoothMessageToConsole(String message) {
-        Log.d("sendBluetooth", message);
-        BluetoothThread.getInstance().write(message.getBytes());
-    }
-
-    public static void sendBluetoothMessageToUnity(String message) {
-        UnityPlayer.UnitySendMessage("PR_GameManager",
-                "ReceiveBluetoothMessageFromConsole", message);
     }
 
     @Override
@@ -47,4 +37,15 @@ public class MainUnityActivity extends UnityPlayerActivity {
         super.onDestroy();
         instance = null;
     }
+
+    public static long getColor() {
+        if (instance == null) {
+            return 0;
+        }
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(instance);
+        long colorVal = instance.getColor(R.color.purple_500);
+        Log.d("color", "" + String.valueOf(colorVal & 0xFFFFFFFFL));
+        return preferences.getLong("color", instance.getColor(R.color.orange_500) & 0xFFFFFFFFL);
+    }
+
 }
