@@ -90,16 +90,17 @@ end
 -- winner is the ID of the winning player (int)
 -- player_one_score and player_two_score are the player scores (int)
 function upload_match_results(player_one, player_two, winner, player_one_score, player_two_score)
-  ip = wifi.sta.getip()
+  if (wifi.sta.getip() == nil) then
+    timer = tmr.create()
+    timer:alarm(1000, tmr.ALARM_AUTO, function()
+       if (wifi.sta.getip() ~= nil) then
+            timer:unregister()
+            send_results(player_one, player_two, winner, player_one_score, player_two_score)
+       end
+       end)
+  else
+    send_results(player_one, player_two, winner, player_one_score, player_two_score)
+  end
 
- if(ip==nil) then
-   print("Connecting...")
- else
-  -- tmr.stop(0)
-  print("Connected to AP!")
-  print(ip)
-  -- send results to the server
-  send_results(player_one, player_two, winner, player_one_score, player_two_score)
 
- end
 end
