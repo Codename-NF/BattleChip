@@ -2,6 +2,7 @@
 extern "C" {
 #endif
 #include <stdio.h>
+#include "Constants.h"
 
 // graphics register addresses
 
@@ -41,9 +42,6 @@ extern "C" {
 // while the course file "ColourPaletteData.c" contains the 24 bit RGB data
 // that is pre-programmed into the palette
 
-#define VERTICAL		1
-#define HORIZONTAL		2
-
 #define XRES 800
 #define YRES 480
 #define FONT2_XPIXELS   10              // width of Font2 characters in pixels (no spacing)
@@ -64,9 +62,10 @@ void WriteAPixel(int x, int y, int Colour);
 void blankscreen(int Colour);
 void squaremapper(int x, int y, int player, int colour);
 void squaremappership(int player, int x, int y, int length, int dir, int done, int colour);
-void writecoords()
-void winnermessage(int winner, int colour, int background, int reset)
-void outgraphicschar(int x, int y, int colour, int backgroundcolour, int c, int Erase)
+void writecoords();
+void winnermessage(int winner, int colour, int background);
+void outgraphicschar(int x, int y, int colour, int backgroundcolour, int c, int Erase);
+void displaywinner(int winner);
 
 int ReadAPixel(int x, int y);
 void ProgramPalette(int PaletteNumber, int RGB);
