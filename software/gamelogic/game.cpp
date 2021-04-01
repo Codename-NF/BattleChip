@@ -258,15 +258,16 @@ void AI_setting_up(list<player>::iterator *AI) {
 }
 
 createmessage create_lobby() {
-    createmessage input1 = get_create_message_BT();
-
-    while(input1.keywrod == 'f') {
+    createmessage input1;
+    int got_msg = 0;
+    do {
+        got_msg = get_create_message_BT(&input1);
         int input2 = get_join_message_BT();
         if (input2 == -1) {
             send_join_reponse_BT(FAILURE);
         }
-        input1 = get_create_message_BT();
-    }
+    } while (!got_msg);
+    
 
     if (input1.keywrod == 'c') {
         send_create_response_BT(input1.numplayer, SUCCESS);
@@ -387,13 +388,18 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
 
     while (!game_finished) {
         shootvalues inputs = shootvalues(-1, -1, -1);
+        int got_message = 0;
         if (turn_1) {
-            inputs = get_shoot_message_BT(1);
+            do {
+                got_message = get_shoot_message_BT(&inputs, PLAYER1);
+            } while (!got_message);
             turn_1 = false;
         }
         else {
             if (!single_player_mode) {
-                inputs = get_shoot_message_BT(2);
+                do {
+                    got_message = get_shoot_message_BT(&inputs, PLAYER2);
+                } while (!got_message);
                 turn_1 = true;
             }
             else {

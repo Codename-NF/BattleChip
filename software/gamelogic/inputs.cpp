@@ -78,7 +78,6 @@ Bit 0 is shipOrientation, bit 1-3 are shipLength
 
 */
 int get_placement_message_BT(list<setupvalues> *list_setupval, int device_num) {
-    //string input = inputstring;
     char receive_char[BT_RECEIVE_SIZE];
     if (device_num == 1) {
         BT_receive_0(receive_char);
@@ -114,48 +113,50 @@ int get_placement_message_BT(list<setupvalues> *list_setupval, int device_num) {
 Format:
 “shoot xCoordinate yCoordinate\n\n”
 */
-shootvalues get_shoot_message_BT(int device_num) {
+int get_shoot_message_BT(shootvalues *input, int device_num) {
     int x,y;
 
     char receive_char[BT_RECEIVE_SIZE];
     char forfeit_char[BT_RECEIVE_SIZE];
-    int success = 0;
+    int first_success = 0;
+    int second_success = 0;
     if (device_num == 1) {
-        BT_receive_0(receive_char);
-        success = BT_receive_1(forfeit_char);
+        first_success = BT_receive_0(receive_char);
+        second_success = BT_receive_1(forfeit_char);
     }
     else {
-        BT_receive_1(receive_char);
-        success = BT_receive_0(forfeit_char);
+        first_success = BT_receive_1(receive_char);
+        second_success = BT_receive_0(forfeit_char);
+    }
+
+    if (first_success == 0) {
+        return FAILURE;
     }
 
     // checking for forfeit messages at the beginning of each turn 
     if (receive_char[0] = 'f') {
         if (device_num == 1) {
-            return shootvalues(true, false);
+            (*input).p1_forfeit = true;
+            return SUCCESS;
         }
-        return shootvalues(false, true);
+        (*input).p2_forfeit = true;
+        return SUCCESS;
     }
 
-    if (success && forfeit_char[0] == 'f') {
+    if (second_success && forfeit_char[0] == 'f') {
         if (device_num == 1) {
-            return shootvalues(false, true);
+            (*input).p2_forfeit = true;
+            return SUCCESS;
         }
-        return shootvalues(true, false);
+        (*input).p1_forfeit = true;
+        return SUCCESS;
     }
 
-    string input = string(receive_char);
-    stringstream ss;
+    (*input).x = receive_char[2];
+    (*input).y = receive_char[4];
+    (*input).device_num = device_num;
 
-    ss << input;
-
-    // dealing the keyword placement in front of the message
-    string keyword;
-    ss >> keyword;
-
-    ss >> x >> y;
-
-    return shootvalues(x, y, device_num);
+    return SUCCESS;
 }
 
 /*
@@ -352,18 +353,20 @@ numPlayers is 1 or 2, 1 for vs AI, 2 for multiplayer
 Only sent to BluetoothChip0
 
 */
-createmessage get_create_message_BT() {
+int get_create_message_BT(createmessage *msg) {
     char receive_char[BT_RECEIVE_SIZE];
 
     
     if (BT_receive_0(receive_char) == SUCCESS) {
         if (receive_char[0] != 'c') { 
-            return createmessage('f', 0, 0);  
-        }  
-
-        return createmessage(receive_char[0], receive_char[4], receive_char[2]);
+            return FAILURE;
+        } 
+        (*msg).keywrod = receive_char[0];
+        (*msg).playerid = receive_char[2];
+        (*msg).numplayer = receive_char[4];
+        return SUCCESS;
     }
-    return createmessage('f', 0, 0);  
+    return FAILURE;
     
 }
 
@@ -413,7 +416,7 @@ int get_join_message_BT() {
     
     if (BT_receive_1(receive_char) == SUCCESS) {
         if (receive_char[0] == 'j') {
-            return receive_char[3];
+            return receive_char[2];
         }
     }
     return -1;
