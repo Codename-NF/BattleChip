@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     public GameObject mTitle;
     public GameObject mStatus;
     public List<Ship> mShips;
+    public ParticleSystem mBackground;
 
     // Start is called before the first frame update
     void Start()
@@ -48,6 +49,11 @@ public class GameManager : MonoBehaviour
         GlobalState.ColorTheme.CellPieceColor = new Color32(red, blue, green, opacity);
         GlobalState.ColorTheme.CellColorDark = new Color32(redLite, blueLite, greenLite, opacity);
         GlobalState.ColorTheme.CellColorLight = new Color32(redTint, blueTint, greenTint, opacity);
+
+        var main = mBackground.main;
+        main.startColor = new ParticleSystem.MinMaxGradient(new Color32(55, 57, 62, 255), new Color32(15, 17, 22, 255));
+        var emission = mBackground.emission;
+        emission.enabled = true;
 
         // Create a board and put pieces on it
         mBoard.Create();
