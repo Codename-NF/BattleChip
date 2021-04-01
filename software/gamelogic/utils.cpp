@@ -129,3 +129,13 @@ void create_shots_with_ships(set<box> *all_boxes_hit, set<box> *shots_with_ships
         }
     }
 }
+
+int get_score(set<box> all_boxes_hit) {
+    int score = 0;
+    for (set<box>::iterator it = all_boxes_hit.begin(); it != all_boxes_hit.end(); it++) {
+        if (it->status != MISS_STATUS_CODE) {
+            score++;
+        }
+    }
+    return score;
+}

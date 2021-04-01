@@ -107,3 +107,14 @@ ship change_status_box_all_boxes(int x, int y, set<box> *boxes_hit, list<ship> *
  * return: 
 **/
 void create_shots_with_ships(set<box> *all_boxes_hit, set<box> *shots_with_ships);
+
+
+/**
+ * for POST records after game finished
+ * get the score of the players 
+ * parameters:
+ *      all_boxes_hit: all the boxes that has been hit
+ * return:
+ *      score of the player
+**/
+int get_score(set<box> all_boxes_hit);

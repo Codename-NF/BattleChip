@@ -422,11 +422,17 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
         if (inputs.p1_forfeit) {
             game_finished = true;
             send_win_by_forfiet_BT(PLAYER2);
+            int score1 = get_score((*p1)->boxes_hit);
+            int score2 = get_score((*p2)->boxes_hit);
+            postgameresults((*p1)->player_id, (*p2)->player_id, (*p2)->player_id, score1, score2);
             break;
         }
         if (inputs.p2_forfeit) {
             game_finished = true;
             send_win_by_forfiet_BT(PLAYER1);
+            int score1 = get_score((*p1)->boxes_hit);
+            int score2 = get_score((*p2)->boxes_hit);
+            postgameresults((*p1)->player_id, (*p2)->player_id, (*p1)->player_id, score1, score2);
             break;
         }
 
@@ -459,6 +465,16 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
                 // only if it's sunk it would be a possibly of gameover 
                 if (current_under_attack->remaining_ships == 0) {
                     game_finished = true;
+                    int score1 = get_score((*p1)->boxes_hit);
+                    int score2 = get_score((*p2)->boxes_hit);
+                    int winnerid;
+                    if (current_attacking == 1) {
+                        winnerid = (*p1)->player_id;
+                    }
+                    else {
+                        winnerid = (*p2)->player_id;
+                    }
+                    postgameresults((*p1)->player_id, (*p2)->player_id, winnerid, score1, score2);
                 }
                 send_result_message_BT(current_attacking, x_in, y_in, game_finished, status, sunk_ship.start_box.x, sunk_ship.start_box.y, sunk_ship.size, sunk_ship.orientation);
                 send_targeted_message_BT(next_up, x_in, y_in, game_finished, status, sunk_ship.start_box.x, sunk_ship.start_box.y, sunk_ship.size, sunk_ship.orientation);
@@ -480,4 +496,5 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
 
         
     }
+    int score1 = 
 }
