@@ -299,16 +299,10 @@ void reject_player2() {
     }
 }
 
-void setting_player_id(battleship *game, int player1_id) {
-    list<player>::iterator player_it = (*game).players.begin();
-    player_it->player_id = player1_id;
 
-}
-void setting_player_id(battleship *game, int player1_id, int player2_id) {
-    list<player>::iterator player_it = (*game).players.begin();
-    player_it->player_id = player1_id;
-    player_it++;
-    player_it->player_id = player2_id;
+void setting_player_id(list<player>::iterator *p1, list<player>::iterator *p2, int player1_id, int player2_id) {
+    (*p1)->player_id = player1_id;
+    (*p2)->player_id = player2_id;
 }
 
 void assign_ship(list<player>::iterator *player, list<setupvalues>::iterator it) {
@@ -411,7 +405,8 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
                 set<box> shots_with_ships;
                 create_shots_with_ships(&((*p1)->boxes_hit), &shots_with_ships);
                 //send_information_to_AI((*p1)->boxes_hit, (*p1)->ships_alive, shots_with_ships);
-                int magic_number = 99;//some_input_function_from_AI();
+                srand (time(0));
+                int magic_number = rand() % 100;//some_input_function_from_AI();
                 inputs.x = magic_number % 10;
                 inputs.y = magic_number / 10;
                 inputs.device_num = 2;

@@ -81,7 +81,7 @@ int main () {
                 }
             }
             
-            setting_player_id(&game, player_num, input1.playerid, input2);
+            setting_player_id(&p1, &p2, input1.playerid, input2);
             
             send_ready_messaeg_BT();
             
@@ -105,7 +105,7 @@ int main () {
                 }
             }
             
-            setting_player_id(&game, player_num, input1.playerid);
+            setting_player_id(&p1, &AI, input1.playerid, AI_PLAYER_ID);
             
             setting_up_ships_BT(&p1, &AI, single_player);
 

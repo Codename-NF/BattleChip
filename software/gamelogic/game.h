@@ -77,24 +77,13 @@ void reject_player2();
 /**
  * Sets player id in the player struct
  * parameters: 
- *      *game: reference to the game struct to access players 
- *      *player_num: number of players 
- *      *player1_id: id of player 1
- * return: 
-**/
-void setting_player_id(battleship *game, int player_num, int player1_id);
-
-
-/**
- * Sets player id in the player struct
- * parameters: 
- *      *game: reference to the game struct to access players 
- *      player_num: number of players 
+ *      *p1: reference to player 1
+ *      *p2: reference to player 2
  *      player1_id: id of player 1
  *      player2_id: id of player 2
  * return: 
 **/
-void setting_player_id(battleship *game, int player_num, int player1_id, int player2_id);
+void setting_player_id(list<player>::iterator *p1, list<player>::iterator *p2, int player1_id, int player2_id);
 
 
 /**

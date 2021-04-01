@@ -29,6 +29,8 @@ const int SUNK_CROSS_COLOR    = BLACK;
 const int PLAYER1       = 1;
 const int PLAYER2       = 2;
 
+const int AI_PLAYER_ID = 0;
+
 
 enum orientations {VERTICAL = 1, HORIZONTAL = 2};
 
