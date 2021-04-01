@@ -264,7 +264,7 @@ createmessage create_lobby() {
     do {
         got_msg = get_create_message_BT(&input1);
         int input2 = get_join_message_BT();
-        if (input2 == -1) {
+        if (input2 != -1) {
             send_join_reponse_BT(FAILURE);
         }
     } while (!got_msg);
