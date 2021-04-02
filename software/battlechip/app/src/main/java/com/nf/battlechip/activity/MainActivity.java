@@ -168,5 +168,4 @@ public class MainActivity extends SetThemeActivity implements ActivityCompat.OnR
             Toast.makeText(this, "We need to enable bluetooth", Toast.LENGTH_LONG).show();
         }
     }
-
 }
