@@ -180,7 +180,7 @@ void send_join_reponse_BT(int status);
  * parameters: 
  * return: 
 **/
-void send_ready_messaeg_BT();
+void send_ready_message_BT();
 
 
 /**
@@ -190,4 +190,4 @@ void send_ready_messaeg_BT();
  *      device_num: the device which won by default
  * return: 
 **/
-void send_win_by_forfiet_BT(int device_num);
+void send_win_by_forfeit_BT(int device_num);

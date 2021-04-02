@@ -4,7 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <stdio.h>
-#include <string.h>
+#include <string>
 #include <bitset>
 #include "RS232.h" // may need to change path 
 
@@ -133,7 +133,7 @@ int get_shoot_message_BT(shootvalues *input, int device_num) {
     }
 
     // checking for forfeit messages at the beginning of each turn 
-    if (receive_char[0] = 'f') {
+    if (receive_char[0] == 'f') {
         if (device_num == 1) {
             (*input).p1_forfeit = true;
             return SUCCESS;
@@ -168,28 +168,13 @@ Format:
 isTurn is 1 if the current player is attacking first, 0 otherwise
 */
 void send_game_start_status_BT(bool start1) {
-    string message_to_1 = "start ";
-    string message_to_2 = "start ";
+    stringstream message_to_1;
+    stringstream message_to_2;
+    message_to_1 << "start " << start1 << "~";
+    message_to_2 << "start " << !start1 << "~";
 
-    
-    message_to_1 += to_string(start1);
-    message_to_2 += to_string(!start1);
-
-    message_to_1 += "~";
-    message_to_2 += "~";
-
-    int n = message_to_1.length();
- 
-    // declaring character array with space for termination character 
-    char message_to_1_char[n + 1];
-    char message_to_2_char[n + 1];
- 
-    // copying the contents of the string to char array
-    strcpy(message_to_1_char, message_to_1.c_str());
-    strcpy(message_to_2_char, message_to_2.c_str());
-
-    BT_send_0(message_to_1_char);
-    BT_send_1(message_to_2_char);
+    BT_send_0(message_to_1.str().c_str());
+    BT_send_1(message_to_2.str().c_str());
 
 }
 
@@ -198,31 +183,14 @@ Format: (the result for attacking)
 “result xCoordinate yCoordinate gamestatus hitstatus~”
 */
 void send_result_message_BT(int device_num, int x, int y, int gamestatus, int hitstatus) {
-    string message = "result ";
-
-    message += to_string(x);
-    message += " ";
-    message += to_string(y);
-    message += " ";
-    message += to_string(gamestatus);
-    message += " ";
-    message += to_string(hitstatus);
-
-    message += "~";
-
-    int n = message.length();
- 
-    // declaring character array with space for termination character 
-    char message_char[n + 1];
- 
-    // copying the contents of the string to char array
-    strcpy(message_char, message.c_str());
+    stringstream message;
+    message << "result " << x << " " << y << " " << gamestatus << " " << hitstatus << "~";
 
     if (device_num == 1) {
-        BT_send_0(message_char);
+        BT_send_0(message.str().c_str());
     }
     else {
-        BT_send_1(message_char);
+        BT_send_1(message.str().c_str());
     }
 
 
@@ -233,39 +201,14 @@ Format: (the result for attacking)
 “targeted xCoordinate yCoordinate gameStatus hitstatus (destroyedShipXCoordinate destroyedShipYCoordinate shipLength shipOrientation)~”
 */
 void send_result_message_BT(int device_num, int x, int y, int gamestatus, int hitstatus, int destroyed_start_x, int destroyed_start_y, int length, int orientation) {
-    string message = "result ";
-
-    message += to_string(x);
-    message += " ";
-    message += to_string(y);
-    message += " ";
-    message += to_string(gamestatus);
-    message += " ";
-    message += to_string(hitstatus);
-    message += " ";
-    message += to_string(destroyed_start_x);
-    message += " ";
-    message += to_string(destroyed_start_y);
-    message += " ";
-    message += to_string(length);
-    message += " ";
-    message += to_string(orientation);
-
-    message += "~";
-
-    int n = message.length();
- 
-    // declaring character array with space for termination character 
-    char message_char[n + 1];
- 
-    // copying the contents of the string to char array
-    strcpy(message_char, message.c_str());
+    stringstream message;
+    message << "result " << x << " " << y << " " << gamestatus << " " << hitstatus << " " << destroyed_start_x << " " << destroyed_start_y << " " << length << " " << orientation << "~";
 
     if (device_num == 1) {
-        BT_send_0(message_char);
+        BT_send_0(message.str().c_str());
     }
     else {
-        BT_send_1(message_char);
+        BT_send_1(message.str().c_str());
     }
 
 }
@@ -275,31 +218,14 @@ Format: (the result of being attacked)
 “targeted xCoordinate yCoordinate gameStatus hitstatus (destroyedShipXCoordinate destroyedShipYCoordinate shipLength shipOrientation)~”
 */
 void send_targeted_message_BT(int device_num, int x, int y, int gamestatus, int hitstatus) {
-    string message = "targeted ";
-
-    message += to_string(x);
-    message += " ";
-    message += to_string(y);
-    message += " ";
-    message += to_string(gamestatus);
-    message += " ";
-    message += to_string(hitstatus);
-
-    message += "~";
-
-    int n = message.length();
- 
-    // declaring character array with space for termination character 
-    char message_char[n + 1];
- 
-    // copying the contents of the string to char array
-    strcpy(message_char, message.c_str());
+    stringstream message;
+    message << "targeted " << x << " " << y << " " << gamestatus << " " << hitstatus << "~";
 
     if (device_num == 1) {
-        BT_send_0(message_char);
+        BT_send_0(message.str().c_str());
     }
     else {
-        BT_send_1(message_char);
+        BT_send_1(message.str().c_str());
     }
 
 }
@@ -309,39 +235,14 @@ Format: (the result of being attacked)
 “targeted xCoordinate yCoordinate gameStatus hitstatus (destroyedShipXCoordinate destroyedShipYCoordinate shipLength shipOrientation)~”
 */
 void send_targeted_message_BT(int device_num, int x, int y, int gamestatus, int hitstatus, int destroyed_start_x, int destroyed_start_y, int length, int orientation) {
-    string message = "targeted ";
-
-    message += to_string(x);
-    message += " ";
-    message += to_string(y);
-    message += " ";
-    message += to_string(gamestatus);
-    message += " ";
-    message += to_string(hitstatus);
-    message += " ";
-    message += to_string(destroyed_start_x);
-    message += " ";
-    message += to_string(destroyed_start_y);
-    message += " ";
-    message += to_string(length);
-    message += " ";
-    message += to_string(orientation);
-
-    message += "~";
-
-    int n = message.length();
- 
-    // declaring character array with space for termination character 
-    char message_char[n + 1];
- 
-    // copying the contents of the string to char array
-    strcpy(message_char, message.c_str());
+    stringstream message;
+    message << "“targeted " << x << " " << y << " " << gamestatus << " " << hitstatus << " " << destroyed_start_x << " " << destroyed_start_y << " " << length << " " << orientation << "~";
 
     if (device_num == 1) {
-        BT_send_0(message_char);
+        BT_send_0(message.str().c_str());
     }
     else {
-        BT_send_1(message_char);
+        BT_send_1(message.str().c_str());
     }
 
 }
@@ -382,24 +283,9 @@ status is “1” or “0”
 Else “1” if multiplayer lobby created successfully
 */
 void send_create_response_BT(int num_players, int status) {
-    string message = "create ";
-
-    message += to_string(num_players);
-    message += " ";
-    message += to_string(status);
-
-    message += "~";
-
-    int n = message.length();
- 
-    // declaring character array with space for termination character 
-    char message_char[n + 1];
- 
-    // copying the contents of the string to char array
-    strcpy(message_char, message.c_str());
-
-    
-    BT_send_0(message_char);
+    stringstream message;
+    message << "create " << num_players << " " << status << "~";
+    BT_send_0(message.str().c_str());
     
 }
 
@@ -427,22 +313,9 @@ int get_join_message_BT() {
 }
 
 void send_join_reponse_BT(int status) {
-    string message = "join ";
-
-    message += to_string(status);
-
-    message += "~";
-
-    int n = message.length();
- 
-    // declaring character array with space for termination character 
-    char message_char[n + 1];
- 
-    // copying the contents of the string to char array
-    strcpy(message_char, message.c_str());
-
-    
-    BT_send_1(message_char);
+    stringstream message;
+    message << "join " << status << "~";
+    BT_send_1(message.str().c_str());
 
 }
 
@@ -454,12 +327,12 @@ Only sent for multiplayer lobbies
 Sent when the multiplayer lobby is full and the players may begin placement
 */
 
-void send_ready_messaeg_BT() {
+void send_ready_message_BT() {
     BT_send_0("ready~");
     BT_send_1("ready~");
 }
 
-void send_win_by_forfiet_BT(int device_num) {
+void send_win_by_forfeit_BT(int device_num) {
     if (device_num == 1) {
         BT_send_0("f~");
     }
