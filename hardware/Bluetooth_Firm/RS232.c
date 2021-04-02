@@ -145,14 +145,14 @@ void RS232Flush_1(void)
 
 void BT_send_0(char *word)
 {
-    for(; *send_char != '\0'; send_char++) {
-        putcharRS232_0(*send_char);
+    for(; *word != '\0'; word++) {
+        putcharRS232_0(*word);
     }
 }
 void BT_send_1(char *word)
 {
-    for(; *send_char != '\0'; send_char++) {
-        putcharRS232_1(*send_char);
+    for(; *word != '\0'; word++) {
+        putcharRS232_1(*word);
     }
 }
 
