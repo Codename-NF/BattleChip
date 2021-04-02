@@ -248,8 +248,8 @@ void AI_setting_up(list<player>::iterator *AI) {
         }
 
         // adding all the boxes into the set
-        for (int i = 0; i < length; i++) {
-            (*AI)->all_boxes_on_board.insert(box(x_in + (offset_x * i), y_in + (offset_y * i)));
+        for (int j = 0; j < length; j++) {
+            (*AI)->all_boxes_on_board.insert(box(x_in + (offset_x * j), y_in + (offset_y * j)));
         }
 
         i++;
@@ -263,10 +263,10 @@ createmessage create_lobby() {
     int got_msg = 0;
     do {
         got_msg = get_create_message_BT(&input1);
-        int input2 = get_join_message_BT();
-        if (input2 != -1) {
-            send_join_reponse_BT(FAILURE);
-        }
+        // int input2 = get_join_message_BT();
+        // if (input2 != -1) {
+        //     send_join_reponse_BT(FAILURE);
+        // }
     } while (!got_msg);
     
 
@@ -313,13 +313,6 @@ void assign_ship(list<player>::iterator *player, list<setupvalues>::iterator it)
     int y_in = it->y;
     int length = it->size;
     int orientation = it->orientation;
-    bool came_from_player1;
-    if (it->device_num == 1) {
-        came_from_player1 = true;
-    }
-    else {
-        came_from_player1 = false;
-    }
 
     // setting the ship
     if ((*ships_being_set_up)->size == 0) {
@@ -381,7 +374,7 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
     bool game_finished = false;
 
     bool turn_1 = true;
-    send_game_start_status_BT(turn_1);
+    send_game_start_status_BT(turn_1, single_player_mode);
 
     while (!game_finished) {
         shootvalues inputs;
@@ -418,7 +411,7 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
         // check for forfeit 
         if (inputs.p1_forfeit) {
             game_finished = true;
-            send_win_by_forfiet_BT(PLAYER2);
+            send_win_by_forfeit_BT(PLAYER2);
             int score1 = get_score((*p1)->boxes_hit);
             int score2 = get_score((*p2)->boxes_hit);
             displaywinner(PLAYER2);
@@ -427,7 +420,7 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
         }
         if (inputs.p2_forfeit) {
             game_finished = true;
-            send_win_by_forfiet_BT(PLAYER1);
+            send_win_by_forfeit_BT(PLAYER1);
             int score1 = get_score((*p1)->boxes_hit);
             int score2 = get_score((*p2)->boxes_hit);
             displaywinner(PLAYER1);
@@ -446,8 +439,8 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
             came_from_player1 = false;
         }
         
-        int current_attacking = came_from_player1 ? 1: 2;
-        int next_up = came_from_player1 ? 2: 1;
+        int current_attacking = came_from_player1 ? PLAYER1: PLAYER2;
+        int next_up = came_from_player1 ? PLAYER2: PLAYER1;
         list<player>::iterator current_under_attack = came_from_player1 ? *p2: *p1;
         int status;
         
@@ -475,14 +468,14 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
                     }
                     postgameresults((*p1)->player_id, (*p2)->player_id, winnerid, score1, score2);
                 }
-                send_result_message_BT(current_attacking, x_in, y_in, game_finished, status, sunk_ship.start_box.x, sunk_ship.start_box.y, sunk_ship.size, sunk_ship.orientation);
-                send_targeted_message_BT(next_up, x_in, y_in, game_finished, status, sunk_ship.start_box.x, sunk_ship.start_box.y, sunk_ship.size, sunk_ship.orientation);
+                send_result_message_BT(current_attacking, x_in, y_in, game_finished, status, sunk_ship.start_box.x, sunk_ship.start_box.y, sunk_ship.size, sunk_ship.orientation, single_player_mode);
+                send_targeted_message_BT(next_up, x_in, y_in, game_finished, status, sunk_ship.start_box.x, sunk_ship.start_box.y, sunk_ship.size, sunk_ship.orientation, single_player_mode);
                 squaremapper(x_in, y_in, next_up, HIT_COLOR);
                 squaremappership(next_up, sunk_ship.start_box.x, sunk_ship.start_box.y, sunk_ship.size, sunk_ship.orientation, game_finished, SUNK_CROSS_COLOR);
                 continue;
             }
-            send_result_message_BT(current_attacking, x_in, y_in, game_finished, status);
-            send_targeted_message_BT(next_up, x_in, y_in, game_finished, status);
+            send_result_message_BT(current_attacking, x_in, y_in, game_finished, status, single_player_mode);
+            send_targeted_message_BT(next_up, x_in, y_in, game_finished, status, single_player_mode);
             if (status == HIT_STATUS_CODE) {
                 squaremapper(x_in, y_in, next_up, HIT_COLOR);
             }

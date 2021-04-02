@@ -60,9 +60,10 @@ int get_shoot_message_BT(shootvalues *input, int device_num);
  * sends game start message to UI through bluetooth firmware
  * parameters: 
  *      start1: whether or not player 1 is starting first 
+ *      single_player_mode: whether or not it is single player
  * return: 
 **/
-void send_game_start_status_BT(bool start1);
+void send_game_start_status_BT(bool start1, bool single_player_mode);
 
 
 /**
@@ -76,7 +77,7 @@ void send_game_start_status_BT(bool start1);
  *      hitstatus: the hit status of the hit (MISS, HIT, SUNK)
  * return: 
 **/
-void send_result_message_BT(int device_num, int x, int y, int gamestatus, int hitstatus);
+void send_result_message_BT(int device_num, int x, int y, int gamestatus, int hitstatus, bool single_player_mode);
 
 
 /**
@@ -94,7 +95,7 @@ void send_result_message_BT(int device_num, int x, int y, int gamestatus, int hi
  *      orientation: orientation of the ship sunk
  * return: 
 **/
-void send_result_message_BT(int device_num, int x, int y, int gamestatus, int hitstatus, int destroyed_start_x, int destroyed_start_y, int length, int orientation);
+void send_result_message_BT(int device_num, int x, int y, int gamestatus, int hitstatus, int destroyed_start_x, int destroyed_start_y, int length, int orientation, bool single_player_mode);
 
 
 /**
@@ -108,7 +109,7 @@ void send_result_message_BT(int device_num, int x, int y, int gamestatus, int hi
  *      hitstatus: the hit status of the hit (MISS, HIT, SUNK)
  * return: 
 **/
-void send_targeted_message_BT(int device_num, int x, int y, int gamestatus, int hitstatus);
+void send_targeted_message_BT(int device_num, int x, int y, int gamestatus, int hitstatus, bool single_player_mode);
 
 
 /**
@@ -126,7 +127,7 @@ void send_targeted_message_BT(int device_num, int x, int y, int gamestatus, int 
  *      orientation: orientation of the ship sunk
  * return: 
 **/
-void send_targeted_message_BT(int device_num, int x, int y, int gamestatus, int hitstatus, int destroyed_start_x, int destroyed_start_y, int length, int orientation);
+void send_targeted_message_BT(int device_num, int x, int y, int gamestatus, int hitstatus, int destroyed_start_x, int destroyed_start_y, int length, int orientation, bool single_player_mode);
 
 
 /**
@@ -180,7 +181,7 @@ void send_join_reponse_BT(int status);
  * parameters: 
  * return: 
 **/
-void send_ready_messaeg_BT();
+void send_ready_message_BT();
 
 
 /**
@@ -190,4 +191,4 @@ void send_ready_messaeg_BT();
  *      device_num: the device which won by default
  * return: 
 **/
-void send_win_by_forfiet_BT(int device_num);
+void send_win_by_forfeit_BT(int device_num);
