@@ -14,39 +14,39 @@ int r_c_index_0 = 0;
 char r_c_buff_1[20];
 int r_c_index_1 = 0;
 
-int main(void) {
-    Init_RS232();
-    // RS232Flush_0();
-    // RS232Flush_1();
-    char receive_char_0[256];
-    char receive_char_1[256];
-    receive_char_0[0] = 1;
-    receive_char_1[1] = 1;
-    while(1) {
+// int main(void) {
+//     Init_RS232();
+//     // RS232Flush_0();
+//     // RS232Flush_1();
+//     char receive_char_0[256];
+//     char receive_char_1[256];
+//     receive_char_0[0] = 1;
+//     receive_char_1[1] = 1;
+//     while(1) {
 
-        if(RS232TestForReceivedData_0()) {
-            // BT_send_0("Ready Player 1");
-            if (BT_receive_0(receive_char_0)) {
-                BT_send_0("Player1:");
-                BT_send_0(receive_char_0);
-                RS232Flush_0();
-            }
-        }
+//         if(RS232TestForReceivedData_0()) {
+//             // BT_send_0("Ready Player 1");
+//             if (BT_receive_0(receive_char_0)) {
+//                 BT_send_0("Player1:");
+//                 BT_send_0(receive_char_0);
+//                 RS232Flush_0();
+//             }
+//         }
         
-        if(RS232TestForReceivedData_1()) {
-            // BT_send_1("Ready Player 2");
-            if (BT_receive_1(receive_char_1)) {
-                BT_send_1("Player2:");
-                BT_send_1(receive_char_1);
-                RS232Flush_1();
-            }       
-        }
-    }
-    BT_send_1("Message Received");
-    printf("%d\n", RS232TestForReceivedData_1());
-    RS232Flush_1();
-    return 0;
-}
+//         if(RS232TestForReceivedData_1()) {
+//             // BT_send_1("Ready Player 2");
+//             if (BT_receive_1(receive_char_1)) {
+//                 BT_send_1("Player2:");
+//                 BT_send_1(receive_char_1);
+//                 RS232Flush_1();
+//             }       
+//         }
+//     }
+//     BT_send_1("Message Received");
+//     printf("%d\n", RS232TestForReceivedData_1());
+//     RS232Flush_1();
+//     return 0;
+// }
 
 void Init_RS232(void)
 {
@@ -145,17 +145,13 @@ void RS232Flush_1(void)
 
 void BT_send_0(char *word)
 {
-    char *send_char;
-    send_char = word;
-    for(send_char; *send_char != '\0'; send_char++) {
+    for(; *send_char != '\0'; send_char++) {
         putcharRS232_0(*send_char);
     }
 }
 void BT_send_1(char *word)
 {
-    char *send_char;
-    send_char = word;
-    for(send_char; *send_char != '\0'; send_char++) {
+    for(; *send_char != '\0'; send_char++) {
         putcharRS232_1(*send_char);
     }
 }
