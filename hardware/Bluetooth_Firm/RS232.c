@@ -143,13 +143,13 @@ void RS232Flush_1(void)
     }
 }
 
-void BT_send_0(char *word)
+void BT_send_0(const char *word)
 {
     for(; *word != '\0'; word++) {
         putcharRS232_0(*word);
     }
 }
-void BT_send_1(char *word)
+void BT_send_1(const char *word)
 {
     for(; *word != '\0'; word++) {
         putcharRS232_1(*word);
