@@ -93,9 +93,9 @@ int get_placement_message_BT(list<setupvalues> *list_setupval, int device_num) {
         int x,y,size, orientation;
         x = receive_char[i] % 10;
         y = receive_char[i] / 10;
-        bitset<8> bitfield(receive_char[i+1]);
-        orientation = bitfield[0] + 1;
-        size = bitfield[3] * 4 + bitfield[2] * 2 + bitfield[1];
+        char bitfield = receive_char[i+1];
+        orientation = (bitfield & 1) + 1;
+        size = bitfield >> 1;
 
         (*list_setupval).push_back(setupvalues(x, y, size, orientation, device_num));
 
@@ -110,8 +110,6 @@ Format:
 “shoot xCoordinate yCoordinate\n\n”
 */
 int get_shoot_message_BT(shootvalues *input, int device_num) {
-    int x,y;
-
     char receive_char[BT_RECEIVE_SIZE];
     char forfeit_char[BT_RECEIVE_SIZE];
     int first_success = 0;
@@ -148,12 +146,12 @@ int get_shoot_message_BT(shootvalues *input, int device_num) {
         return SUCCESS;
     }
 
-    if (receive_char[0] == 's') {
+    if (receive_char[0] != 's') {
         return FAILURE;
     }
 
-    (*input).x = receive_char[2];
-    (*input).y = receive_char[4];
+    (*input).x = receive_char[2] - '0';
+    (*input).y = receive_char[4] - '0';
     (*input).device_num = device_num;
 
     return SUCCESS;
@@ -247,7 +245,7 @@ void send_targeted_message_BT(int device_num, int x, int y, int gamestatus, int 
 /*
 Format:
 Create message (app to console)
-“c playerID numPlayers~” 
+“c numPlayers playerID ~” 
 playerID is the ID of the player
 numPlayers is 1 or 2, 1 for vs AI, 2 for multiplayer
 Only sent to BluetoothChip0
@@ -262,8 +260,9 @@ int get_create_message_BT(createmessage *msg) {
             return FAILURE;
         } 
         (*msg).keywrod = receive_char[0];
-        (*msg).playerid = receive_char[2];
-        (*msg).numplayer = receive_char[4];
+        (*msg).numplayer = receive_char[2] - '0';
+        (*msg).playerid = atoi(receive_char + 4);
+        
         return SUCCESS;
     }
     return FAILURE;
@@ -301,7 +300,7 @@ int get_join_message_BT() {
     
     if (BT_receive_1(receive_char) == SUCCESS) {
         if (receive_char[0] == 'j') {
-            return receive_char[2];
+            return atoi(receive_char + 2);
         }
     }
     return -1;
