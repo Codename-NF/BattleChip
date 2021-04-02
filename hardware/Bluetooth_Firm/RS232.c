@@ -169,8 +169,8 @@ int BT_receive_0(char *receive_char)
 
     if (r_c_buff_0[x-1] == '~') {
         r_c_index_0 = 0;
-        r_c_buff_0[x] = '\0';
-        for (int y = 0; y <= x; y++) {
+        r_c_buff_0[x-1] = '\0';
+        for (int y = 0; y < x; y++) {
             receive_char[y] = r_c_buff_0[y];
         }
         return 1;
@@ -191,8 +191,8 @@ int BT_receive_1(char *receive_char)
 
     if (r_c_buff_1[x-1] == '~') {
         r_c_index_1 = 0;
-        r_c_buff_1[x] = '\0';
-        for (int y = 0; y <= x; y++) {
+        r_c_buff_1[x-1] = '\0';
+        for (int y = 0; y < x; y++) {
             receive_char[y] = r_c_buff_1[y];
         }
         return 1;
