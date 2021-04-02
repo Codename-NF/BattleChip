@@ -9,6 +9,10 @@
 **
 **  Refer to UART data sheet for details of registers and programming
 ***************************************************************************/
+char r_c_buff_0[20];
+int r_c_index_0 = 0;
+char r_c_buff_1[20];
+int r_c_index_1 = 0;
 
 int main(void) {
     Init_RS232();
@@ -143,7 +147,7 @@ void BT_send_0(char *word)
 {
     char *send_char;
     send_char = word;
-    for(send_char++; *send_char != '\0'; send_char++) {
+    for(send_char; *send_char != '\0'; send_char++) {
         putcharRS232_0(*send_char);
     }
 }
@@ -151,7 +155,7 @@ void BT_send_1(char *word)
 {
     char *send_char;
     send_char = word;
-    for(send_char++; *send_char != '\0'; send_char++) {
+    for(send_char; *send_char != '\0'; send_char++) {
         putcharRS232_1(*send_char);
     }
 }
@@ -163,19 +167,20 @@ int BT_receive_0(char *receive_char)
     }
 
     int x;
-    for(x = 0;RS232TestForReceivedData_0();x++) {
-        receive_char[x] = getcharRS232_0();
-        // putcharRS232_1(receive_char[x]);
+    for(x = r_c_index_0;RS232TestForReceivedData_0();x++) {
+        r_c_buff_0[x] = getcharRS232_0();
     }
 
-    if (receive_char[x-1] == '~') {
-        // receive_char[0] = 1;
-        receive_char[x] = '\0';
-        RS232Flush_0();
+    if (r_c_buff_0[x-1] == '~') {
+        r_c_index_0 = 0;
+        r_c_buff_0[x] = '\0';
+        for (int y = 0; y <= x; y++) {
+            receive_char[y] = r_c_buff_0[y];
+        }
         return 1;
     }
-    // receive_char[0] = x;
-    return 2;
+    r_c_index_0 = x;
+    return 0;
 }
 int BT_receive_1(char *receive_char)
 {
@@ -184,17 +189,18 @@ int BT_receive_1(char *receive_char)
     }
 
     int x;
-    for(x = 0;RS232TestForReceivedData_1();x++) {
-        receive_char[x] = getcharRS232_1();
-        // putcharRS232_1(receive_char[x]);
+    for(x = r_c_index_1;RS232TestForReceivedData_1();x++) {
+        r_c_buff_1[x] = getcharRS232_1();
     }
 
-    if (receive_char[x-1] == '~') {
-        // receive_char[0] = 1;
-        receive_char[x] = '\0';
-        RS232Flush_1();
+    if (r_c_buff_1[x-1] == '~') {
+        r_c_index_1 = 0;
+        r_c_buff_1[x] = '\0';
+        for (int y = 0; y <= x; y++) {
+            receive_char[y] = r_c_buff_1[y];
+        }
         return 1;
     }
-    // receive_char[0] = x;
-    return 2;
+    r_c_index_1 = x;
+    return 0;
 }
