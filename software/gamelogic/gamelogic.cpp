@@ -57,19 +57,21 @@ int main () {
             }
         }
         else { // dealing with UI / BT
+            cout << "i'm here" << endl;
             Init_RS232();
             Init_RS232_WIFI();
             blankscreen( BLUE );
-            int player_num;
+            cout << "past init" << endl;
+            int num_players;
             bool single_player = false;
             createmessage input1 = create_lobby();
             
-            player_num = input1.numplayer;
+            num_players = input1.numplayer;
 
-            if (player_num == 2) {
+            if (num_players == 2) {
                 int input2 = wait_for_player2();
 
-                battleship game = battleship(player_num);
+                battleship game = battleship(num_players);
                 list<player>::iterator p1, p2;
                 for (list<player>::iterator it = game.players.begin(); it != game.players.end(); it++) {
                     if (it->player_num == PLAYER1) {
@@ -91,7 +93,7 @@ int main () {
             }
             else {
                 // if player_num == 1 -> plyaing with AI
-                reject_player2();
+                //reject_player2();
                 single_player = true;
                 battleship game = battleship(2);
                 list<player>::iterator p1, AI;
