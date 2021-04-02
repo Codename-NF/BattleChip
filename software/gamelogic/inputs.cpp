@@ -164,22 +164,22 @@ Format:
 “start isTurn~”
 isTurn is 1 if the current player is attacking first, 0 otherwise
 */
-void send_game_start_status_BT(bool start1) {
+void send_game_start_status_BT(bool start1, bool single_player_mode) {
     stringstream message_to_1;
-    stringstream message_to_2;
     message_to_1 << "start " << start1 << "~";
-    message_to_2 << "start " << !start1 << "~";
-
     BT_send_0(message_to_1.str().c_str());
-    BT_send_1(message_to_2.str().c_str());
-
+    if (!single_player_mode) {
+        stringstream message_to_2;
+        message_to_2 << "start " << !start1 << "~";
+        BT_send_1(message_to_2.str().c_str());
+    }
 }
 
 /*
 Format: (the result for attacking)
 “result xCoordinate yCoordinate gamestatus hitstatus~”
 */
-void send_result_message_BT(int device_num, int x, int y, int gamestatus, int hitstatus) {
+void send_result_message_BT(int device_num, int x, int y, int gamestatus, int hitstatus, bool single_player_mode) {
     stringstream message;
     message << "result " << x << " " << y << " " << gamestatus << " " << hitstatus << "~";
 
@@ -187,7 +187,9 @@ void send_result_message_BT(int device_num, int x, int y, int gamestatus, int hi
         BT_send_0(message.str().c_str());
     }
     else {
-        BT_send_1(message.str().c_str());
+        if (!single_player_mode) {
+            BT_send_1(message.str().c_str());
+        }
     }
 
 
@@ -197,7 +199,7 @@ void send_result_message_BT(int device_num, int x, int y, int gamestatus, int hi
 Format: (the result for attacking)
 “targeted xCoordinate yCoordinate gameStatus hitstatus (destroyedShipXCoordinate destroyedShipYCoordinate shipLength shipOrientation)~”
 */
-void send_result_message_BT(int device_num, int x, int y, int gamestatus, int hitstatus, int destroyed_start_x, int destroyed_start_y, int length, int orientation) {
+void send_result_message_BT(int device_num, int x, int y, int gamestatus, int hitstatus, int destroyed_start_x, int destroyed_start_y, int length, int orientation, bool single_player_mode) {
     stringstream message;
     message << "result " << x << " " << y << " " << gamestatus << " " << hitstatus << " " << destroyed_start_x << " " << destroyed_start_y << " " << length << " " << orientation << "~";
 
@@ -205,7 +207,9 @@ void send_result_message_BT(int device_num, int x, int y, int gamestatus, int hi
         BT_send_0(message.str().c_str());
     }
     else {
-        BT_send_1(message.str().c_str());
+        if (!single_player_mode) {
+            BT_send_1(message.str().c_str());
+        }
     }
 
 }
@@ -214,7 +218,7 @@ void send_result_message_BT(int device_num, int x, int y, int gamestatus, int hi
 Format: (the result of being attacked)
 “targeted xCoordinate yCoordinate gameStatus hitstatus (destroyedShipXCoordinate destroyedShipYCoordinate shipLength shipOrientation)~”
 */
-void send_targeted_message_BT(int device_num, int x, int y, int gamestatus, int hitstatus) {
+void send_targeted_message_BT(int device_num, int x, int y, int gamestatus, int hitstatus, bool single_player_mode) {
     stringstream message;
     message << "targeted " << x << " " << y << " " << gamestatus << " " << hitstatus << "~";
 
@@ -222,7 +226,9 @@ void send_targeted_message_BT(int device_num, int x, int y, int gamestatus, int 
         BT_send_0(message.str().c_str());
     }
     else {
-        BT_send_1(message.str().c_str());
+        if (!single_player_mode) {
+            BT_send_1(message.str().c_str());
+        }
     }
 
 }
@@ -231,7 +237,7 @@ void send_targeted_message_BT(int device_num, int x, int y, int gamestatus, int 
 Format: (the result of being attacked)
 “targeted xCoordinate yCoordinate gameStatus hitstatus (destroyedShipXCoordinate destroyedShipYCoordinate shipLength shipOrientation)~”
 */
-void send_targeted_message_BT(int device_num, int x, int y, int gamestatus, int hitstatus, int destroyed_start_x, int destroyed_start_y, int length, int orientation) {
+void send_targeted_message_BT(int device_num, int x, int y, int gamestatus, int hitstatus, int destroyed_start_x, int destroyed_start_y, int length, int orientation, bool single_player_mode) {
     stringstream message;
     message << "“targeted " << x << " " << y << " " << gamestatus << " " << hitstatus << " " << destroyed_start_x << " " << destroyed_start_y << " " << length << " " << orientation << "~";
 
@@ -239,7 +245,9 @@ void send_targeted_message_BT(int device_num, int x, int y, int gamestatus, int 
         BT_send_0(message.str().c_str());
     }
     else {
-        BT_send_1(message.str().c_str());
+        if (!single_player_mode) {
+            BT_send_1(message.str().c_str());
+        }
     }
 
 }
