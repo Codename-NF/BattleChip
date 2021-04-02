@@ -62,16 +62,16 @@ int main () {
             Init_RS232_WIFI();
             blankscreen( BLUE );
             cout << "past init" << endl;
-            int player_num;
+            int num_players;
             bool single_player = false;
             createmessage input1 = create_lobby();
             
-            player_num = input1.numplayer;
+            num_players = input1.numplayer;
 
-            if (player_num == 2) {
+            if (num_players == 2) {
                 int input2 = wait_for_player2();
 
-                battleship game = battleship(player_num);
+                battleship game = battleship(num_players);
                 list<player>::iterator p1, p2;
                 for (list<player>::iterator it = game.players.begin(); it != game.players.end(); it++) {
                     if (it->player_num == PLAYER1) {

@@ -186,12 +186,9 @@ void send_result_message_BT(int device_num, int x, int y, int gamestatus, int hi
     if (device_num == 1) {
         BT_send_0(message.str().c_str());
     }
-    else {
-        if (!single_player_mode) {
-            BT_send_1(message.str().c_str());
-        }
+    else if(!single_player_mode){
+        BT_send_1(message.str().c_str());
     }
-
 
 }
 
@@ -206,10 +203,8 @@ void send_result_message_BT(int device_num, int x, int y, int gamestatus, int hi
     if (device_num == 1) {
         BT_send_0(message.str().c_str());
     }
-    else {
-        if (!single_player_mode) {
-            BT_send_1(message.str().c_str());
-        }
+    else if(!single_player_mode){
+        BT_send_1(message.str().c_str());
     }
 
 }
@@ -225,10 +220,8 @@ void send_targeted_message_BT(int device_num, int x, int y, int gamestatus, int 
     if (device_num == 1) {
         BT_send_0(message.str().c_str());
     }
-    else {
-        if (!single_player_mode) {
-            BT_send_1(message.str().c_str());
-        }
+    else if(!single_player_mode){
+        BT_send_1(message.str().c_str());
     }
 
 }
@@ -244,10 +237,8 @@ void send_targeted_message_BT(int device_num, int x, int y, int gamestatus, int 
     if (device_num == 1) {
         BT_send_0(message.str().c_str());
     }
-    else {
-        if (!single_player_mode) {
-            BT_send_1(message.str().c_str());
-        }
+    else if(!single_player_mode){
+        BT_send_1(message.str().c_str());
     }
 
 }
