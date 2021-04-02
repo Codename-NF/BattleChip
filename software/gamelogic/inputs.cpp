@@ -99,10 +99,7 @@ int get_placement_message_BT(list<setupvalues> *list_setupval, int device_num) {
 
         (*list_setupval).push_back(setupvalues(x, y, size, orientation, device_num));
 
-        cout << "x: " << x << '\n';
-        cout << "y: " << y << '\n';
-        cout << "size: " << size << '\n';
-        cout << "orientation: " << orientation << '\n'; 
+        cout << "(" << x << ", " << y << ")" << "size: " << size << ", orientation: " << orientation << endl;
 
     }
     return SUCCESS;
