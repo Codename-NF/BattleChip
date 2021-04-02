@@ -24,6 +24,10 @@ public class UnityMessage {
             bytes[i / 2 + 1] = (byte) (Byte.parseByte(splitMessage[i]) + Byte.parseByte(splitMessage[i + 1]) * 10);
             bytes[i / 2 + 2] = (byte) (Byte.parseByte(splitMessage[i + 2]) * 2 + Byte.parseByte(splitMessage[i + 3]));
         }
+
+        for (byte b : bytes) {
+            Log.d(UNITY_MESSAGE_DEBUG, "" + b);
+        }
         BluetoothThread.getInstance().write(bytes);
     }
 
@@ -40,7 +44,7 @@ public class UnityMessage {
 
     // Called in Android to send create game message
     public static void create(int playerId, int numPlayers) {
-        String message = String.format(Locale.ENGLISH, "c %d %d~", playerId, numPlayers);
+        String message = String.format(Locale.ENGLISH, "c %d %d~", numPlayers, playerId);
         BluetoothThread.getInstance().write(message.getBytes());
     }
 
