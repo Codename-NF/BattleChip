@@ -82,7 +82,7 @@ int main () {
                 
                 setting_player_id(&p1, &p2, input1.playerid, input2);
                 
-                send_ready_messaeg_BT();
+                send_ready_message_BT();
                 
                 setting_up_ships_BT(&p1, &p2, single_player);
 

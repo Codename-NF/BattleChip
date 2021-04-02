@@ -454,12 +454,12 @@ Only sent for multiplayer lobbies
 Sent when the multiplayer lobby is full and the players may begin placement
 */
 
-void send_ready_messaeg_BT() {
+void send_ready_message_BT() {
     BT_send_0("ready~");
     BT_send_1("ready~");
 }
 
-void send_win_by_forfiet_BT(int device_num) {
+void send_win_by_forfeit_BT(int device_num) {
     if (device_num == 1) {
         BT_send_0("f~");
     }
