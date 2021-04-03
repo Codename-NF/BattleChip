@@ -21,6 +21,7 @@
 #define WIFI_DivisorLatchMSB                   ((volatile unsigned char *)(CONCATENATE_ADDRESSES(Base_Address_Wifi, 2)))
 
 void Init_RS232_WIFI(void);
+void Init_Wifi(void);
 int putcharWIFI(int c);
 int getcharWIFI(void);
 int WIFITestForReceivedData(void);

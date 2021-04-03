@@ -99,7 +99,7 @@ void WIFIFlush(void)
     }
 }
 
-void InitWifi(void) {
+void Init_Wifi(void) {
     int i = 0;
     Init_RS232_WIFI();
     WIFIFlush();
