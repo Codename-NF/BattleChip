@@ -193,4 +193,4 @@ void send_ready_message_BT();
 **/
 void send_win_by_forfeit_BT(int device_num);
 
-int get_magic_number_AI(set<box> boxes_hit, bitset<5> ships_alive, set<box> shots_with_ships);
+int where_to_shoot_AI(set<box> boxes_hit, bitset<5> ships_alive, set<box> shots_with_ships);

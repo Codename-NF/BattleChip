@@ -336,7 +336,7 @@ void send_win_by_forfeit_BT(int device_num) {
     }
 }
 
-int get_magic_number_AI(set<box> boxes_hit, bitset<5> ships_alive, set<box> shots_with_ships) {
+int where_to_shoot_AI(set<box> boxes_hit, bitset<5> ships_alive, set<box> shots_with_ships) {
     bitset<100> all_boxes_hit = 0;
     bitset<100> unsunk_boxes = 0;
     for(set<box>::iterator it = boxes_hit.begin(); it != boxes_hit.end(); it++) {
@@ -358,5 +358,7 @@ int get_magic_number_AI(set<box> boxes_hit, bitset<5> ships_alive, set<box> shot
     unsigned long right_shots_with_ships = ((unsunk_boxes & divider).to_ulong());
 
     int alive_ships = (int) (ships_alive.to_ulong());
+
+    return ai_where_to_shoot(left_all_boxes_hit, right_all_boxes_hit, left_shots_with_ships, right_shots_with_ships, alive_ships);
     
 }
