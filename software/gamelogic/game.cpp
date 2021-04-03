@@ -305,45 +305,49 @@ void setting_player_id(list<player>::iterator *p1, list<player>::iterator *p2, i
     (*p2)->player_id = player2_id;
 }
 
-void assign_ship(list<player>::iterator *player, list<setupvalues>::iterator it) {
+void assign_ships(list<player>::iterator *player, list<setupvalues> values) {
     list<ship>::iterator ships_being_set_up = (*player)->ships_list.begin();
-    cout << "size is " << (*player)->ships_list.size();
+    int x_in;
+    int y_in;
+    int length;
+    int orientation;
 
-    int x_in = it->x;
-    int y_in = it->y;
-    int length = it->size;
-    int orientation = it->orientation;
-    cout << "got " << "(" << x_in << " " << y_in << " " << length << " " << orientation << ")" << endl;
+    for (list<setupvalues>::iterator it = values.begin(); it != values.end(); it++) {
+        x_in = it->x;
+        y_in = it->y;
+        length = it->size;
+        orientation = it->orientation;
 
-    // setting the ship
-    if (ships_being_set_up->size == 0) {
-        ships_being_set_up->orientation = orientation;
-        ships_being_set_up->size = length;
-        ships_being_set_up->start_box = box(x_in, y_in);
-        ships_being_set_up++;
-    }
+        // setting the ship
+        if (ships_being_set_up->size == 0) {
+            ships_being_set_up->orientation = orientation;
+            ships_being_set_up->size = length;
+            ships_being_set_up->start_box = box(x_in, y_in);
+            ships_being_set_up++;
+        }
 
-    int offset_x, offset_y;
-    if (orientation == VERTICAL) {
-        offset_x = 0;
-        offset_y = 1;
-    }
-    else {
-        offset_x = 1;
-        offset_y = 0;
-    }
+        int offset_x, offset_y;
+        if (orientation == VERTICAL) {
+            offset_x = 0;
+            offset_y = 1;
+        }
+        else {
+            offset_x = 1;
+            offset_y = 0;
+        }
 
-    // adding all the boxes into the set
-    for (int i = 0; i < length; i++) {
-        cout << "inserting (" << x_in+(offset_x*i) << ", " << y_in + (offset_y*i) << ")" << endl;
-        (*player)->all_boxes_on_board.insert(box(x_in + (offset_x * i), y_in + (offset_y * i)));
-    }
-    cout << "adding " << "(" << x_in << " " << y_in << " " << length << " " << orientation << ")" << endl;
-    for (set<box>::iterator it = (*player)->all_boxes_on_board.begin(); it != (*player)->all_boxes_on_board.end(); it++) {
-        cout << "hello \n";
-        cout << "(" << it->x << ", " << it->y << ") \n";
-    }
+        // adding all the boxes into the set
+        for (int i = 0; i < length; i++) {
+            cout << "inserting (" << x_in+(offset_x*i) << ", " << y_in + (offset_y*i) << ")" << endl;
+            (*player)->all_boxes_on_board.insert(box(x_in + (offset_x * i), y_in + (offset_y * i)));
+        }
+        for (set<box>::iterator it = (*player)->all_boxes_on_board.begin(); it != (*player)->all_boxes_on_board.end(); it++) {
+            cout << "All the boxes I have: \n";
+            cout << "(" << it->x << ", " << it->y << ") \n";
+        }
 
+    }
+    
 }
 
 void setting_up_ships_BT(list<player>::iterator *p1, list<player>::iterator *p2, bool single_player_mode) {
@@ -354,16 +358,8 @@ void setting_up_ships_BT(list<player>::iterator *p1, list<player>::iterator *p2,
     }
     while (!success);
 
-
-    for (list<setupvalues>::iterator it = list_of_placement.begin(); it != list_of_placement.end(); it++) {
-        cout << "Assigning " << "(" << it->x << " " << it->y << " " << it->size << " " << it->orientation << ")" << endl;
-        assign_ship(p1, it);
-    }
-    for (set<box>::iterator it = (*p1)->all_boxes_on_board.begin(); it != (*p1)->all_boxes_on_board.end(); it++) {
-        cout << "hello \n";
-        cout << "(" << it->x << ", " << it->y << ") \n";
-    }
-
+    assign_ships(p1, list_of_placement);
+    
     if (single_player_mode) {
         AI_setting_up(p2);
         return;
@@ -376,9 +372,7 @@ void setting_up_ships_BT(list<player>::iterator *p1, list<player>::iterator *p2,
     }
     while (!success);
     
-    for (list<setupvalues>::iterator it = list_of_placement.begin(); it != list_of_placement.end(); it++) {
-        assign_ship(p2, it);
-    }
+    assign_ships(p2, list_of_placement);
 
 }
 

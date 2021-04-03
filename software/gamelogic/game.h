@@ -93,7 +93,7 @@ void setting_player_id(list<player>::iterator *p1, list<player>::iterator *p2, i
  *      it: iterator to the setupvalues in a list
  * return: 
 **/
-void assign_ship(list<player>::iterator *player, list<setupvalues>::iterator it);
+void assign_ships(list<player>::iterator *player, list<setupvalues> values);
 
 
 /**
