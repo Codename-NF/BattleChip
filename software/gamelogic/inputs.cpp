@@ -335,3 +335,28 @@ void send_win_by_forfeit_BT(int device_num) {
         BT_send_1("f~");
     }
 }
+
+int get_magic_number_AI(set<box> boxes_hit, bitset<5> ships_alive, set<box> shots_with_ships) {
+    bitset<100> all_boxes_hit = 0;
+    bitset<100> unsunk_boxes = 0;
+    for(set<box>::iterator it = boxes_hit.begin(); it != boxes_hit.end(); it++) {
+        int number = (it->y)*10 + it->x;
+        all_boxes_hit[99 - number] = 1;
+    }
+
+    for(set<box>::iterator it = shots_with_ships.begin(); it != shots_with_ships.end(); it++) {
+        int number = (it->y)*10 + it->x;
+        unsunk_boxes[99 - number] = 1;
+    }
+
+    std::bitset<100> divider = (0b0000000000000000000000000000000000000000000000000011111111111111111111111111111111111111111111111111);
+
+    unsigned long left_all_boxes_hit = ((all_boxes_hit >> 50) & divider).to_ulong();
+    unsigned long right_all_boxes_hit ((all_boxes_hit & divider).to_ulong());
+
+    unsigned long left_shots_with_ships = ((unsunk_boxes >> 50) & divider).to_ulong();
+    unsigned long right_shots_with_ships = ((unsunk_boxes & divider).to_ulong());
+
+    int alive_ships = (int) (ships_alive.to_ulong());
+    
+}
