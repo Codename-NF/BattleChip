@@ -7,6 +7,7 @@
 #include <string>
 #include <bitset>
 #include "RS232.h" // may need to change path 
+#include "ai_firm.h"
 
 using namespace std;
 
