@@ -306,20 +306,21 @@ void setting_player_id(list<player>::iterator *p1, list<player>::iterator *p2, i
 }
 
 void assign_ship(list<player>::iterator *player, list<setupvalues>::iterator it) {
-    list<ship>::iterator player_ships = (*player)->ships_list.begin();
-    list<ship>::iterator *ships_being_set_up = &player_ships;
+    list<ship>::iterator ships_being_set_up = (*player)->ships_list.begin();
+    cout << "size is " << (*player)->ships_list.size();
 
     int x_in = it->x;
     int y_in = it->y;
     int length = it->size;
     int orientation = it->orientation;
+    cout << "got " << "(" << x_in << " " << y_in << " " << length << " " << orientation << ")" << endl;
 
     // setting the ship
-    if ((*ships_being_set_up)->size == 0) {
-        (*ships_being_set_up)->orientation = orientation;
-        (*ships_being_set_up)->size = length;
-        (*ships_being_set_up)->start_box = box(x_in, y_in);
-        (*ships_being_set_up)++;
+    if (ships_being_set_up->size == 0) {
+        ships_being_set_up->orientation = orientation;
+        ships_being_set_up->size = length;
+        ships_being_set_up->start_box = box(x_in, y_in);
+        ships_being_set_up++;
     }
 
     int offset_x, offset_y;
@@ -334,7 +335,13 @@ void assign_ship(list<player>::iterator *player, list<setupvalues>::iterator it)
 
     // adding all the boxes into the set
     for (int i = 0; i < length; i++) {
+        cout << "inserting (" << x_in+(offset_x*i) << ", " << y_in + (offset_y*i) << ")" << endl;
         (*player)->all_boxes_on_board.insert(box(x_in + (offset_x * i), y_in + (offset_y * i)));
+    }
+    cout << "adding " << "(" << x_in << " " << y_in << " " << length << " " << orientation << ")" << endl;
+    for (set<box>::iterator it = (*player)->all_boxes_on_board.begin(); it != (*player)->all_boxes_on_board.end(); it++) {
+        cout << "hello \n";
+        cout << "(" << it->x << ", " << it->y << ") \n";
     }
 
 }
@@ -349,7 +356,12 @@ void setting_up_ships_BT(list<player>::iterator *p1, list<player>::iterator *p2,
 
 
     for (list<setupvalues>::iterator it = list_of_placement.begin(); it != list_of_placement.end(); it++) {
+        cout << "Assigning " << "(" << it->x << " " << it->y << " " << it->size << " " << it->orientation << ")" << endl;
         assign_ship(p1, it);
+    }
+    for (set<box>::iterator it = (*p1)->all_boxes_on_board.begin(); it != (*p1)->all_boxes_on_board.end(); it++) {
+        cout << "hello \n";
+        cout << "(" << it->x << ", " << it->y << ") \n";
     }
 
     if (single_player_mode) {
