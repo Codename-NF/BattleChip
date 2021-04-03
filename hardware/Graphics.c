@@ -14,16 +14,6 @@ void WriteAPixel(int x, int y, int Colour)
 	GraphicsCommandReg = PutAPixel;			// give graphics "write pixel" command
 }
 
-void blankscreen(int Colour)
-{
-    WAIT_FOR_GRAPHICS;              // is graphics ready for new command
-
-    GraphicsX1Reg = 0;              // write coords to x1, y1
-    GraphicsY1Reg = 0;
-    GraphicsColourReg = Colour;
-    GraphicsCommandReg = Blankboard; 
-}
-
 void squaremapper(int x, int y, int player, int colour)
 {
     WAIT_FOR_GRAPHICS;              // is graphics ready for new command
@@ -102,7 +92,6 @@ void outgraphicschar(int x, int y, int colour, int backgroundcolour, int c, int 
 void winnermessage(int winner, int colour, int background) {
     int current_x = 0;
     int current_y = YBASE - (2 * FONT2_YPIXELS);
-    char current_letter = 'P';
     int i = 0;
 
     if (winner == 1) {
@@ -120,6 +109,11 @@ void winnermessage(int winner, int colour, int background) {
             current_x += FONT2_XPIXELS;
         }
     }
+}
+
+
+void displaywinner(int winner) {
+    winnermessage(winner, LIME, BLACK);
 }
 
 void writecoords() {

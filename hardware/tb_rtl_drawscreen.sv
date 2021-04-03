@@ -1,4 +1,7 @@
 `timescale 1 ps / 1 ps
+`define BASEX_LEFT 9'd10
+`define BASEX_RIGHT 9'd178
+`define BASEY 8'd91
 
 module tb_rtl_drawscreen();
 
@@ -18,13 +21,13 @@ module tb_rtl_drawscreen();
     logic TB_VGA_HS;
     logic TB_VGA_VS;
     logic TB_VGA_CLK;
-    logic [7:0] TB_VGA_X;
-    logic [6:0] TB_VGA_Y;
+    logic [8:0] TB_VGA_X;
+    logic [7:0] TB_VGA_Y;
     logic [2:0] TB_VGA_COLOUR;
     logic TB_VGA_PLOT;
     integer i;
     integer curX;
-    integer maxY;
+    integer curY;
     integer curI;
 
     drawscreen DUT(.CLOCK_50(TB_CLOCK_50), .KEY(TB_KEY), .SW(TB_SW), .LEDR(TB_LEDR), .HEX0(TB_HEX0),
@@ -38,16 +41,169 @@ module tb_rtl_drawscreen();
     end
     initial begin
         TB_KEY[3] = 1'b0;
-        TB_SW[2:0] = 3'b000;
+        TB_SW[3:0] = 4'd5;
+        TB_SW[7:4] = 4'd5;
+        TB_SW[9:8] = 2'd0;
         curX = 0;
         #5;
         TB_KEY[3] = 1'b1;
-        TB_KEY[0] = 1'b0;
+        TB_KEY[0] = 1'b1;
+        TB_KEY[1] = 1'b1;
+
+        //Print blankboard
         for (i = 0; i <= 76800; i++) begin
             #1;#1;
         end
+        //$stop;
+
+        //Print (5,5) to "MISS" on board 1
+        TB_KEY[0] = 1'b0;
+        #6;
+        print_square(TB_SW[3:0], TB_SW[7:4], 3'b111, 0);
+        TB_KEY[0] = 1'b1;
+        #10;
+        //$stop;
+        #2;
+
+        //Print (5,5) to "MISS" on board 2
+        TB_KEY[1] = 1'b0;
+        #6;
+        print_square(TB_SW[3:0], TB_SW[7:4], 3'b111, 1);
+        TB_KEY[1] = 1'b1;
+        #2;
+        TB_SW[9:8] = 2'd1;
+        TB_SW[3:0] = 4'd0;
+        TB_SW[7:4] = 4'd9;
+        #8;
+        //$stop;
+        #2;
+
+        //Print (0,9) to "HIT" on board 1
+        TB_KEY[0] = 1'b0;
+        #6;
+        print_square(TB_SW[3:0], TB_SW[7:4], 3'b100, 0);
+        TB_KEY[0] = 1'b1;
+        #2;
+        TB_SW[3:0] = 4'd0;
+        TB_SW[7:4] = 4'd0;
+        #8;
+        //$stop;
+        #2;
+
+        //Print (0,0) to "HIT" on board 1
+        TB_KEY[0] = 1'b0;
+        #6;
+        print_square(TB_SW[3:0], TB_SW[7:4], 3'b100, 0);
+        TB_KEY[0] = 1'b1;
+        #2;
+        TB_SW[3:0] = 4'd9;
+        TB_SW[7:4] = 4'd0;
+        #8;
+        //$stop;
+        #2;
+
+        //Print (9,0) to "HIT" on board 1
+        TB_KEY[0] = 1'b0;
+        #6;
+        print_square(TB_SW[3:0], TB_SW[7:4], 3'b100, 0);
+        TB_KEY[0] = 1'b1;
+        #2;
+        TB_SW[3:0] = 4'd9;
+        TB_SW[7:4] = 4'd9;
+        #8;
+        //$stop;
+        #2;
+
+        //Print (9,9) to "HIT" on board 1
+        TB_KEY[0] = 1'b0;
+        #6;
+        print_square(TB_SW[3:0], TB_SW[7:4], 3'b100, 0);
+        TB_KEY[0] = 1'b1;
+        #2;
+
+        //Same process for board 2, try magenta
+
+        TB_SW[9:8] = 2'd2;
+        TB_SW[3:0] = 4'd0;
+        TB_SW[7:4] = 4'd9;
+        #8;
+        //$stop;
+        #2;
+
+        //Print (0,9) to "HIT" on board 2
+        TB_KEY[1] = 1'b0;
+        #6;
+        print_square(TB_SW[3:0], TB_SW[7:4], 3'b101, 1);
+        TB_KEY[1] = 1'b1;
+        #2;
+        TB_SW[3:0] = 4'd0;
+        TB_SW[7:4] = 4'd0;
+        #8;
+        //$stop;
+        #2;
+
+        //Print (0,0) to "HIT" on board 2
+        TB_KEY[1] = 1'b0;
+        #6;
+        print_square(TB_SW[3:0], TB_SW[7:4], 3'b101, 1);
+        TB_KEY[1] = 1'b1;
+        #2;
+        TB_SW[3:0] = 4'd9;
+        TB_SW[7:4] = 4'd0;
+        #8;
+        //$stop;
+        #2;
+
+        //Print (9,0) to "HIT" on board 2
+        TB_KEY[1] = 1'b0;
+        #6;
+        print_square(TB_SW[3:0], TB_SW[7:4], 3'b101, 1);
+        TB_KEY[1] = 1'b1;
+        #2;
+        TB_SW[3:0] = 4'd9;
+        TB_SW[7:4] = 4'd9;
+        #8;
+        //$stop;
+        #2;
+
+        //Print (9,9) to "HIT" on board 2
+        TB_KEY[1] = 1'b0;
+        #6;
+        print_square(TB_SW[3:0], TB_SW[7:4], 3'b101, 1);
+        TB_KEY[1] = 1'b1;
+        #2;
+
+
+
+
+
+
 
         $stop;
     end
+
+task print_square;
+    input [3:0] x_val;
+    input [3:0] y_val;
+    input [2:0] expected_colour;
+    input player;
+    begin
+        for (i = 0; i <= 143; i++) begin
+            #1;#1;
+            if (player == 0) begin
+                curX = `BASEX_LEFT + (14 * x_val) + (i / 12);
+            end else begin
+                curX = `BASEX_RIGHT + (14 * x_val) + (i / 12);
+            end
+            curY = `BASEY + (14 * TB_SW[7:4]) + (i % 12);
+
+            assert(TB_VGA_X == (curX)) else $display("The X is currently %d when should be %d", TB_VGA_X,  curX);
+            assert(TB_VGA_Y == (curY)) else $display("The Y is currently %d when should be %d", TB_VGA_Y,  curY);
+
+            assert(TB_VGA_COLOUR == expected_colour);
+            assert(TB_VGA_PLOT == 1);
+        end
+    end
+endtask
 
 endmodule: tb_rtl_drawscreen
