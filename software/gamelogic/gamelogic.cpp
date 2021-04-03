@@ -59,7 +59,7 @@ int main () {
         else { // dealing with UI / BT
             cout << "i'm here" << endl;
             Init_RS232();
-            Init_RS232_WIFI();
+            Init_Wifi();
             cout << "past init" << endl;
             int num_players;
             bool single_player = false;
