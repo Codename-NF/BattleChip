@@ -11,9 +11,9 @@ import androidx.annotation.Nullable;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import com.nf.battlechip.GoogleHelper;
 import com.nf.battlechip.R;
 import com.nf.battlechip.RetrofitHelper;
 import com.nf.battlechip.pojo.User;
@@ -36,10 +36,7 @@ public class LoginActivity extends SetThemeActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        client = GoogleSignIn.getClient(this, new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .requestIdToken("110124662131-u2iujveotr90trk5phf99i2kq2agomgf.apps.googleusercontent.com")
-                .build());
+        client = GoogleHelper.getClient(this);
 
         // user is already signed in
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);

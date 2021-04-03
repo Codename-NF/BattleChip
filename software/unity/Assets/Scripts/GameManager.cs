@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
+using System.Threading.Tasks;
 
 public class GameManager : MonoBehaviour
 {
@@ -18,11 +19,13 @@ public class GameManager : MonoBehaviour
 
     private bool mAllowStatusUpdates;
     private int mPlayerShipsRemaining;
+    private bool mIsGettingResult;
 
     // Start is called before the first frame update
     void Start()
     {
         mAllowStatusUpdates = false;
+        mIsGettingResult = true;
         GlobalState.GameState = GameState.Placement;
         GlobalState.ColorTheme = new ColorTheme();
         GlobalState.WaitingForPush = false;
@@ -33,7 +36,7 @@ public class GameManager : MonoBehaviour
         Debug.LogFormat("Color retrieved is {0}.", color);
 
         // If no color is available, set as default
-        color = (color != 0) ? color : 4284612846; // purple
+        color = (color != 0) ? color : 4293467747; // red
 
         // Extract color values from long variable
         byte opacity = (byte) ((color & 0xFF000000) >> 24);
@@ -42,13 +45,13 @@ public class GameManager : MonoBehaviour
         byte green = (byte) ((color & 0x000000FF));
 
         // Generate board colors based on theme color
-        byte redLite = (byte) ((red >> 3) + 80);
-        byte blueLite = (byte) ((blue >> 3) + 80);
-        byte greenLite = (byte) ((green >> 3) + 80);
+        byte redLite = (byte) ((red >> 3) + 140);
+        byte blueLite = (byte) ((blue >> 3) + 140);
+        byte greenLite = (byte) ((green >> 3) + 140);
 
-        byte redTint = (byte)((red >> 4) + 120);
-        byte blueTint = (byte)((blue >> 4) + 120);
-        byte greenTint = (byte)((green >> 4) + 120);
+        byte redTint = (byte)((red >> 4) + 170);
+        byte blueTint = (byte)((blue >> 4) + 170);
+        byte greenTint = (byte)((green >> 4) + 170);
 
         // Apply color theme directly to ship
         GlobalState.ColorTheme.CellPieceColor = new Color32(red, blue, green, opacity);
@@ -107,7 +110,7 @@ public class GameManager : MonoBehaviour
                 int yCoord = mBoard.mTargetedCell.mBoardPosition.y;
 
                 Debug.Log("Shoot " + xCoord.ToString() + " " + yCoord.ToString() + "\n");
-                mStatus.GetComponent<TextMeshProUGUI>().text = "Firing at (" + xCoord.ToString() + ", " + yCoord.ToString() + ") ...";
+                mStatus.GetComponent<TextMeshProUGUI>().text = "Firing at " + Convert.ToChar(xCoord + 65) + (yCoord + 1).ToString() + "...";
 
                 // Send target coords to Android
                 jc.CallStatic("shoot", xCoord, yCoord);
@@ -173,6 +176,7 @@ public class GameManager : MonoBehaviour
             case "result":
                 if (GlobalState.GameState == GameState.Attacking && GlobalState.WaitingForPush)
                 {
+                    mIsGettingResult = true;
                     int xCoord = int.Parse(msgTokens[1]);
                     int yCoord = int.Parse(msgTokens[2]);
                     int gameStatus = int.Parse(msgTokens[3]); // 1 == gameover
@@ -230,46 +234,16 @@ public class GameManager : MonoBehaviour
                 break;
 
             case "targeted":
-                if (GlobalState.GameState == GameState.Defending && GlobalState.WaitingForPush)
+                if (!mIsGettingResult)
                 {
-                    int xCoord = int.Parse(msgTokens[1]);
-                    int yCoord = int.Parse(msgTokens[2]);
-
-                    // Shot hit if the cell has 1 piece on it
-                    bool didHit = (mBoard.mAllCells[xCoord, yCoord].mIncludedShips.Count == 1);
-
-                    // Update list of shots
-                    mBoard.mShotsOnMe[xCoord, yCoord] = (didHit) ? ShotType.Hit : ShotType.Miss;
-
-                    if (didHit)
-                    {
-                        // If the connecting shot sinks the ship
-                        if (mBoard.mAllCells[xCoord, yCoord].mIncludedShips[0].HasShipSunk())
-                        {
-                            mStatus.GetComponent<TextMeshProUGUI>().text = "Oof! Our ship at (" + xCoord + ", " + yCoord + ") has sunk!";
-                            mPlayerShipsRemaining--;
-                        }
-                        else
-                        {
-                            mStatus.GetComponent<TextMeshProUGUI>().text = "Ouch! Out ship at (" + xCoord + ", " + yCoord + ") has been hit!";
-                        }
-                    }
-                    else
-                    {
-                        mStatus.GetComponent<TextMeshProUGUI>().text = "Whew! Your opponent missed!";
-                    }
-
-                    if (mPlayerShipsRemaining < 1)
-                    {
-                        StartCoroutine(EndTheGame("loss"));
-                    }
-                    else
-                    {
-                        // Wait a moment, then switch state to player's turn
-                        StartCoroutine(ProcessOpponentAttack());
-                    }
-                    
+                    HandleTargeted(int.Parse(msgTokens[1]), int.Parse(msgTokens[2]));
                 }
+                else
+                {
+                    // NOTE: Our hardware accelerated AI makes its decision SO FAST that we need to delay the handling of 'targeted'
+                    Task.Delay(3000).ContinueWith(t => AndroidToUnity("targeted " + msgTokens[1] + " " + msgTokens[2]));
+                }
+                
                 break;
             case "f": // Opponent forfeited
                 StartCoroutine(EndTheGame("opponentForfeit"));
@@ -280,6 +254,50 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /* Handle Targeted message */
+    private void HandleTargeted(int x, int y)
+    {
+        if (GlobalState.GameState == GameState.Defending && GlobalState.WaitingForPush)
+        {
+            int xCoord = x;
+            int yCoord = y;
+
+            // Shot hit if the cell has 1 piece on it
+            bool didHit = (mBoard.mAllCells[xCoord, yCoord].mIncludedShips.Count == 1);
+
+            // Update list of shots
+            mBoard.mShotsOnMe[xCoord, yCoord] = (didHit) ? ShotType.Hit : ShotType.Miss;
+
+            if (didHit)
+            {
+                // If the connecting shot sinks the ship
+                if (mBoard.mAllCells[xCoord, yCoord].mIncludedShips[0].HasShipSunk())
+                {
+                    mStatus.GetComponent<TextMeshProUGUI>().text = "Oof! Our ship at " + Convert.ToChar(xCoord + 65) + (yCoord + 1).ToString() + " has sunk!";
+                    mPlayerShipsRemaining--;
+                }
+                else
+                {
+                    mStatus.GetComponent<TextMeshProUGUI>().text = "Ouch! Out ship at " + Convert.ToChar(xCoord + 65) + (yCoord + 1).ToString() + " has been hit!";
+                }
+            }
+            else
+            {
+                mStatus.GetComponent<TextMeshProUGUI>().text = "Whew! Your opponent missed!";
+            }
+
+            if (mPlayerShipsRemaining < 1)
+            {
+                StartCoroutine(EndTheGame("loss"));
+            }
+            else
+            {
+                // Wait a moment, then switch state to player's turn
+                StartCoroutine(ProcessOpponentAttack());
+            }
+
+        }
+    }
     /* Display the opponent's shot on player, wait three seconds, the swap to attack */
     private IEnumerator ProcessOpponentAttack()
     {
@@ -306,6 +324,7 @@ public class GameManager : MonoBehaviour
         GlobalState.GameState = GameState.Defending;
 
         GlobalState.WaitingForPush = true;
+        mIsGettingResult = false; // Done getting result
     }
 
     private IEnumerator UpdatePlacementMessage()

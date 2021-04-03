@@ -19,35 +19,28 @@ public class ConfirmButton : MonoBehaviour
     // Logic to decide when to enable this confirm button
     void FixedUpdate()
     {
-        if (GlobalState.WaitingForPush)
+        switch (GlobalState.GameState)
         {
-            GetComponent<Button>().interactable = false;
-        }
-        else
-        {
-            switch (GlobalState.GameState)
-            {
-                case GameState.Placement:
-                    // Make confirm button visible
-                    GetComponent<Image>().enabled = true;
-                    GetComponentInChildren<TextMeshProUGUI>().enabled = true;
-                    GetComponent<Button>().interactable = (mBoard.ValidateShips());
-                    break;
-                case GameState.Attacking:
-                    // Make confirm button visible
-                    GetComponent<Image>().enabled = true;
-                    GetComponentInChildren<TextMeshProUGUI>().enabled = true;
-                    GetComponent<Button>().interactable = (mBoard.mTargetedCell != null);
-                    break;
-                case GameState.Defending:
-                    // Hide confirm button
-                    GetComponent<Image>().enabled = false;
-                    GetComponentInChildren<TextMeshProUGUI>().enabled = false;
-                    break;
-                default:
-                    Debug.Log("ERROR: This should not be possible!");
-                    break;
-            }
+            case GameState.Placement:
+                // Make confirm button visible
+                GetComponent<Image>().enabled = true;
+                GetComponentInChildren<TextMeshProUGUI>().enabled = true;
+                GetComponent<Button>().interactable = mBoard.ValidateShips() && !GlobalState.WaitingForPush;
+                break;
+            case GameState.Attacking:
+                // Make confirm button visible
+                GetComponent<Image>().enabled = true;
+                GetComponentInChildren<TextMeshProUGUI>().enabled = true;
+                GetComponent<Button>().interactable = (mBoard.mTargetedCell != null) && !GlobalState.WaitingForPush;
+                break;
+            case GameState.Defending:
+                // Hide confirm button
+                GetComponent<Image>().enabled = false;
+                GetComponentInChildren<TextMeshProUGUI>().enabled = false;
+                break;
+            default:
+                Debug.Log("ERROR: This should not be possible!");
+                break;
         }
     }
 }
