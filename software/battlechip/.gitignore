@@ -13,3 +13,5 @@
 .externalNativeBuild
 .cxx
 local.properties
+gradle.properties
+battlechip-keystore.jks

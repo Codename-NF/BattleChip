@@ -1,4 +1,27 @@
 <resources>
     <string name="app_name">BattleChip</string>
     <string name="game_view_content_description">Game view</string>
+    <string name="single_player_button_label">Singleplayer</string>
+    <string name="multi_player_button_label">Multiplayer</string>
+    <string name="player_stats_button_label">Player Stats</string>
+    <string name="options_button_label">Options</string>
+    <string name="logo_content_description">BattleChip logo</string>
+    <string name="logging_button_label">Logging</string>
+    <string name="dialog_text">Select a Theme Color</string>
+    <string name="match_history_label">Match History</string>
+    <string name="color_key">color</string>
+    <string name="theme_key">theme</string>
+    <string name="statistics_name_text">&lt;b&gt;&lt;font color=%d&gt;Name: &lt;/font&gt;&lt;/b&gt;%s %s</string>
+    <string name="statistics_win_text">&lt;b&gt;&lt;font color=%d&gt;Wins: &lt;/font&gt;&lt;/b&gt;%d</string>
+    <string name="statistics_loss_text">&lt;b&gt;&lt;font color=%d&gt;Losses: &lt;/font&gt;&lt;/b&gt;%d</string>
+    <string name="match_result_text">&lt;b&gt;&lt;font color=%d&gt;%s &lt;/font&gt;&lt;/b&gt;</string>
+    <string name="hits_text">&lt;b&gt;&lt;font color=%d&gt;Hits: &lt;/font&gt;&lt;/b&gt;&lt;b&gt;&lt;font color=%d&gt;%d&lt;/font&gt;&lt;/b&gt; - &lt;b&gt;&lt;font color=%d&gt;%d&lt;/font&gt;&lt;/b&gt;</string>
+    <string name="opponent_text">&lt;b&gt;&lt;font color=%d&gt;Opponent: &lt;/font&gt;&lt;/b&gt;%s</string>
+    <string name="lobby_text">
+        Waiting for opponent to join!\n
+        Please have your opponent connect to the other Bluetooth device on the console</string>
+    <string name="return_to_main_menu_button_label">Return to main menu</string>
+    <string name="failed_to_create_game_text">
+        Failed to create/join game.
+    </string>
 </resources>

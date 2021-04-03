@@ -111,6 +111,7 @@ void winnermessage(int winner, int colour, int background) {
     }
 }
 
+
 void displaywinner(int winner) {
     winnermessage(winner, LIME, BLACK);
 }
@@ -173,8 +174,8 @@ void blankscreen(int Colour)
     GraphicsColourReg = Colour;
     GraphicsCommandReg = Blankboard;
     writecoords();
-    winnermessage(1, BLACK, BLACK);
-    winnermessage(2, BLACK, BLACK); 
+    winnermessage(1, 0, 0);
+    winnermessage(2, 0, 0); 
 }
 
 /*********************************************************************************************

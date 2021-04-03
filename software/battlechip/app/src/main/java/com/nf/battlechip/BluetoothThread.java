@@ -3,79 +3,144 @@ package com.nf.battlechip;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public class BluetoothThread {
 
-    private final String MAC_ID = "TEMP";
+    private static final String BLUETOOTH_DEBUG = "Bluetooth";
+    private static BluetoothThread instance = null;
 
-    private final BluetoothSocket bluetoothSocket;
+    private static final Set<String> CHIP_ONE_MAC_IDS = new HashSet<>(Arrays.asList("20:18:11:21:24:72", "B8:9A:2A:30:2B:35", "34:F6:4B:D7:53:65", "5C:F3:70:9F:40:7A", "58:24:29:64:DD:DC")); // TODO: rely only on device name?
+    private static final Set<String> CHIP_ONE_DEVICE_NAMES = new HashSet<>(Arrays.asList("hc01.com HC-05"));
+    private static final Set<String> CHIP_TWO_MAC_IDS = new HashSet<>(); // TODO: fill
+    private static final Set<String> CHIP_TWO_DEVICE_NAMES = new HashSet<>(); // TODO: fill
+    private static final UUID SERVICE_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
-    private final InputStream inputStream;
-    private final OutputStream outputStream;
+    private BluetoothSocket bluetoothSocket;
+    private InputStream inputStream;
+    private OutputStream outputStream;
+    private final int chipId;
 
-    public BluetoothThread() {
+    BluetoothThread(int chipId) throws IOException {
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-
+        // List all devices
+        for (BluetoothDevice device : adapter.getBondedDevices()) {
+            Log.d(BLUETOOTH_DEBUG, device.getAddress() + " " + device.getName());
+        }
         Optional<BluetoothDevice> device = adapter.getBondedDevices().stream()
-                .filter(bondedDevice -> MAC_ID.equals(bondedDevice.getAddress())).findAny();
-        BluetoothSocket socket = null;
-        InputStream input = null;
-        OutputStream output = null;
-
+                .filter(chipId == 1 ? BluetoothThread::isChipOneDevice : BluetoothThread::isChipTwoDevice).findAny();
         // create socket
         try {
-            socket = device.isPresent() ? device.get().createRfcommSocketToServiceRecord(UUID.randomUUID())
+            bluetoothSocket = device.isPresent() ? device.get().createRfcommSocketToServiceRecord(SERVICE_UUID)
                     : null;
-        } catch (IOException ignored) {
-            // ignore socket creation exception
+            if (bluetoothSocket == null) {
+                Log.d(BLUETOOTH_DEBUG, "Failed to find device\n");
+                throw new IOException();
+            }
+        } catch (IOException e) {
+            Log.d(BLUETOOTH_DEBUG, "Socket creation failed\n" + e.toString());
+            throw e;
         }
-        bluetoothSocket = socket;
 
         // connect socket
-        if (bluetoothSocket != null) {
-            try {
-                bluetoothSocket.connect();
-            } catch (IOException exception) {
-                try {
-                    bluetoothSocket.close();
-                } catch (IOException closeException) {
-                    // ignore close exception
-                }
-            }
-
+        try {
+            bluetoothSocket.connect();
             // get streams
-            try {
-                input = bluetoothSocket.getInputStream();
-                output = bluetoothSocket.getOutputStream();
-            } catch (IOException e) {
-                // ignore stream exception
-            }
+            inputStream = bluetoothSocket.getInputStream();
+            outputStream = bluetoothSocket.getOutputStream();
+        } catch (IOException e) {
+            Log.d(BLUETOOTH_DEBUG, "Exception getting connection/retrieving streams\n" + e.toString());
+            close();
+            throw e;
         }
-
-        inputStream = input;
-        outputStream = output;
+        this.chipId = chipId;
     }
 
-    public int read(byte[] readBuffer) {
-        try {
-            return inputStream.read(readBuffer);
-        } catch (IOException e) {
-            // exit the read now that socket read has failed
-            return 0;
+    private static boolean isChipOneDevice(BluetoothDevice device) {
+        return CHIP_ONE_MAC_IDS.contains(device.getAddress())
+                || CHIP_ONE_DEVICE_NAMES.contains(device.getName());
+    }
+
+    private static boolean isChipTwoDevice(BluetoothDevice device) {
+        return CHIP_TWO_MAC_IDS.contains(device.getAddress())
+                || CHIP_TWO_DEVICE_NAMES.contains(device.getName());
+    }
+
+    public static void createInstance(int chipId) throws IOException {
+        if (instance != null) {
+            instance.close();
         }
+        instance = new BluetoothThread(chipId);
+        instance.startReading();
+    }
+
+    public static BluetoothThread getInstance() {
+        if (instance != null && instance.isInvalidThread()) {
+            try {
+                instance = new BluetoothThread(instance.chipId);
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
+        }
+        return instance;
+    }
+
+    public void startReading() {
+        if (bluetoothSocket.isConnected()) {
+            new Thread(this::read).start();
+        } else {
+            Log.d(BLUETOOTH_DEBUG, "Can't read, socket not connected");
+        }
+    }
+
+    public void read() {
+        Log.d(BLUETOOTH_DEBUG, "Starting thread");
+        try {
+            byte[] readBuffer = new byte[1024];
+            StringBuilder builder = new StringBuilder();
+
+            while (inputStream != null) {
+                int bytesRead = inputStream.read(readBuffer); // possible to read portions of the message at a time
+                String readCharacters = new String(readBuffer).substring(0, bytesRead);
+                builder.append(readCharacters);
+                Log.d(BLUETOOTH_DEBUG, "Read: " + readCharacters);
+
+                // Only send to Unity if entire message has been read
+                while (builder.indexOf("~") != -1) {
+                    UnityMessage.processBluetoothMessage(builder.substring(0, builder.indexOf("~")));
+                    builder = builder.delete(0, builder.indexOf("~") + 1); // remove last message
+                }
+            }
+        } catch (IOException e) {
+            close();
+            Log.d(BLUETOOTH_DEBUG, "Read failed, exiting\n" + e.toString());
+        }
+    }
+
+    public boolean isInvalidThread() {
+        return !bluetoothSocket.isConnected() || inputStream == null || outputStream == null;
     }
 
     public void write(byte[] bytes) {
-        try {
-            outputStream.write(bytes);
-        } catch (IOException e) {
-            // ignore write exception
+        if (isInvalidThread()) {
+            Log.d(BLUETOOTH_DEBUG, "Can't write, invalid thread");
+        } else {
+            try {
+                Log.d(BLUETOOTH_DEBUG, "Write: " + new String(bytes));
+                outputStream.write(bytes);
+            } catch (IOException e) {
+                close();
+                Log.d(BLUETOOTH_DEBUG, "Write failed\n" + e.toString());
+            }
         }
     }
 
@@ -83,7 +148,10 @@ public class BluetoothThread {
         try {
             bluetoothSocket.close();
         } catch (IOException e) {
-            // ignore closing exception
+            Log.d(BLUETOOTH_DEBUG, "Failed to close socket\n" + e.toString());
+        } finally {
+            inputStream = null;
+            outputStream = null;
         }
     }
 }
