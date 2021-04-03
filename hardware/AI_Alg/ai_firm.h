@@ -1,1 +1,1 @@
-Empty atm
+int ai_where_to_shoot(unsigned long fired_0, unsigned long fired_1, unsigned long hits_0, unsigned long hits_1, int ships)；
