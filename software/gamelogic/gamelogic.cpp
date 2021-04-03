@@ -60,12 +60,11 @@ int main () {
             cout << "i'm here" << endl;
             Init_RS232();
             Init_RS232_WIFI();
-            blankscreen( BLUE );
             cout << "past init" << endl;
             int num_players;
             bool single_player = false;
             createmessage input1 = create_lobby();
-            
+            blankscreen( BLUE );
             num_players = input1.numplayer;
 
             if (num_players == 2) {
