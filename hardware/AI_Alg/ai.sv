@@ -247,7 +247,7 @@ module ai(input clock, input reset_n, input unsigned [3:0] addr, input write_en,
         data_out <= 32'd100;
         if (read_en === 1'd1) begin
             if (addr === 4'd0) begin
-                data_out <= largest_index;
+                data_out <= {25'd0,largest_index};
             end
             else if (addr === 4'd1) begin
                 data_out <= fired[31:0];
@@ -274,7 +274,7 @@ module ai(input clock, input reset_n, input unsigned [3:0] addr, input write_en,
                 data_out <= {28'd0,hits[99:96]};
             end
             else if (addr === 4'd9) begin
-                data_out <= {27'd0,ships[4:0]};
+                data_out <= {27'd0,ships};
             end
         end
     end
