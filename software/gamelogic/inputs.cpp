@@ -350,16 +350,20 @@ int where_to_shoot_AI(set<box> boxes_hit, bitset<5> ships_alive, set<box> shots_
         unsunk_boxes[99 - number] = 1;
     }
 
-    std::bitset<100> divider = (0b0000000000000000000000000000000000000000000000000011111111111111111111111111111111111111111111111111);
+    std::bitset<100> divider = (0b0000000000000000000000000000000000000000000000000000000000000000000011111111111111111111111111111111);
 
-    unsigned long left_all_boxes_hit = ((all_boxes_hit >> 50) & divider).to_ulong();
-    unsigned long right_all_boxes_hit ((all_boxes_hit & divider).to_ulong());
+    unsigned long first_32_all_boxes_hit = ((all_boxes_hit >> 68) & divider).to_ulong();
+    unsigned long seoncd_32_all_boxes_hit = ((all_boxes_hit >> 36) & divider).to_ulong();
+    unsigned long third_32_all_boxes_hit = ((all_boxes_hit >> 4) & divider).to_ulong();
+    unsigned long last_4_all_boxes_hit = ((bitset<4>)((all_boxes_hit & divider).to_ulong())).to_ulong();
 
-    unsigned long left_shots_with_ships = ((unsunk_boxes >> 50) & divider).to_ulong();
-    unsigned long right_shots_with_ships = ((unsunk_boxes & divider).to_ulong());
+    unsigned long first_32_unsunk_boxes = ((unsunk_boxes >> 68) & divider).to_ulong();
+    unsigned long seoncd_32_unsunk_boxes = ((unsunk_boxes >> 36) & divider).to_ulong();
+    unsigned long third_32_unsunk_boxes = ((unsunk_boxes >> 4) & divider).to_ulong();
+    unsigned long last_4_unsunk_boxes = ((bitset<4>)((unsunk_boxes & divider).to_ulong())).to_ulong();
 
     int alive_ships = (int) (ships_alive.to_ulong());
 
-    return ai_where_to_shoot(left_all_boxes_hit, right_all_boxes_hit, left_shots_with_ships, right_shots_with_ships, alive_ships);
+    return ai_where_to_shoot(first_32_all_boxes_hit, seoncd_32_all_boxes_hit, third_32_all_boxes_hit, last_4_all_boxes_hit, first_32_unsunk_boxes, seoncd_32_unsunk_boxes, third_32_unsunk_boxes, last_4_unsunk_boxes, alive_ships);
     
 }
