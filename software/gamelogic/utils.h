@@ -100,13 +100,24 @@ ship change_status_box_all_boxes(int x, int y, set<box> *boxes_hit, list<ship> *
 
 /**
  * for AI algorithm
- * creates all the shots that has been fired and the ship has not been sunk
+ * creates all the shots that is an active hit
  * parameters:
  *      *all_boxes_hit: reference to all the boxes that has been hit 
- *      *shots_with_ships: shots that has been fired and the ship has not been sunk to modify
+ *      *hits: shots that are active hits
  * return: 
 **/
-void create_shots_with_ships(set<box> *all_boxes_hit, set<box> *shots_with_ships);
+void create_hits_for_AI(set<box> *all_boxes_hit, set<box> *hits);
+
+
+/**
+ * for AI algorithm
+ * creates all the shots that is either miss or sunk
+ * parameters:
+ *      *all_boxes_hit: reference to all the boxes that has been hit 
+ *      *fired: shots that are either missed or sunk
+ * return: 
+**/
+void create_fired_for_AI(set<box> *all_boxes_hit, set<box> *fired);
 
 
 /**

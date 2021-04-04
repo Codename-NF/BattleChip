@@ -1,11 +1,11 @@
 CC = g++
 CFLAGS = -g -w -Wall
 
-gamelogic: gamelogic.o game.o inputs.o utils.o RS232.o Graphics.o Wifi.o
-	$(CC) $(CFLAGS) -o gamelogic gamelogic.o game.o inputs.o utils.o RS232.o Graphics.o Wifi.o
+gamelogic: gamelogic.o game.o inputs.o utils.o RS232.o Graphics.o Wifi.o ai_firm.o
+	$(CC) $(CFLAGS) -o gamelogic gamelogic.o game.o inputs.o utils.o RS232.o Graphics.o Wifi.o ai_firm.o
 
-utilstest: utilstest.o game.o inputs.o utils.o RS232.o Graphics.o Wifi.o
-	$(CC) $(CFLAGS) -o utilstest utilstest.o game.o inputs.o utils.o RS232.o Graphics.o Wifi.o
+utilstest: utilstest.o game.o inputs.o utils.o RS232.o Graphics.o Wifi.o ai_firm.o
+	$(CC) $(CFLAGS) -o utilstest utilstest.o game.o inputs.o utils.o RS232.o Graphics.o Wifi.o ai_firm.o
 
 utils.o: utils.h utils.cpp
 	$(CC) $(CFLAGS) -c utils.cpp
@@ -24,6 +24,9 @@ Graphics.o: Graphics.h Graphics.c
 
 Wifi.o: Wifi.h Wifi.c
 	$(CC) $(CFLAGS) -c Wifi.c
+
+ai_firm.o: ai_firm.h ai_firm.c
+	$(CC) $(CFLAGS) -c ai_firm.c
 
 clean:
 	rm -f core *.o gamelogic utilstest
