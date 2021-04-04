@@ -231,7 +231,7 @@ Format: (the result of being attacked)
 */
 void send_targeted_message_BT(int device_num, int x, int y, int gamestatus, int hitstatus, int destroyed_start_x, int destroyed_start_y, int length, int orientation, bool single_player_mode) {
     stringstream message;
-    message << "“targeted " << x << " " << y << " " << gamestatus << " " << hitstatus << " " << destroyed_start_x << " " << destroyed_start_y << " " << length << " " << orientation << "~";
+    message << "targeted " << x << " " << y << " " << gamestatus << " " << hitstatus << " " << destroyed_start_x << " " << destroyed_start_y << " " << length << " " << orientation << "~";
 
     if (device_num == 1) {
         BT_send_0(message.str().c_str());
