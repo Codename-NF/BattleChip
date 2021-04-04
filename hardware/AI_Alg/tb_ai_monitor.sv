@@ -1,13 +1,13 @@
 module tb_ai_monitor();
 
-    reg clock, reset_n, write_en;
-    reg [1:0] addr;
-    reg [99:0] data_in;
+    reg clock, reset_n, write_en, read_en;
+    reg [2:0] addr;
+    reg [63:0] data_in;
     wire wait_request;
-    wire [103:0] data_out;
+    wire [63:0] data_out;
 
     // ai DUT(fired, ships, clk, rst_n, density, largest_index, done, start);
-    ai DUT(clock,reset_n, addr, write_en, data_in, wait_request, data_out);
+    ai DUT(clock,reset_n, addr, write_en, read_en, data_in, wait_request, data_out);
 
     initial begin
         clock = 1'b1;
@@ -20,26 +20,43 @@ module tb_ai_monitor();
     initial begin
         reset_n = 1'd0;
         write_en = 1'd0;
-        addr = 2'd0;
+        addr = 3'd0;
         #100;
         reset_n = 1'd1;
         wait (wait_request === 1'b0)
         #50;
-        addr = 2'd1;
+        addr = 3'd1;
         write_en = 1'd1;
-        data_in = 104'd0;
+        data_in = 64'h123456789abcdef0;
         #100;
-        addr = 2'd2;
+        addr = 3'd2;
         #100;
-        addr = 2'd3;
-        data_in = data_in + 5'b11111;
+        addr = 3'd3;
         #100;
-        addr = 2'd0;
+        addr = 3'd4;
+        #100;
+        addr = 3'd5;
+        data_in = 64'hffffffffffffffff;
+        #100;
+        addr = 3'd0;
         #100;
         write_en = 1'd0;
         #100;
         #100;
         wait (wait_request === 1'b0)
+        read_en = 1'b1;
+        #200;
+        addr = 3'd1;
+        #100;
+        addr = 3'd2;
+        #100;
+        addr = 3'd3;
+        #100;
+        addr = 3'd4;
+        #100;
+        addr = 3'd5;
+        #100;
+        
         #200;
 
         // ships = 5'b11111;

@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.nf.battlechip.GoogleHelper;
 import com.nf.battlechip.R;
 import com.nf.battlechip.RetrofitHelper;
 import com.nf.battlechip.UserService;
@@ -41,6 +42,7 @@ public class UserStatisticsActivity extends SetThemeActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_statistics);
 
+        RetrofitHelper.initRetrofit(GoogleHelper.getClient(this));
         getUser();
         getMatches();
     }
