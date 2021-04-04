@@ -24,8 +24,6 @@ module ai(input clock, input reset_n, input unsigned [3:0] addr, input write_en,
     reg [6:0] pos;
     reg [99:0][5:0] density;
 
-    // assign data_out = 7'd69;
-
 	always @(posedge clock or negedge reset_n) begin
         if (reset_n === 1'b0) begin
             state <= `set_density;
@@ -196,7 +194,6 @@ module ai(input clock, input reset_n, input unsigned [3:0] addr, input write_en,
                     if (pos === 7'd99) begin
                         state <= `set_density;
                         pos <= 7'd0;
-                        data_out <= largest_index;
                     end
                     else begin
                         pos <= pos + 7'd1;
@@ -241,15 +238,13 @@ module ai(input clock, input reset_n, input unsigned [3:0] addr, input write_en,
                             ships <= data_in[4:0];
                         end
                     end
-                    // if (read_en === 1'd1) begin
-                    //     data_out <= largest_index;
-                    // end
                 end
             endcase
         end         
 	end
 
     always @(*) begin
+        data_out <= 32'd100;
         if (read_en === 1'd1) begin
             if (addr === 4'd0) begin
                 data_out <= largest_index;
