@@ -241,38 +241,6 @@ module ai(input clock, input reset_n, input unsigned [3:0] addr, input write_en,
                             ships <= data_in[4:0];
                         end
                     end
-                    if (read_en === 1'd1) begin
-                        if (addr === 4'd0) begin
-                            data_out <= largest_index;
-                        end
-                        else if (addr === 4'd1) begin
-                            data_out <= fired[31:0];
-                        end
-                        else if (addr === 4'd2) begin
-                            data_out <= fired[63:32];
-                        end
-                        else if (addr === 4'd3) begin
-                            data_out <= fired[95:64];
-                        end
-                        else if (addr === 4'd4) begin
-                            data_out <= {28'd0,fired[99:96]};
-                        end
-                        else if (addr === 4'd5) begin
-                            data_out <= hits[31:0];
-                        end
-                        else if (addr === 4'd6) begin
-                            data_out <= hits[63:32];
-                        end
-                        else if (addr === 4'd7) begin
-                            data_out <= hits[95:64];
-                        end
-                        else if (addr === 4'd8) begin
-                            data_out <= {28'd0,hits[99:96]};
-                        end
-                        else if (addr === 4'd9) begin
-                            data_out <= {27'd0,ships[4:0]};
-                        end
-                    end
                     // if (read_en === 1'd1) begin
                     //     data_out <= largest_index;
                     // end
@@ -280,4 +248,39 @@ module ai(input clock, input reset_n, input unsigned [3:0] addr, input write_en,
             endcase
         end         
 	end
+
+    always @(*) begin
+        if (read_en === 1'd1) begin
+            if (addr === 4'd0) begin
+                data_out <= largest_index;
+            end
+            else if (addr === 4'd1) begin
+                data_out <= fired[31:0];
+            end
+            else if (addr === 4'd2) begin
+                data_out <= fired[63:32];
+            end
+            else if (addr === 4'd3) begin
+                data_out <= fired[95:64];
+            end
+            else if (addr === 4'd4) begin
+                data_out <= {28'd0,fired[99:96]};
+            end
+            else if (addr === 4'd5) begin
+                data_out <= hits[31:0];
+            end
+            else if (addr === 4'd6) begin
+                data_out <= hits[63:32];
+            end
+            else if (addr === 4'd7) begin
+                data_out <= hits[95:64];
+            end
+            else if (addr === 4'd8) begin
+                data_out <= {28'd0,hits[99:96]};
+            end
+            else if (addr === 4'd9) begin
+                data_out <= {27'd0,ships[4:0]};
+            end
+        end
+    end
 endmodule 
