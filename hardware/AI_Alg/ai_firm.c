@@ -5,7 +5,7 @@ int main()
 {
     int fired = 0x00000;
     int hits = 0x00000;
-    int ships = 0xFFFFFFFF;
+    int ships = 0xFFFFFFFFFFFFFFFF;
 
     printf("Starting\n");
     *(ai_alg_base+1) = fired;

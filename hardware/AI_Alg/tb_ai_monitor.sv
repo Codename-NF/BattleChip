@@ -27,7 +27,7 @@ module tb_ai_monitor();
         #50;
         addr = 3'd1;
         write_en = 1'd1;
-        data_in = 64'd0;
+        data_in = 64'h123456789abcdef0;
         #100;
         addr = 3'd2;
         #100;
@@ -36,7 +36,7 @@ module tb_ai_monitor();
         addr = 3'd4;
         #100;
         addr = 3'd5;
-        data_in = data_in + 5'b11111;
+        data_in = 64'hffffffffffffffff;
         #100;
         addr = 3'd0;
         #100;
@@ -46,6 +46,16 @@ module tb_ai_monitor();
         wait (wait_request === 1'b0)
         read_en = 1'b1;
         #200;
+        addr = 3'd1;
+        #100;
+        addr = 3'd2;
+        #100;
+        addr = 3'd3;
+        #100;
+        addr = 3'd4;
+        #100;
+        addr = 3'd5;
+        #100;
         
         #200;
 
