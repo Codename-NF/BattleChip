@@ -337,33 +337,34 @@ void send_win_by_forfeit_BT(int device_num) {
     }
 }
 
-int where_to_shoot_AI(set<box> boxes_hit, bitset<5> ships_alive, set<box> shots_with_ships) {
-    bitset<100> all_boxes_hit = 0;
-    bitset<100> unsunk_boxes = 0;
-    for(set<box>::iterator it = boxes_hit.begin(); it != boxes_hit.end(); it++) {
+int where_to_shoot_AI(set<box> fired, bitset<5> ships_alive, set<box> hits) {
+    bitset<100> fired_bits = 0;
+    bitset<100> hits_bits = 0;
+
+    for(set<box>::iterator it = fired.begin(); it != fired.end(); it++) {
         int number = (it->y)*10 + it->x;
-        all_boxes_hit[99 - number] = 1;
+        fired_bits[number] = 1;
     }
 
-    for(set<box>::iterator it = shots_with_ships.begin(); it != shots_with_ships.end(); it++) {
+    for(set<box>::iterator it = hits.begin(); it != hits.end(); it++) {
         int number = (it->y)*10 + it->x;
-        unsunk_boxes[99 - number] = 1;
+        hits_bits[number] = 1;
     }
 
-    std::bitset<100> divider = (0b0000000000000000000000000000000000000000000000000000000000000000000011111111111111111111111111111111);
+    std::bitset<100> divider (std::string("0000000000000000000000000000000000000000000000000000000000000000000011111111111111111111111111111111"));
 
-    unsigned long first_32_all_boxes_hit = ((all_boxes_hit >> 68) & divider).to_ulong();
-    unsigned long seoncd_32_all_boxes_hit = ((all_boxes_hit >> 36) & divider).to_ulong();
-    unsigned long third_32_all_boxes_hit = ((all_boxes_hit >> 4) & divider).to_ulong();
-    unsigned long last_4_all_boxes_hit = ((bitset<4>)((all_boxes_hit & divider).to_ulong())).to_ulong();
+    unsigned long fired0 = (fired_bits & divider).to_ulong();
+    unsigned long fired1 = ((fired_bits >> 32) & divider).to_ulong();
+    unsigned long fired2 = ((fired_bits >> 64) & divider).to_ulong();
+    unsigned long fired3 = ((fired_bits >> 96) & divider).to_ulong();
 
-    unsigned long first_32_unsunk_boxes = ((unsunk_boxes >> 68) & divider).to_ulong();
-    unsigned long seoncd_32_unsunk_boxes = ((unsunk_boxes >> 36) & divider).to_ulong();
-    unsigned long third_32_unsunk_boxes = ((unsunk_boxes >> 4) & divider).to_ulong();
-    unsigned long last_4_unsunk_boxes = ((bitset<4>)((unsunk_boxes & divider).to_ulong())).to_ulong();
+    unsigned long hits0 = (hits_bits & divider).to_ulong();
+    unsigned long hits1 = ((hits_bits >> 32) & divider).to_ulong();
+    unsigned long hits2 = ((hits_bits >> 64) & divider).to_ulong();
+    unsigned long hits3 = ((hits_bits >> 96) & divider).to_ulong();
 
     int alive_ships = (int) (ships_alive.to_ulong());
 
-    return ai_where_to_shoot(first_32_all_boxes_hit, seoncd_32_all_boxes_hit, third_32_all_boxes_hit, last_4_all_boxes_hit, first_32_unsunk_boxes, seoncd_32_unsunk_boxes, third_32_unsunk_boxes, last_4_unsunk_boxes, alive_ships);
+    return ai_where_to_shoot(fired0, fired1, fired2, fired3, hits0, hits1, hits2, hits3, alive_ships);
     
 }

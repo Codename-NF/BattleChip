@@ -193,4 +193,15 @@ void send_ready_message_BT();
 **/
 void send_win_by_forfeit_BT(int device_num);
 
-int where_to_shoot_AI(set<box> boxes_hit, bitset<5> ships_alive, set<box> shots_with_ships);
+
+
+/**
+ * AI use
+ * Get where to shoot based on the AI algorithm 
+ * parameters: 
+ *      fired: all the shots that is either miss or sunk
+ *      ships_alive: 5 bit one hot representation of ships alive
+ *      hits: all the shots that is a hit
+ * return: 
+**/
+int where_to_shoot_AI(set<box> fired, bitset<5> ships_alive, set<box> hits);
