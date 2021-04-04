@@ -213,7 +213,7 @@ public class GameManager : MonoBehaviour
                                 }
                                 else
                                 {
-                                    shipY--;
+                                    shipY++;
                                 }
                             }
                             break;
@@ -278,7 +278,7 @@ public class GameManager : MonoBehaviour
                 }
                 else
                 {
-                    mStatus.GetComponent<TextMeshProUGUI>().text = "Ouch! Out ship at " + Convert.ToChar(xCoord + 65) + (yCoord + 1).ToString() + " has been hit!";
+                    mStatus.GetComponent<TextMeshProUGUI>().text = "Ouch! Our ship at " + Convert.ToChar(xCoord + 65) + (yCoord + 1).ToString() + " has been hit!";
                 }
             }
             else
