@@ -403,9 +403,7 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
                 // TODO 
                 set<box> shots_with_ships;
                 create_shots_with_ships(&((*p1)->boxes_hit), &shots_with_ships);
-                //send_information_to_AI((*p1)->boxes_hit, (*p1)->ships_alive, shots_with_ships);
-                srand (time(0));
-                int magic_number = rand() % 100;//some_input_function_from_AI();
+                int magic_number = where_to_shoot_AI((*p1)->boxes_hit, (*p1)->ships_alive, shots_with_ships);
                 inputs.x = magic_number % 10;
                 inputs.y = magic_number / 10;
                 inputs.device_num = 2;
