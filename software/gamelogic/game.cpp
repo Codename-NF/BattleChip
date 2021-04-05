@@ -271,10 +271,10 @@ createmessage create_lobby() {
     
 
     if (input1.keywrod == 'c') {
-        send_create_response_BT(input1.numplayer, SUCCESS);
+        send_create_response_BT(input1.playing_mode, SUCCESS);
     }
     else {
-        send_create_response_BT(input1.numplayer, FAILURE);
+        send_create_response_BT(input1.playing_mode, FAILURE);
     }
 
     return input1;
@@ -396,7 +396,8 @@ void reveal_ships(list<player>::iterator *p1, list<player>::iterator *p2) {
     }
 }
 
-void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, bool single_player_mode) {
+
+void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, bool single_player_mode, int mode) {
     bool game_finished = false;
 
     bool turn_1 = true;
@@ -420,11 +421,19 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
             }
             else {
                 // Get input from HARDWARE AI algorithm
-                set<box> fired;
-                set<box> hits;
-                create_fired_for_AI(&((*p1)->boxes_hit), &fired);
-                create_hits_for_AI(&((*p1)->boxes_hit), &hits);
-                int magic_number = where_to_shoot_AI(fired, (*p1)->ships_alive, hits);
+                int magic_number;
+                if (mode = EASY_AI_MODE) {
+                    srand (time(0));
+                    magic_number = rand() % 100;
+                }
+                else if (mode == HARD_AI_MODE) {
+                    set<box> fired;
+                    set<box> hits;
+                    create_fired_for_AI(&((*p1)->boxes_hit), &fired);
+                    create_hits_for_AI(&((*p1)->boxes_hit), &hits);
+                    magic_number = where_to_shoot_AI(fired, (*p1)->ships_alive, hits);
+                }
+                
                 inputs.x = magic_number % 10;
                 inputs.y = magic_number / 10;
                 inputs.device_num = 2;
