@@ -384,10 +384,6 @@ void reveal_ships(list<player>::iterator *p1, list<player>::iterator *p2) {
             // if it has not been hit
             squaremapper(it->x, it->y, PLAYER1, LIME);
         }
-        else if (element->status != SUNK_STATUS_CODE) {
-            // it has been hit and not sunk
-            squaremapper(it->x, it->y, PLAYER1, LIME);
-        }
     }
 
     // reveal player 2
@@ -395,10 +391,6 @@ void reveal_ships(list<player>::iterator *p1, list<player>::iterator *p2) {
         set<box>::iterator element = (*p2)->boxes_hit.find(box(it->x, it->y));
         if ( element == (*p2)->boxes_hit.end()) {
             // if it has not been hit
-            squaremapper(it->x, it->y, PLAYER2, LIME);
-        }
-        else if (element->status != SUNK_STATUS_CODE) {
-            // it has been hit and not sunk
             squaremapper(it->x, it->y, PLAYER2, LIME);
         }
     }
