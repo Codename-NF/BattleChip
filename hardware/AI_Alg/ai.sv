@@ -16,11 +16,12 @@ module ai(input clock, input reset_n, input unsigned [3:0] addr, input write_en,
     reg [4:0] ships;
 
     reg hitmode;
-    reg [1:0] ship0_density_x, ship0_density_y;
-    reg [2:0][1:0] ship1_2_density_x, ship1_2_density_y;
+    reg [1:0][1:0] ship0_density_x, ship0_density_y;
+    reg [2:0][2:0] ship1_2_density_x, ship1_2_density_y;
     reg [2:0] state;
-    reg [3:0] ship3_density_x, ship3_density_y, x, y;
-    reg [4:0] ship4_density_x, ship4_density_y;
+    reg [3:0][2:0] ship3_density_x, ship3_density_y;
+    reg [3:0] x, y;
+    reg [4:0][2:0] ship4_density_x, ship4_density_y;
     reg [6:0] pos;
     reg [99:0][5:0] density;
 
@@ -73,15 +74,15 @@ module ai(input clock, input reset_n, input unsigned [3:0] addr, input write_en,
                         // or there are active hits and the placement has at least one hit on it
                         if ((fired[pos] === 1'd0 && fired[pos + 1] === 1'd0) && (!hitmode || (hitmode &&
                                 (hits[pos] === 1'd1 || hits[pos + 1] === 1'd1)))) begin
-                            ship0_density_x[0] <= 1'd1;
-                            ship0_density_x[1] <= 1'd1;
+                            ship0_density_x <= {2{({2{!hitmode}} & 2'd1) + ({2{hitmode}}&(hits[pos] + hits[pos + 1]))}};
+                            // ship0_density_x[1] <= {2{!hitmode}} & 2'd1 + ({2{hitmode}}&(hits[pos] + hits[pos + 1]));
                         end
                     end
                     if (ships[0] && (y < 4'd9)) begin
                         if ((fired[pos] === 1'd0 && fired[pos + 10] === 1'd0) && (!hitmode || (hitmode &&
                                 (hits[pos] === 1'd1 || hits[pos + 10] === 1'd1)))) begin
-                            ship0_density_y[0] <= 1'd1;
-                            ship0_density_y[1] <= 1'd1;
+                            ship0_density_y <= {2{({2{!hitmode}} & 2'd1) + ({2{hitmode}}&(hits[pos] + hits[pos + 10]))}};
+                            // ship0_density_y[1] <= {2{~hitmode}} & 2'd1 + {2{hitmode}}&(hits[pos] + hits[pos + 10]);
                         end	
                     end
                     if ((ships[1] || ships[2]) && (x < 4'd8)) begin
@@ -89,38 +90,42 @@ module ai(input clock, input reset_n, input unsigned [3:0] addr, input write_en,
                                 (!hitmode || (hitmode && 
                                 (hits[pos] === 1'd1 || hits[pos + 1] === 1'd1 || hits[pos + 2] === 1'd1)))) begin
                             // Small trick to check both 3 length ships at once
-                            ship1_2_density_x[0] <= (2'd1 && ships[1])  +  (2'd1 && ships[2]);
-                            ship1_2_density_x[1] <= (2'd1 && ships[1])  +  (2'd1 && ships[2]);
-                            ship1_2_density_x[2] <= (2'd1 && ships[1])  +  (2'd1 && ships[2]);
+                            ship1_2_density_x <= {3{({3{~hitmode}} & 3'd1 & {3{ships[1]}}) + ({3{~hitmode}} & 3'd1 & {3{ships[2]}})
+                                                    + ({3{hitmode}}&{3{ships[1]}}&(hits[pos]) + (hits[pos + 1] + hits[pos + 2]))
+                                                    + ({3{hitmode}}&{3{ships[2]}}&(hits[pos] + hits[pos + 1] + hits[pos + 2]))}};
+                            // ship1_2_density_x[1] <= (2'd1 && ships[1])  +  (2'd1 && ships[2]));
+                            // ship1_2_density_x[2] <= (2'd1 && ships[1])  +  (2'd1 && ships[2]);
                         end     
                     end  
                     if ((ships[1] || ships[2]) && (y < 4'd8)) begin
                         if ((fired[pos] === 1'd0 && fired[pos + 10] === 1'd0 && fired[pos + 20] === 1'd0) &&
                                 (!hitmode || (hitmode && 
                                 (hits[pos] === 1'd1 || hits[pos + 10] === 1'd1 || hits[pos + 20] === 1'd1)))) begin
-                            ship1_2_density_y[0] <= (2'd1 && ships[1])  +  (2'd1 && ships[2]);
-                            ship1_2_density_y[1] <= (2'd1 && ships[1])  +  (2'd1 && ships[2]);
-                            ship1_2_density_y[2] <= (2'd1 && ships[1])  +  (2'd1 && ships[2]);
+                            ship1_2_density_y <= {3{({3{~hitmode}} & 3'd1 & {3{ships[1]}}) + ({3{~hitmode}} & 3'd1 & {3{ships[2]}})
+                                                    + ({3{hitmode}}&{3{ships[1]}}&(hits[pos]) + (hits[pos + 10] + hits[pos + 20]))
+                                                    + ({3{hitmode}}&{3{ships[2]}}&(hits[pos] + hits[pos + 10] + hits[pos + 20]))}};
+                            // ship1_2_density_y[1] <= (2'd1 && ships[1])  +  (2'd1 && ships[2]);
+                            // ship1_2_density_y[2] <= (2'd1 && ships[1])  +  (2'd1 && ships[2]);
                         end     
                     end                        
                     if (ships[3] && (x < 4'd7)) begin
                         if ((fired[pos] === 1'd0 && fired[pos + 1] === 1'd0 && fired[pos + 2] === 1'd0 && fired[pos + 3] === 1'd0) &&
                                 (!hitmode || (hitmode && (hits[pos] === 1'd1 || hits[pos + 1] === 1'd1 ||
                                 hits[pos + 2] === 1'd1 || hits[pos + 3] === 1'd1)))) begin
-                            ship3_density_x[0] <= 1'd1;
-                            ship3_density_x[1] <= 1'd1;
-                            ship3_density_x[2] <= 1'd1;
-                            ship3_density_x[3] <= 1'd1;
+                            ship3_density_x <= {4{({3{~hitmode}} & 3'd1) + ({3{hitmode}}&(hits[pos] + hits[pos + 1] + hits[pos + 2] + hits[pos + 3]))}};
+                            // ship3_density_x[1] <= 1'd1;
+                            // ship3_density_x[2] <= 1'd1;
+                            // ship3_density_x[3] <= 1'd1;
                         end
                     end
                     if (ships[3] && (y < 4'd7)) begin
                         if ((fired[pos] === 1'd0 && fired[pos + 10] === 1'd0 && fired[pos + 20] === 1'd0 &&
                                 fired[pos + 30] === 1'd0) && (!hitmode || (hitmode && (hits[pos] === 1'd1 ||
                                 hits[pos + 10] === 1'd1 || hits[pos + 20] === 1'd1 || hits[pos + 30] === 1'd1)))) begin
-                            ship3_density_y[0] <= 1'd1;
-                            ship3_density_y[1] <= 1'd1;
-                            ship3_density_y[2] <= 1'd1;
-                            ship3_density_y[3] <= 1'd1;
+                            ship3_density_y <= {4{({3{~hitmode}} & 3'd1) + ({3{hitmode}}&(hits[pos] + hits[pos + 10] + hits[pos + 20] + hits[pos + 30]))}};
+                            // ship3_density_y[1] <= 1'd1;
+                            // ship3_density_y[2] <= 1'd1;
+                            // ship3_density_y[3] <= 1'd1;
                         end
                     end       
                     if (ships[4] && (x < 4'd6)) begin
@@ -128,11 +133,11 @@ module ai(input clock, input reset_n, input unsigned [3:0] addr, input write_en,
                                 fired[pos+ 3] === 1'd0 && fired[pos+ 4] === 1'd0) && (!hitmode || (hitmode &&
                                 (hits[pos] === 1'd1 || hits[pos + 1] === 1'd1 || hits[pos + 2] === 1'd1 ||
                                 hits[pos + 3] === 1'd1 || hits[pos + 4] === 1'd1)))) begin
-                            ship4_density_x[0] <= 1'd1;
-                            ship4_density_x[1] <= 1'd1;
-                            ship4_density_x[2] <= 1'd1;
-                            ship4_density_x[3] <= 1'd1;
-                            ship4_density_x[4] <= 1'd1;
+                            ship4_density_x <= {5{({3{~hitmode}} & 3'd1) + ({3{hitmode}}&(hits[pos] + hits[pos + 1] + hits[pos + 2] + hits[pos + 3] + hits[pos + 4]))}};
+                            // ship4_density_x[1] <= 1'd1;
+                            // ship4_density_x[2] <= 1'd1;
+                            // ship4_density_x[3] <= 1'd1;
+                            // ship4_density_x[4] <= 1'd1;
                         end    
                     end
                     if (ships[4] && (y < 4'd6)) begin
@@ -140,11 +145,11 @@ module ai(input clock, input reset_n, input unsigned [3:0] addr, input write_en,
                                 fired[pos+ 30] === 1'd0 && fired[pos+ 40] === 1'd0) && (!hitmode || (hitmode &&
                                 (hits[pos] === 1'd1 || hits[pos + 10] === 1'd1 || hits[pos + 20] === 1'd1 ||
                                 hits[pos + 30] === 1'd1 || hits[pos + 40] === 1'd1)))) begin
-                            ship4_density_y[0] <= 1'd1;
-                            ship4_density_y[1] <= 1'd1;
-                            ship4_density_y[2] <= 1'd1;
-                            ship4_density_y[3] <= 1'd1;
-                            ship4_density_y[4] <= 1'd1;
+                            ship4_density_y <= {5{({3{~hitmode}} & 3'd1) + ({3{hitmode}}&(hits[pos] + hits[pos + 10] + hits[pos + 20] + hits[pos + 30] + hits[pos + 40]))}};;
+                            // ship4_density_y[1] <= 1'd1;
+                            // ship4_density_y[2] <= 1'd1;
+                            // ship4_density_y[3] <= 1'd1;
+                            // ship4_density_y[4] <= 1'd1;
                         end    
                     end
                 end
