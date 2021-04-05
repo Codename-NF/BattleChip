@@ -35,12 +35,14 @@ bool out_of_bound(int x_start, int y_start, int size, int orientation);
  * parameters: 
  *      x_start: x coordinate of the start of the ship
  *      y_start: y coordinate of the start of the ship
+ *      length: length of the ship
+ *      orientation: orientation of the ship
  *      all_boxes_on_board: all the boxes that's on the board
  * return: 
  *      true if it is empty
  *      false if not
 **/
-bool path_empty(int x_start, int y_start, set<box> all_boxes_on_board);
+bool path_empty(int x_start, int y_start, int length, int orientation, set<box> all_boxes_on_board);
 
 
 /**
