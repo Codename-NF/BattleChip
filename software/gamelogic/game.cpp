@@ -401,11 +401,11 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
             else {
                 // Get input from HARDWARE AI algorithm 
                 // TODO 
-                set<box> shots_with_ships;
-                create_shots_with_ships(&((*p1)->boxes_hit), &shots_with_ships);
-                //send_information_to_AI((*p1)->boxes_hit, (*p1)->ships_alive, shots_with_ships);
-                srand (time(0));
-                int magic_number = rand() % 100;//some_input_function_from_AI();
+                set<box> fired;
+                set<box> hits;
+                create_fired_for_AI(&((*p1)->boxes_hit), &fired);
+                create_hits_for_AI(&((*p1)->boxes_hit), &hits);
+                int magic_number = where_to_shoot_AI(fired, (*p1)->ships_alive, hits);
                 inputs.x = magic_number % 10;
                 inputs.y = magic_number / 10;
                 inputs.device_num = 2;
@@ -463,8 +463,8 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
                 // only if it's sunk it would be a possibly of gameover 
                 if (current_under_attack->remaining_ships == 0) {
                     game_finished = true;
-                    int score1 = get_score((*p1)->boxes_hit);
-                    int score2 = get_score((*p2)->boxes_hit);
+                    int player1_score = get_score((*p2)->boxes_hit);
+                    int player2_score = get_score((*p1)->boxes_hit);
                     int winnerid;
                     if (current_attacking == 1) {
                         winnerid = (*p1)->player_id;
@@ -472,7 +472,7 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
                     else {
                         winnerid = (*p2)->player_id;
                     }
-                    postgameresults((*p1)->player_id, (*p2)->player_id, winnerid, score1, score2);
+                    postgameresults((*p1)->player_id, (*p2)->player_id, winnerid, player1_score, player2_score);
                 }
                 send_result_message_BT(current_attacking, x_in, y_in, game_finished, status, sunk_ship.start_box.x, sunk_ship.start_box.y, sunk_ship.size, sunk_ship.orientation, single_player_mode);
                 send_targeted_message_BT(next_up, x_in, y_in, game_finished, status, sunk_ship.start_box.x, sunk_ship.start_box.y, sunk_ship.size, sunk_ship.orientation, single_player_mode);
