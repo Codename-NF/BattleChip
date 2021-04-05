@@ -115,5 +115,5 @@ void setting_up_ships_BT(list<player>::iterator *p1, list<player>::iterator *p2,
  *      single_player_mode: indicating if it is single player mode 
  * return: 
 **/
-void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, bool single_player_mode);
+void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, bool single_player_mode, int mode);
 

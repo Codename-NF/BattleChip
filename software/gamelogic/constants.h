@@ -31,6 +31,10 @@ const int PLAYER2       = 2;
 
 const int AI_PLAYER_ID = 0;
 
+const int EASY_AI_MODE      = 0;
+const int HARD_AI_MODE      = 1;
+const int MULTI_PLAYER_MODE = 2;
+
 
 enum orientations {VERTICAL = 1, HORIZONTAL = 2};
 

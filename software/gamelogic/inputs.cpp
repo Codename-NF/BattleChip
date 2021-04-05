@@ -246,9 +246,13 @@ void send_targeted_message_BT(int device_num, int x, int y, int gamestatus, int 
 /*
 Format:
 Create message (app to console)
-“c numPlayers playerID ~” 
+“c mode playerID ~” 
 playerID is the ID of the player
-numPlayers is 1 or 2, 1 for vs AI, 2 for multiplayer
+Mode is 0 or 1 or 2
+    0  for easy AI mode, 
+    1 for hard AI mode,
+    2 for multiplayer
+
 Only sent to BluetoothChip0
 
 */
@@ -261,7 +265,7 @@ int get_create_message_BT(createmessage *msg) {
             return FAILURE;
         } 
         (*msg).keywrod = receive_char[0];
-        (*msg).numplayer = receive_char[2] - '0';
+        (*msg).playing_mode = receive_char[2] - '0';
         (*msg).playerid = atoi(receive_char + 4);
         
         return SUCCESS;
@@ -272,15 +276,18 @@ int get_create_message_BT(createmessage *msg) {
 
 /*
 Format:
-“create numPlayers status~”
-numPlayers is 1 or 2, 1 for vs AI, 2 for multiplayer
+“create mode status~”
+Mode is 0 or 1 or 2
+    0  for easy AI mode, 
+    1 for hard AI mode,
+    2 for multiplayer
 status is “1” or “0”
 “0” if a game is already in progress
 Else “1” if multiplayer lobby created successfully
 */
-void send_create_response_BT(int num_players, int status) {
+void send_create_response_BT(int mode, int status) {
     stringstream message;
-    message << "create " << num_players << " " << status << "~";
+    message << "create " << mode << " " << status << "~";
     BT_send_0(message.str().c_str());
     
 }
