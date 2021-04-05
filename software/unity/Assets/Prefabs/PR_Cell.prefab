@@ -73,7 +73,6 @@ MonoBehaviour:
   mBoardPosition: {x: 0, y: 0}
   mBoard: {fileID: 0}
   mRectTransform: {fileID: 0}
-  mCurrentPieces: []
 --- !u!222 &930869003673962901
 CanvasRenderer:
   m_ObjectHideFlags: 0

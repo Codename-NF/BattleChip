@@ -35,11 +35,11 @@
             android:layout_height="wrap_content"
             android:checkable="true"
             app:checkedIconVisible="true"
-            app:chipBackgroundColor="@color/green_500">
+            app:chipBackgroundColor="@color/theme_green">
 
             <tag
                 android:id="@string/color_key"
-                android:value="@color/green_500" />
+                android:value="@color/theme_green" />
 
             <tag
                 android:id="@string/theme_key"
@@ -52,11 +52,11 @@
             android:layout_height="wrap_content"
             android:checkable="true"
             app:checkedIconVisible="true"
-            app:chipBackgroundColor="@color/blue_500">
+            app:chipBackgroundColor="@color/theme_blue">
 
             <tag
                 android:id="@string/color_key"
-                android:value="@color/blue_500" />
+                android:value="@color/theme_blue" />
 
             <tag
                 android:id="@string/theme_key"
@@ -69,11 +69,11 @@
             android:layout_height="wrap_content"
             android:checkable="true"
             app:checkedIconVisible="true"
-            app:chipBackgroundColor="@color/pink_500">
+            app:chipBackgroundColor="@color/theme_pink">
 
             <tag
                 android:id="@string/color_key"
-                android:value="@color/pink_500" />
+                android:value="@color/theme_pink" />
 
             <tag
                 android:id="@string/theme_key"
@@ -86,16 +86,34 @@
             android:layout_height="wrap_content"
             android:checkable="true"
             app:checkedIconVisible="true"
-            app:chipBackgroundColor="@color/orange_500">
+            app:chipBackgroundColor="@color/theme_orange">
 
             <tag
                 android:id="@string/color_key"
-                android:value="@color/orange_500" />
+                android:value="@color/theme_orange" />
 
             <tag
                 android:id="@string/theme_key"
                 android:value="@style/Theme.OrangeBattleChip" />
         </com.google.android.material.chip.Chip>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_teal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            app:checkedIconVisible="true"
+            app:chipBackgroundColor="@color/teal_700">
+
+            <tag
+                android:id="@string/color_key"
+                android:value="@color/teal_700" />
+
+            <tag
+                android:id="@string/theme_key"
+                android:value="@style/Theme.TealBattleChip" />
+        </com.google.android.material.chip.Chip>
+
     </com.google.android.material.chip.ChipGroup>
 
 </FrameLayout>

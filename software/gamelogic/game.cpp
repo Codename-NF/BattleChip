@@ -376,6 +376,27 @@ void setting_up_ships_BT(list<player>::iterator *p1, list<player>::iterator *p2,
 
 }
 
+void reveal_ships(list<player>::iterator *p1, list<player>::iterator *p2) {
+    // reveal player 1
+    for (set<box>::iterator it = (*p1)->all_boxes_on_board.begin(); it != (*p1)->all_boxes_on_board.end(); it++) {
+        set<box>::iterator element = (*p1)->boxes_hit.find(box(it->x, it->y));
+        if ( element == (*p1)->boxes_hit.end()) {
+            // if it has not been hit
+            squaremapper(it->x, it->y, PLAYER1, LIME);
+        }
+    }
+
+    // reveal player 2
+    for (set<box>::iterator it = (*p2)->all_boxes_on_board.begin(); it != (*p2)->all_boxes_on_board.end(); it++) {
+        set<box>::iterator element = (*p2)->boxes_hit.find(box(it->x, it->y));
+        if ( element == (*p2)->boxes_hit.end()) {
+            // if it has not been hit
+            squaremapper(it->x, it->y, PLAYER2, LIME);
+        }
+    }
+}
+
+
 void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, bool single_player_mode, int mode) {
     bool game_finished = false;
 
@@ -501,4 +522,6 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
 
         
     }
+    // reavl ships when game finished
+    reveal_ships(p1, p2);
 }
