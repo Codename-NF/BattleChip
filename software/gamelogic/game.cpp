@@ -418,8 +418,8 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
         if (inputs.p1_forfeit) {
             game_finished = true;
             send_win_by_forfeit_BT(PLAYER2);
-            int score1 = get_score((*p1)->boxes_hit);
-            int score2 = get_score((*p2)->boxes_hit);
+            int score1 = get_score((*p2)->boxes_hit);
+            int score2 = get_score((*p1)->boxes_hit);
             displaywinner(PLAYER2);
             postgameresults((*p1)->player_id, (*p2)->player_id, (*p2)->player_id, score1, score2);
             break;
@@ -427,8 +427,8 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
         if (inputs.p2_forfeit) {
             game_finished = true;
             send_win_by_forfeit_BT(PLAYER1);
-            int score1 = get_score((*p1)->boxes_hit);
-            int score2 = get_score((*p2)->boxes_hit);
+            int score1 = get_score((*p2)->boxes_hit);
+            int score2 = get_score((*p1)->boxes_hit);
             displaywinner(PLAYER1);
             postgameresults((*p1)->player_id, (*p2)->player_id, (*p1)->player_id, score1, score2);
             break;
