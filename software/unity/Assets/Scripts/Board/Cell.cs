@@ -18,6 +18,9 @@ public enum CellState
 public class Cell : EventTrigger
 {
     public Image mImage;
+    private Sprite mRegularSprite;
+    private Sprite mHitSprite;
+
     public CellState mCellState;
 
     [HideInInspector]
@@ -41,6 +44,8 @@ public class Cell : EventTrigger
         mWasDragged = false;
 
         mRectTransform = GetComponent<RectTransform>();
+        mRegularSprite = Resources.Load<Sprite>("tileshape");
+        mHitSprite = Resources.Load<Sprite>("tileshape_hit");
     }
 
     protected void Update()
@@ -131,6 +136,7 @@ public class Cell : EventTrigger
 
         #region CellColorLogic
         // If cell has a piece colour that cell
+        mImage.sprite = mRegularSprite;
         switch (mCellState)
         {
             case CellState.Occupied: // One ship on cell
@@ -147,13 +153,13 @@ public class Cell : EventTrigger
                 {
                     // Cell shows a hit on the opponent
                     tempColor = GlobalState.ColorTheme.CellEnemyColor;
-                    tempColor.a = 100;
+                    mImage.sprite = mHitSprite;
                 }
                 else 
                 {
                     // Cell shows a hit on the player
                     tempColor = GlobalState.ColorTheme.CellPieceColor;
-                    tempColor.a = 100;
+                    mImage.sprite = mHitSprite;
                 }
                 mImage.color = tempColor;
                 break;
@@ -162,13 +168,15 @@ public class Cell : EventTrigger
                 {
                     // Cell shows a hit on the opponent
                     tempColor = GlobalState.ColorTheme.CellEnemyColor;
-                    tempColor.a = 50;
+                    tempColor.a = 100;
+                    mImage.sprite = mHitSprite;
                 }
                 else 
                 {
                     // Cell shows a hit on the player
                     tempColor = GlobalState.ColorTheme.CellPieceColor;
-                    tempColor.a = 50;
+                    tempColor.a = 100;
+                    mImage.sprite = mHitSprite;
                 }
                 mImage.color = tempColor;
                 break;
