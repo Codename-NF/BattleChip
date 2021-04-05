@@ -204,7 +204,7 @@ module ai(input clock, input reset_n, input unsigned [3:0] addr, input write_en,
                         pos <= pos + 7'd1;
                     end
                     // Check if current pos is higher, and don't count positions at hits
-                    if ((density[pos] & {6{~hits[pos]}}) > (density[largest_index] & {6{~hits[pos]}})) begin
+                    if ((density[pos] & {6{~hits[pos]}}) > (density[largest_index] & {6{~hits[largest_index]}})) begin
                         largest_index <= pos;
                     end
                 end
