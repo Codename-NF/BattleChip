@@ -36,18 +36,8 @@ public class MainActivity extends SetThemeActivity implements ActivityCompat.OnR
         getBackgroundPermissionsIfNecessary();
         setUpBluetooth();
 
-        findViewById(R.id.app_name_text_view).setOnClickListener(view -> startUnityActivity()); // TODO: remove this Unity shortcut
         findViewById(R.id.options_button).setOnClickListener(view -> showColorDialog());
-        findViewById(R.id.single_player_button).setOnClickListener(view -> {
-            try {
-                BluetoothThread.createInstance(1);
-                UnityMessage.create(playerId, 1);
-                startLobbyActivity();
-            } catch (IOException exception) {
-                exception.printStackTrace();
-                Toast.makeText(this, "Failed to connect to Bluetooth", Toast.LENGTH_SHORT).show();
-            }
-        });
+        findViewById(R.id.single_player_button).setOnClickListener(view -> showSinglePlayerDialog(playerId));
         findViewById(R.id.multi_player_button).setOnClickListener(view -> showMultiplayerDialog(playerId));
         findViewById(R.id.player_stats_button).setOnClickListener(view -> startActivity(new Intent(this, UserStatisticsActivity.class)));
     }
@@ -59,6 +49,26 @@ public class MainActivity extends SetThemeActivity implements ActivityCompat.OnR
         BluetoothThread thread = BluetoothThread.getInstance();
         if (thread != null) {
             thread.close();
+        }
+    }
+
+    private void showSinglePlayerDialog(int playerId) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Choose an AI difficulty");
+        builder.setNeutralButton("Cancel", ((dialog, which) -> dialog.dismiss()));
+        builder.setNegativeButton("Easy", ((dialog, which) -> startSingleplayerLobby(playerId, 0)));
+        builder.setPositiveButton("Hard", ((dialog, which) -> startSingleplayerLobby(playerId, 1)));
+        builder.create().show();
+    }
+
+    private void startSingleplayerLobby(int playerId, int mode) {
+        try {
+            BluetoothThread.createInstance(1);
+            UnityMessage.create(playerId, mode);
+            startLobbyActivity();
+        } catch (IOException exception) {
+            exception.printStackTrace();
+            Toast.makeText(this, "Failed to connect to Bluetooth", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -102,13 +112,15 @@ public class MainActivity extends SetThemeActivity implements ActivityCompat.OnR
 
         dialog.setButton(DialogInterface.BUTTON_POSITIVE, "Confirm", (alertDialog, which) -> {
             Chip checkedChip = dialog.findViewById(group.getCheckedChipId());
-            String color = (String) checkedChip.getTag(R.string.color_key);
-            String themeId = (String) checkedChip.getTag(R.string.theme_key);
-            PreferenceManager.getDefaultSharedPreferences(this).edit()
-                    .putInt("theme", Integer.parseInt(themeId.substring(1))).apply(); // remove @ symbol with substring
-            PreferenceManager.getDefaultSharedPreferences(this).edit()
-                    .putLong("color", Long.parseLong(color.substring(1).toUpperCase(), 16)).apply();
-            recreate();
+            if (checkedChip != null) {
+                String color = (String) checkedChip.getTag(R.string.color_key);
+                String themeId = (String) checkedChip.getTag(R.string.theme_key);
+                PreferenceManager.getDefaultSharedPreferences(this).edit()
+                        .putInt("theme", Integer.parseInt(themeId.substring(1))).apply(); // remove @ symbol with substring
+                PreferenceManager.getDefaultSharedPreferences(this).edit()
+                        .putLong("color", Long.parseLong(color.substring(1).toUpperCase(), 16)).apply();
+                recreate();
+            }
             dialog.dismiss();
         });
     }

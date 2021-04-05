@@ -43,8 +43,9 @@ public class UnityMessage {
     }
 
     // Called in Android to send create game message
-    public static void create(int playerId, int numPlayers) {
-        String message = String.format(Locale.ENGLISH, "c %d %d~", numPlayers, playerId);
+    // mode = 0 for easy, 1 for hard, 2 for multiplayer
+    public static void create(int playerId, int mode) {
+        String message = String.format(Locale.ENGLISH, "c %d %d~", mode, playerId);
         BluetoothThread.getInstance().write(message.getBytes());
     }
 
@@ -63,7 +64,7 @@ public class UnityMessage {
             if ("0".equals(splitMessage[2])) {
                 LobbyActivity.failedToCreateGame();
                 // single-player game ready
-            } else if ("1".equals(splitMessage[1])) {
+            } else if (Integer.parseInt(splitMessage[1]) <= 1) {
                 LobbyActivity.gamesIsReady();
             }
             // failed to join an existing game
