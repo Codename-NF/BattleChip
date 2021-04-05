@@ -4,8 +4,8 @@ CFLAGS = -g -w -Wall
 gamelogic: gamelogic.o game.o inputs.o utils.o RS232.o Graphics.o Wifi.o ai_firm.o
 	$(CC) $(CFLAGS) -o gamelogic gamelogic.o game.o inputs.o utils.o RS232.o Graphics.o Wifi.o ai_firm.o
 
-utilstest: utilstest.o game.o inputs.o utils.o RS232.o Graphics.o Wifi.o ai_firm.o
-	$(CC) $(CFLAGS) -o utilstest utilstest.o game.o inputs.o utils.o RS232.o Graphics.o Wifi.o ai_firm.o
+utilstest: utilstest.o utils.o
+	$(CC) $(CFLAGS) -o utilstest utilstest.o utils.o
 
 utils.o: utils.h utils.cpp
 	$(CC) $(CFLAGS) -c utils.cpp

@@ -12,7 +12,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitHelper {
 
-    private static String SERVER_URL = "http://ec2-54-151-115-99.us-west-1.compute.amazonaws.com:9091/";
+    private static final String SERVER_URL = "http://ec2-54-151-115-99.us-west-1.compute.amazonaws.com:9091/";
     private static UserService userService = null;
     private static Retrofit retrofit = null;
 

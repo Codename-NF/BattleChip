@@ -25,12 +25,22 @@ void test_out_of_bound(void) {
 
 void test_path_empty(void) {
     set<box> myset;
+    int x = 0;
+    int y = 0;
+    int length = 0;
+    int orientation = 0;
     cout << "  Empty set" << endl;
-    TEST_CHECK_(path_empty(0,0,myset) == true, "path_empty(%d,%d, myset)==%d", 0,0, true);
-    TEST_CHECK_(path_empty(1,1,myset) == true, "path_empty(%d,%d, myset)==%d", 1,1, true);
+    TEST_CHECK_(path_empty(x,y,length,orientation,myset) == true, "path_empty(%d,%d,%d,%d myset)==%d", x,y,length,orientation, true);
+    x = 1;
+    y = 1;
+    TEST_CHECK_(path_empty(x,y,length,orientation,myset) == true, "path_empty(%d,%d,%d,%d myset)==%d", x,y,length,orientation, true);
     cout << "  Inserting (0,0)" << endl;
     myset.insert(box(0,0));
-    TEST_CHECK_(path_empty(0,0,myset) == false, "path_empty(%d,%d, myset)==%d", 0,0, false);
+    x = 0;
+    y = 0;
+    length = 1;
+    orientation = VERTICAL;
+    TEST_CHECK_(path_empty(x,y,length,orientation,myset) == false, "path_empty(%d,%d,%d,%d myset)==%d", x,y,length,orientation, false);
     cout << "  Inserting (1,1)" << endl;
     myset.insert(box(1,1));
     cout << "  Inserting (2,2)" << endl;
@@ -41,17 +51,57 @@ void test_path_empty(void) {
     myset.insert(box(5,5));
     cout << "  Inserting (5,9)" << endl;
     myset.insert(box(5,9));
-    TEST_CHECK_(path_empty(1,1,myset) == false, "path_empty(%d,%d, myset)==%d", 1,1, false);
-    TEST_CHECK_(path_empty(2,2,myset) == false, "path_empty(%d,%d, myset)==%d", 2,2, false);
-    TEST_CHECK_(path_empty(3,2,myset) == false, "path_empty(%d,%d, myset)==%d", 3,2, false);
-    TEST_CHECK_(path_empty(5,5,myset) == false, "path_empty(%d,%d, myset)==%d", 5,5, false);
-    TEST_CHECK_(path_empty(5,9,myset) == false, "path_empty(%d,%d, myset)==%d", 5,9, false);
+    x = 1;
+    y = 1;
+    length = 1;
+    orientation = VERTICAL;
+    TEST_CHECK_(path_empty(x,y,length,orientation,myset)== false, "path_empty(%d,%d,%d,%d myset)==%d", x,y,length,orientation, false);
+    x = 0;
+    y = 2;
+    length = 3;
+    orientation = HORIZONTAL;
+    TEST_CHECK_(path_empty(x,y,length,orientation,myset) == false, "path_empty(%d,%d,%d,%d myset)==%d", x,y,length,orientation, false);
+    x = 3;
+    y = 0;
+    length = 3;
+    orientation = VERTICAL;
+    TEST_CHECK_(path_empty(x,y,length,orientation,myset) == false, "path_empty(%d,%d,%d,%d myset)==%d", x,y,length,orientation, false);
+    x = 5;
+    y = 1;
+    length = 5;
+    orientation = VERTICAL;
+    TEST_CHECK_(path_empty(x,y,length,orientation,myset) == false, "path_empty(%d,%d,%d,%d myset)==%d", x,y,length,orientation, false);
+    x = 5;
+    y = 8;
+    length = 2;
+    orientation = VERTICAL;
+    TEST_CHECK_(path_empty(x,y,length,orientation,myset) == false, "path_empty(%d,%d,%d,%d myset)==%d", x,y,length,orientation, false);
 
-    TEST_CHECK_(path_empty(2,3,myset) == true, "path_empty(%d,%d, myset)==%d", 2,3, true);
-    TEST_CHECK_(path_empty(3,3,myset) == true, "path_empty(%d,%d, myset)==%d", 3,3, true);
-    TEST_CHECK_(path_empty(4,4,myset) == true, "path_empty(%d,%d, myset)==%d", 4,4, true);
-    TEST_CHECK_(path_empty(9,5,myset) == true, "path_empty(%d,%d, myset)==%d", 9,5, true);
-    TEST_CHECK_(path_empty(6,6,myset) == true, "path_empty(%d,%d, myset)==%d", 6,6, true);
+    x = 2;
+    y = 3;
+    length = 1;
+    orientation = VERTICAL;
+    TEST_CHECK_(path_empty(x,y,length,orientation,myset) == true, "path_empty(%d,%d,%d,%d myset)==%d", x,y,length,orientation, true);
+    x = 3;
+    y = 3;
+    length = 1;
+    orientation = VERTICAL;
+    TEST_CHECK_(path_empty(x,y,length,orientation,myset) == true, "path_empty(%d,%d,%d,%d myset)==%d", x,y,length,orientation, true);
+    x = 4;
+    y = 4;
+    length = 1;
+    orientation = VERTICAL;
+    TEST_CHECK_(path_empty(x,y,length,orientation,myset) == true, "path_empty(%d,%d,%d,%d myset)==%d", x,y,length,orientation, true);
+    x = 9;
+    y = 5;
+    length = 1;
+    orientation = VERTICAL;
+    TEST_CHECK_(path_empty(x,y,length,orientation,myset) == true, "path_empty(%d,%d,%d,%d myset)==%d", x,y,length,orientation, true);
+    x = 6;
+    y = 6;
+    length = 1;
+    orientation = VERTICAL;
+    TEST_CHECK_(path_empty(x,y,length,orientation,myset) == true, "path_empty(%d,%d,%d,%d myset)==%d", x,y,length,orientation, true);
     
 };
 
@@ -353,7 +403,7 @@ void test_change_status_box_all_boxes(void) {
 
 };
 
-void test_create_shots_with_ships(void) {
+void test_create_hits_for_AI(void) {
     int inputx, inputy;
     set<box> boxes_hit;
     list<ship> ships;
@@ -372,16 +422,16 @@ void test_create_shots_with_ships(void) {
         i++;
     }
 
-    set<box> shots_with_ships;
+    set<box> hits;
 
-    create_shots_with_ships(&boxes_hit, &shots_with_ships);
+    create_hits_for_AI(&boxes_hit, &hits);
 
     // should have no ships
 
-    TEST_CHECK(shots_with_ships.size() == 0);
+    TEST_CHECK(hits.size() == 0);
 
     for (set<box>::iterator it = boxes_hit.begin(); it != boxes_hit.end(); it++) {
-        TEST_CHECK(shots_with_ships.find(box(it->x, it->y)) != shots_with_ships.end());
+        TEST_CHECK(hits.find(box(it->x, it->y)) != hits.end());
     }
 
     // Let hit all ships until 1 boxes until remains 
@@ -394,15 +444,15 @@ void test_create_shots_with_ships(void) {
         i++;
     }
 
-    create_shots_with_ships(&boxes_hit, &shots_with_ships);
+    create_hits_for_AI(&boxes_hit, &hits);
 
     // this should be exactly the same ships 
 
     for (set<box>::iterator it = boxes_hit.begin(); it != boxes_hit.end(); it++) {
-        TEST_CHECK(shots_with_ships.find(box(it->x, it->y)) != shots_with_ships.end());
+        TEST_CHECK(hits.find(box(it->x, it->y)) != hits.end());
     }
 
-    TEST_CHECK(shots_with_ships.size() == (1+2+2+3+4));
+    TEST_CHECK(hits.size() == (1+2+2+3+4));
 
     // hit the rest
     inputx = 1;
@@ -411,19 +461,19 @@ void test_create_shots_with_ships(void) {
 
     change_status_box_all_boxes(inputx,inputy,&boxes_hit, &ships);
 
-    create_shots_with_ships(&boxes_hit, &shots_with_ships);
+    create_hits_for_AI(&boxes_hit, &hits);
 
     for (set<box>::iterator it = boxes_hit.begin(); it != boxes_hit.end(); it++) {
         if (it->status == SUNK_STATUS_CODE) {
-            TEST_CHECK(shots_with_ships.find(box(it->x, it->y)) == shots_with_ships.end());
+            TEST_CHECK(hits.find(box(it->x, it->y)) == hits.end());
         }
         else {
-            TEST_CHECK(shots_with_ships.find(box(it->x, it->y)) != shots_with_ships.end());
+            TEST_CHECK(hits.find(box(it->x, it->y)) != hits.end());
         }
         
     }
 
-    TEST_CHECK(shots_with_ships.size() == (2+2+3+4));
+    TEST_CHECK(hits.size() == (2+2+3+4));
 
     inputx = 3;
     inputy = 1;
@@ -431,19 +481,19 @@ void test_create_shots_with_ships(void) {
 
     change_status_box_all_boxes(inputx,inputy,&boxes_hit, &ships);
 
-    create_shots_with_ships(&boxes_hit, &shots_with_ships);
+    create_hits_for_AI(&boxes_hit, &hits);
 
     for (set<box>::iterator it = boxes_hit.begin(); it != boxes_hit.end(); it++) {
         if (it->status == SUNK_STATUS_CODE) {
-            TEST_CHECK(shots_with_ships.find(box(it->x, it->y)) == shots_with_ships.end());
+            TEST_CHECK(hits.find(box(it->x, it->y)) == hits.end());
         }
         else {
-            TEST_CHECK(shots_with_ships.find(box(it->x, it->y)) != shots_with_ships.end());
+            TEST_CHECK(hits.find(box(it->x, it->y)) != hits.end());
         }
         
     }
 
-    TEST_CHECK(shots_with_ships.size() == (2+3+4));
+    TEST_CHECK(hits.size() == (2+3+4));
 
     inputx = 4;
     inputy = 2;
@@ -451,19 +501,19 @@ void test_create_shots_with_ships(void) {
 
     change_status_box_all_boxes(inputx,inputy,&boxes_hit, &ships);
 
-    create_shots_with_ships(&boxes_hit, &shots_with_ships);
+    create_hits_for_AI(&boxes_hit, &hits);
 
     for (set<box>::iterator it = boxes_hit.begin(); it != boxes_hit.end(); it++) {
         if (it->status == SUNK_STATUS_CODE) {
-            TEST_CHECK(shots_with_ships.find(box(it->x, it->y)) == shots_with_ships.end());
+            TEST_CHECK(hits.find(box(it->x, it->y)) == hits.end());
         }
         else {
-            TEST_CHECK(shots_with_ships.find(box(it->x, it->y)) != shots_with_ships.end());
+            TEST_CHECK(hits.find(box(it->x, it->y)) != hits.end());
         }
         
     }
 
-    TEST_CHECK(shots_with_ships.size() == (3+4));
+    TEST_CHECK(hits.size() == (3+4));
 
     inputx = 6;
     inputy = 3;
@@ -471,19 +521,19 @@ void test_create_shots_with_ships(void) {
 
     change_status_box_all_boxes(inputx,inputy,&boxes_hit, &ships);
 
-    create_shots_with_ships(&boxes_hit, &shots_with_ships);
+    create_hits_for_AI(&boxes_hit, &hits);
 
     for (set<box>::iterator it = boxes_hit.begin(); it != boxes_hit.end(); it++) {
         if (it->status == SUNK_STATUS_CODE) {
-            TEST_CHECK(shots_with_ships.find(box(it->x, it->y)) == shots_with_ships.end());
+            TEST_CHECK(hits.find(box(it->x, it->y)) == hits.end());
         }
         else {
-            TEST_CHECK(shots_with_ships.find(box(it->x, it->y)) != shots_with_ships.end());
+            TEST_CHECK(hits.find(box(it->x, it->y)) != hits.end());
         }
         
     }
 
-    TEST_CHECK(shots_with_ships.size() == (4));
+    TEST_CHECK(hits.size() == (4));
 
     inputx = 8;
     inputy = 4;
@@ -491,19 +541,131 @@ void test_create_shots_with_ships(void) {
 
     change_status_box_all_boxes(inputx,inputy,&boxes_hit, &ships);
 
-    create_shots_with_ships(&boxes_hit, &shots_with_ships);
+    create_hits_for_AI(&boxes_hit, &hits);
 
     for (set<box>::iterator it = boxes_hit.begin(); it != boxes_hit.end(); it++) {
         if (it->status == SUNK_STATUS_CODE) {
-            TEST_CHECK(shots_with_ships.find(box(it->x, it->y)) == shots_with_ships.end());
+            TEST_CHECK(hits.find(box(it->x, it->y)) == hits.end());
         }
         else {
-            TEST_CHECK(shots_with_ships.find(box(it->x, it->y)) != shots_with_ships.end());
+            TEST_CHECK(hits.find(box(it->x, it->y)) != hits.end());
         }
         
     }
 
-    TEST_CHECK(shots_with_ships.size() == 0);
+    TEST_CHECK(hits.size() == 0);
+
+};
+
+void test_create_fired_for_AI(void) {
+    int inputx, inputy;
+    set<box> boxes_hit;
+    list<ship> ships;
+
+    // initializing
+    int i = 0;
+    int sizes[5] = {2, 3, 3, 4, 5};
+    for (int i = 0; i < 5; i++) {
+        ships.push_back(ship());
+    }
+
+    for (list<ship>::iterator it = ships.begin(); it != ships.end(); it++) {
+        (*it).start_box = box(i,i);
+        (*it).size = sizes[i];
+        (*it).orientation = HORIZONTAL;
+        i++;
+    }
+
+    set<box> fired;
+
+    create_fired_for_AI(&boxes_hit, &fired);
+
+    // should have no ships
+
+    TEST_CHECK(fired.size() == 0);
+
+    for (int i = 0; i < 5; i++) {
+        boxes_hit.insert(box(i,0,MISS_STATUS_CODE));
+    }
+    for (int i = 5; i < 10; i++) {
+        boxes_hit.insert(box(i,0,HIT_STATUS_CODE));
+    }
+
+    create_fired_for_AI(&boxes_hit, &fired);
+    TEST_CHECK(fired.size() == 5);
+
+    for (set<box>::iterator it = boxes_hit.begin(); it != boxes_hit.end(); it++) {
+        if (it->status == HIT_STATUS_CODE) {
+            TEST_CHECK(fired.find(box(it->x, it->y)) == fired.end());
+        }
+        else {
+            TEST_CHECK(fired.find(box(it->x, it->y)) != fired.end());
+        }
+        
+    }
+
+    for (int i = 0; i < 5; i++) {
+        boxes_hit.insert(box(i,1,SUNK_STATUS_CODE));
+    }
+    for (int i = 5; i < 10; i++) {
+        boxes_hit.insert(box(i,1,HIT_STATUS_CODE));
+    }
+
+    create_fired_for_AI(&boxes_hit, &fired);
+    TEST_CHECK(fired.size() == 10);
+
+    for (set<box>::iterator it = boxes_hit.begin(); it != boxes_hit.end(); it++) {
+        if (it->status == HIT_STATUS_CODE) {
+            TEST_CHECK(fired.find(box(it->x, it->y)) == fired.end());
+        }
+        else {
+            TEST_CHECK(fired.find(box(it->x, it->y)) != fired.end());
+        }
+        
+    }
+
+    for (set<box>::iterator it = boxes_hit.begin(); it != boxes_hit.end(); it++) {
+        if (it->status == MISS_STATUS_CODE) {
+            it->status = HIT_STATUS_CODE;
+        }
+    }
+
+    create_fired_for_AI(&boxes_hit, &fired);
+    TEST_CHECK(fired.size() == 5);
+
+    for (set<box>::iterator it = boxes_hit.begin(); it != boxes_hit.end(); it++) {
+        if (it->status == SUNK_STATUS_CODE) {
+            it->status = HIT_STATUS_CODE;
+        }
+    }
+
+    create_fired_for_AI(&boxes_hit, &fired);
+    TEST_CHECK(fired.size() == 0);
+
+
+};
+
+void test_get_score(void) {
+    set<box> boxes_hit;
+    TEST_CHECK(get_score(boxes_hit) == 0);
+
+    for (int i = 0; i < 10; i++) {
+        boxes_hit.insert(box(i,0,MISS_STATUS_CODE));
+    }
+
+    TEST_CHECK(get_score(boxes_hit) == 0);
+
+    for (int i = 0; i < 10; i++) {
+        boxes_hit.insert(box(i,1,HIT_STATUS_CODE));
+    }
+
+    TEST_CHECK(get_score(boxes_hit) == 10);
+
+    for (int i = 0; i < 10; i++) {
+        boxes_hit.insert(box(i,2,SUNK_STATUS_CODE));
+    }
+
+    TEST_CHECK(get_score(boxes_hit) == 20);
 
 };
 
@@ -511,11 +673,13 @@ void test_create_shots_with_ships(void) {
 TEST_LIST = {
     
     {"bool out_of_bound(int, int, int, int);", test_out_of_bound},
-    {"bool path_empty(int, int, set<box>);", test_path_empty},
+    {"bool path_empty(int, int, int, int, set<box>);", test_path_empty},
     {"bool contains_box(ship, int, int);", test_contains_box},
     {"int check_hit_what(int, int, list<ship>*, int *, bitset<5> *);", test_check_hit_what},
     {"bool not_hit_yet(int, int, set<box>);", test_not_hit_yet},
     {"void change_status_box_all_boxes(int, int, set<box> *, list<ship> *);", test_change_status_box_all_boxes},
-    {"void create_shots_with_ships(set<box> *, set<box> *);", test_create_shots_with_ships},
+    {"void create_hits_for_AI(set<box> *, set<box> *);", test_create_hits_for_AI},
+    {"void create_fired_for_AI(set<box> *, set<box> *);", test_create_fired_for_AI},
+    {"void get_score(set<box>);", test_get_score},
     {0} // terminating test 
 };

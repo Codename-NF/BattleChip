@@ -80,7 +80,7 @@ void setting_up_ships(list<player>::iterator *p1, list<player>::iterator *p2, bo
         list<player>::iterator *currently_setting_up = came_from_player1 ? p1: p2;
         list<ship>::iterator *ships_being_set_up = came_from_player1 ? &shipsp1: &shipsp2;
 
-        if (!path_empty(x_in, y_in, (*currently_setting_up)->all_boxes_on_board)) {
+        if (!path_empty(x_in, y_in, length, orientation, (*currently_setting_up)->all_boxes_on_board)) {
             cout << "another ship in the way for " << (*currently_setting_up)->player_name << endl;
             p1count--;
             continue;
@@ -224,7 +224,7 @@ void AI_setting_up(list<player>::iterator *AI) {
             continue;
         }
 
-        if (!path_empty(x_in, y_in, (*AI)->all_boxes_on_board)) {
+        if (!path_empty(x_in, y_in, length, orientation, (*AI)->all_boxes_on_board)) {
             //cout << "another ship in the way for " << (*AI)->player_name << endl;
             continue;
         }
@@ -418,8 +418,8 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
         if (inputs.p1_forfeit) {
             game_finished = true;
             send_win_by_forfeit_BT(PLAYER2);
-            int score1 = get_score((*p1)->boxes_hit);
-            int score2 = get_score((*p2)->boxes_hit);
+            int score1 = get_score((*p2)->boxes_hit);
+            int score2 = get_score((*p1)->boxes_hit);
             displaywinner(PLAYER2);
             postgameresults((*p1)->player_id, (*p2)->player_id, (*p2)->player_id, score1, score2);
             break;
@@ -427,8 +427,8 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
         if (inputs.p2_forfeit) {
             game_finished = true;
             send_win_by_forfeit_BT(PLAYER1);
-            int score1 = get_score((*p1)->boxes_hit);
-            int score2 = get_score((*p2)->boxes_hit);
+            int score1 = get_score((*p2)->boxes_hit);
+            int score2 = get_score((*p1)->boxes_hit);
             displaywinner(PLAYER1);
             postgameresults((*p1)->player_id, (*p2)->player_id, (*p1)->player_id, score1, score2);
             break;

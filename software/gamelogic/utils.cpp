@@ -21,8 +21,23 @@ bool out_of_bound(int x_start, int y_start, int size, int orientation) {
     return false;
 }
 
-bool path_empty(int x_start, int y_start, set<box> all_boxes_on_board) {
-    return all_boxes_on_board.find(box(x_start, y_start)) == all_boxes_on_board.end();
+bool path_empty(int x_start, int y_start, int length, int orientation, set<box> all_boxes_on_board) {
+    for (int i = 0; i < length; i++) {
+        int x,y;
+        if (orientation == VERTICAL) {
+            x = x_start;
+            y = y_start + i; 
+        }
+        else if (orientation == HORIZONTAL) {
+            x = x_start + i;
+            y = y_start; 
+        }
+        // check 
+        if (all_boxes_on_board.find(box(x, y)) != all_boxes_on_board.end()) {
+            return false;
+        }
+    }
+    return true;
 }
 
 bool contains_box(ship *ship, int x, int y) {
