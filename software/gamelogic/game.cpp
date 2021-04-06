@@ -402,6 +402,7 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
 
     bool turn_1 = true;
     send_game_start_status_BT(turn_1, single_player_mode);
+    bool AI_target = false;
 
     while (!game_finished) {
         shootvalues inputs;
@@ -423,12 +424,22 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
                 // Get input from HARDWARE AI algorithm
                 int magic_number;
                 if (mode == EASY_AI_MODE) {
-                    srand (time(0));
-                    magic_number = rand() % 100;
-                    while (!not_hit_yet(magic_number%10, magic_number/10, (*p1)->boxes_hit)) {
+                    if (!AI_target) {
                         srand (time(0));
                         magic_number = rand() % 100;
+                        while (!not_hit_yet(magic_number%10, magic_number/10, (*p1)->boxes_hit)) {
+                            srand (time(0));
+                            magic_number = rand() % 100;
+                        }
                     }
+                    else {
+                        set<box> fired;
+                        set<box> hits;
+                        create_fired_for_AI(&((*p1)->boxes_hit), &fired);
+                        create_hits_for_AI(&((*p1)->boxes_hit), &hits);
+                        magic_number = where_to_shoot_AI(fired, (*p1)->ships_alive, hits);
+                    }
+                    
                 }
                 else if (mode == HARD_AI_MODE) {
                     set<box> fired;
@@ -489,6 +500,10 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
             current_under_attack->boxes_hit.insert(box(x_in, y_in, status));
 
             if (status == SUNK_STATUS_CODE) {
+                // change the AI targeting mode back to random 
+                if (current_attacking == PLAYER2 && single_player_mode) {
+                    AI_target = false;
+                }
                 // need to go through all boxes with that ship
                 ship sunk_ship = change_status_box_all_boxes(x_in, y_in, &(current_under_attack->boxes_hit), &(current_under_attack->ships_list));
 
@@ -511,6 +526,10 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
                 squaremapper(x_in, y_in, next_up, HIT_COLOR);
                 squaremappership(next_up, sunk_ship.start_box.x, sunk_ship.start_box.y, sunk_ship.size, sunk_ship.orientation, game_finished, SUNK_CROSS_COLOR);
                 continue;
+            }
+            // Set the AI targeting mode if it's a hit
+            if (current_attacking == PLAYER2 && single_player_mode && status == HIT_STATUS_CODE) {
+                    AI_target = true;
             }
             send_result_message_BT(current_attacking, x_in, y_in, game_finished, status, single_player_mode);
             send_targeted_message_BT(next_up, x_in, y_in, game_finished, status, single_player_mode);
