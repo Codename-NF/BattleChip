@@ -9,6 +9,8 @@
 #include "constants.h"
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
+#include "Graphics.h"
+#include "Wifi.h"
 
 using namespace std;
 
@@ -61,7 +63,7 @@ void setting_up_ships(list<player>::iterator *p1, list<player>::iterator *p2, bo
         int length = inputs.size;
         int orientation = inputs.orientation;
         bool came_from_player1;
-        if (inputs.device_num == 1) {
+        if (inputs.device_num == PLAYER1) {
             came_from_player1 = true;
         }
         else {
@@ -78,7 +80,7 @@ void setting_up_ships(list<player>::iterator *p1, list<player>::iterator *p2, bo
         list<player>::iterator *currently_setting_up = came_from_player1 ? p1: p2;
         list<ship>::iterator *ships_being_set_up = came_from_player1 ? &shipsp1: &shipsp2;
 
-        if (!path_empty(x_in, y_in, (*currently_setting_up)->all_boxes_on_board)) {
+        if (!path_empty(x_in, y_in, length, orientation, (*currently_setting_up)->all_boxes_on_board)) {
             cout << "another ship in the way for " << (*currently_setting_up)->player_name << endl;
             p1count--;
             continue;
@@ -204,9 +206,6 @@ void playing_game(list<player>::iterator *p1, list<player>::iterator *p2, bool s
 
 void AI_setting_up(list<player>::iterator *AI) {
     list<ship>::iterator ships_being_set_up = (*AI)->ships_list.begin();
-    (*AI)->player_name = "Milo";
-
-    cout << "AI name is " << (*AI)->player_name << endl;
 
     // setting up ships 
     // keep getting random place until it works? 
@@ -225,7 +224,7 @@ void AI_setting_up(list<player>::iterator *AI) {
             continue;
         }
 
-        if (!path_empty(x_in, y_in, (*AI)->all_boxes_on_board)) {
+        if (!path_empty(x_in, y_in, length, orientation, (*AI)->all_boxes_on_board)) {
             //cout << "another ship in the way for " << (*AI)->player_name << endl;
             continue;
         }
@@ -249,12 +248,296 @@ void AI_setting_up(list<player>::iterator *AI) {
         }
 
         // adding all the boxes into the set
-        for (int i = 0; i < length; i++) {
-            (*AI)->all_boxes_on_board.insert(box(x_in + (offset_x * i), y_in + (offset_y * i)));
+        for (int j = 0; j < length; j++) {
+            (*AI)->all_boxes_on_board.insert(box(x_in + (offset_x * j), y_in + (offset_y * j)));
         }
 
         i++;
         cout << "(" << x_in << " " << y_in << " " << length << " " << orientation << ")" << endl;
     }
 
+}
+
+createmessage create_lobby() {
+    createmessage input1;
+    int got_msg = 0;
+    do {
+        got_msg = get_create_message_BT(&input1);
+        // int input2 = get_join_message_BT();
+        // if (input2 != -1) {
+        //     send_join_reponse_BT(FAILURE);
+        // }
+    } while (!got_msg);
+    
+
+    if (input1.keywrod == 'c') {
+        send_create_response_BT(input1.playing_mode, SUCCESS);
+    }
+    else {
+        send_create_response_BT(input1.playing_mode, FAILURE);
+    }
+
+    return input1;
+}
+
+int wait_for_player2() {
+    int input2;
+
+    do {
+        input2 = get_join_message_BT();
+    }
+    while (input2 == -1);
+
+    send_join_reponse_BT(SUCCESS);
+    return input2;
+}
+
+void reject_player2() {
+    int input2 = get_join_message_BT();
+    if (input2 != -1) {
+        send_join_reponse_BT(FAILURE);
+    }
+}
+
+
+void setting_player_id(list<player>::iterator *p1, list<player>::iterator *p2, int player1_id, int player2_id) {
+    (*p1)->player_id = player1_id;
+    (*p2)->player_id = player2_id;
+}
+
+void assign_ships(list<player>::iterator *player, list<setupvalues> values) {
+    list<ship>::iterator ships_being_set_up = (*player)->ships_list.begin();
+    int x_in;
+    int y_in;
+    int length;
+    int orientation;
+
+    for (list<setupvalues>::iterator it = values.begin(); it != values.end(); it++) {
+        x_in = it->x;
+        y_in = it->y;
+        length = it->size;
+        orientation = it->orientation;
+
+        // setting the ship
+        if (ships_being_set_up->size == 0) {
+            ships_being_set_up->orientation = orientation;
+            ships_being_set_up->size = length;
+            ships_being_set_up->start_box = box(x_in, y_in);
+            ships_being_set_up++;
+        }
+
+        int offset_x, offset_y;
+        if (orientation == VERTICAL) {
+            offset_x = 0;
+            offset_y = 1;
+        }
+        else {
+            offset_x = 1;
+            offset_y = 0;
+        }
+
+        // adding all the boxes into the set
+        for (int i = 0; i < length; i++) {
+            (*player)->all_boxes_on_board.insert(box(x_in + (offset_x * i), y_in + (offset_y * i)));
+        }
+
+    }
+    
+}
+
+void setting_up_ships_BT(list<player>::iterator *p1, list<player>::iterator *p2, bool single_player_mode) {
+    list<setupvalues> list_of_placement;
+    int success = 0;
+    do {
+        success = get_placement_message_BT(&list_of_placement, PLAYER1);
+    }
+    while (!success);
+
+    assign_ships(p1, list_of_placement);
+    
+    if (single_player_mode) {
+        AI_setting_up(p2);
+        return;
+    }
+
+    success = 0;
+
+    do {
+        success = get_placement_message_BT(&list_of_placement, PLAYER2);
+    }
+    while (!success);
+    
+    assign_ships(p2, list_of_placement);
+
+}
+
+void reveal_ships(list<player>::iterator *p1, list<player>::iterator *p2) {
+    // reveal player 1
+    for (set<box>::iterator it = (*p1)->all_boxes_on_board.begin(); it != (*p1)->all_boxes_on_board.end(); it++) {
+        set<box>::iterator element = (*p1)->boxes_hit.find(box(it->x, it->y));
+        if ( element == (*p1)->boxes_hit.end()) {
+            // if it has not been hit
+            squaremapper(it->x, it->y, PLAYER1, LIME);
+        }
+    }
+
+    // reveal player 2
+    for (set<box>::iterator it = (*p2)->all_boxes_on_board.begin(); it != (*p2)->all_boxes_on_board.end(); it++) {
+        set<box>::iterator element = (*p2)->boxes_hit.find(box(it->x, it->y));
+        if ( element == (*p2)->boxes_hit.end()) {
+            // if it has not been hit
+            squaremapper(it->x, it->y, PLAYER2, LIME);
+        }
+    }
+}
+
+
+void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, bool single_player_mode, int mode) {
+    bool game_finished = false;
+
+    bool turn_1 = true;
+    send_game_start_status_BT(turn_1, single_player_mode);
+    bool AI_target = false;
+
+    while (!game_finished) {
+        shootvalues inputs;
+        int got_message = 0;
+        if (turn_1) {
+            do {
+                got_message = get_shoot_message_BT(&inputs, PLAYER1);
+            } while (!got_message);
+            turn_1 = false;
+        }
+        else {
+            if (!single_player_mode) {
+                do {
+                    got_message = get_shoot_message_BT(&inputs, PLAYER2);
+                } while (!got_message);
+                turn_1 = true;
+            }
+            else {
+                // Get input from HARDWARE AI algorithm
+                int magic_number;
+                if (mode == EASY_AI_MODE) {
+                    if (!AI_target) {
+                        srand (time(0));
+                        do {
+                            magic_number = rand() % 100;
+                        } while (!not_hit_yet(magic_number%10, magic_number/10, (*p1)->boxes_hit));
+                    }
+                    else {
+                        set<box> fired;
+                        set<box> hits;
+                        create_fired_for_AI(&((*p1)->boxes_hit), &fired);
+                        create_hits_for_AI(&((*p1)->boxes_hit), &hits);
+                        magic_number = where_to_shoot_AI(fired, (*p1)->ships_alive, hits);
+                    }
+                    
+                }
+                else if (mode == HARD_AI_MODE) {
+                    set<box> fired;
+                    set<box> hits;
+                    create_fired_for_AI(&((*p1)->boxes_hit), &fired);
+                    create_hits_for_AI(&((*p1)->boxes_hit), &hits);
+                    magic_number = where_to_shoot_AI(fired, (*p1)->ships_alive, hits);
+                }
+                
+                inputs.x = magic_number % 10;
+                inputs.y = magic_number / 10;
+                inputs.device_num = 2;
+                turn_1 = true;
+            }
+            
+        }
+
+        // check for forfeit 
+        if (inputs.p1_forfeit) {
+            game_finished = true;
+            send_win_by_forfeit_BT(PLAYER2);
+            int score1 = get_score((*p2)->boxes_hit);
+            int score2 = get_score((*p1)->boxes_hit);
+            displaywinner(PLAYER2);
+            postgameresults((*p1)->player_id, (*p2)->player_id, (*p2)->player_id, score1, score2);
+            break;
+        }
+        if (inputs.p2_forfeit) {
+            game_finished = true;
+            send_win_by_forfeit_BT(PLAYER1);
+            int score1 = get_score((*p2)->boxes_hit);
+            int score2 = get_score((*p1)->boxes_hit);
+            displaywinner(PLAYER1);
+            postgameresults((*p1)->player_id, (*p2)->player_id, (*p1)->player_id, score1, score2);
+            break;
+        }
+
+        
+        int x_in = inputs.x;
+        int y_in = inputs.y;
+        bool came_from_player1;
+        if (inputs.device_num == 1) {
+            came_from_player1 = true;
+        }
+        else {
+            came_from_player1 = false;
+        }
+        
+        int current_attacking = came_from_player1 ? PLAYER1: PLAYER2;
+        int next_up = came_from_player1 ? PLAYER2: PLAYER1;
+        list<player>::iterator current_under_attack = came_from_player1 ? *p2: *p1;
+        int status;
+        
+        if (not_hit_yet(x_in, y_in, current_under_attack->boxes_hit)) {
+
+            status = check_hit_what(x_in, y_in, &(current_under_attack->ships_list), &(current_under_attack->remaining_ships), &(current_under_attack->ships_alive));
+
+            current_under_attack->boxes_hit.insert(box(x_in, y_in, status));
+
+            if (status == SUNK_STATUS_CODE) {
+                // change the AI targeting mode back to random 
+                if (current_attacking == PLAYER2 && single_player_mode) {
+                    AI_target = false;
+                }
+                // need to go through all boxes with that ship
+                ship sunk_ship = change_status_box_all_boxes(x_in, y_in, &(current_under_attack->boxes_hit), &(current_under_attack->ships_list));
+
+                // only if it's sunk it would be a possibly of gameover 
+                if (current_under_attack->remaining_ships == 0) {
+                    game_finished = true;
+                    int player1_score = get_score((*p2)->boxes_hit);
+                    int player2_score = get_score((*p1)->boxes_hit);
+                    int winnerid;
+                    if (current_attacking == 1) {
+                        winnerid = (*p1)->player_id;
+                    }
+                    else {
+                        winnerid = (*p2)->player_id;
+                    }
+                    postgameresults((*p1)->player_id, (*p2)->player_id, winnerid, player1_score, player2_score);
+                }
+                send_result_message_BT(current_attacking, x_in, y_in, game_finished, status, sunk_ship.start_box.x, sunk_ship.start_box.y, sunk_ship.size, sunk_ship.orientation, single_player_mode);
+                send_targeted_message_BT(next_up, x_in, y_in, game_finished, status, sunk_ship.start_box.x, sunk_ship.start_box.y, sunk_ship.size, sunk_ship.orientation, single_player_mode);
+                squaremapper(x_in, y_in, next_up, HIT_COLOR);
+                squaremappership(next_up, sunk_ship.start_box.x, sunk_ship.start_box.y, sunk_ship.size, sunk_ship.orientation, game_finished, SUNK_CROSS_COLOR);
+                continue;
+            }
+            // Set the AI targeting mode if it's a hit
+            if (current_attacking == PLAYER2 && single_player_mode && status == HIT_STATUS_CODE) {
+                AI_target = true;
+            }
+            send_result_message_BT(current_attacking, x_in, y_in, game_finished, status, single_player_mode);
+            send_targeted_message_BT(next_up, x_in, y_in, game_finished, status, single_player_mode);
+            if (status == HIT_STATUS_CODE) {
+                squaremapper(x_in, y_in, next_up, HIT_COLOR);
+            }
+            else {
+                squaremapper(x_in, y_in, next_up, MISS_COLOR);
+            }
+            
+
+        }
+
+        
+    }
+    // reavl ships when game finished
+    reveal_ships(p1, p2);
 }

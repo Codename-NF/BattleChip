@@ -1,7 +1,9 @@
 package com.nf.battlechip.activity;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,9 +18,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.nf.battlechip.interfaces.GoogleHelper;
 import com.nf.battlechip.R;
-import com.nf.battlechip.RetrofitHelper;
-import com.nf.battlechip.UserService;
+import com.nf.battlechip.interfaces.RetrofitHelper;
+import com.nf.battlechip.interfaces.UserService;
 import com.nf.battlechip.pojo.Match;
 import com.nf.battlechip.pojo.Matches;
 import com.nf.battlechip.pojo.User;
@@ -30,8 +33,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.internal.EverythingIsNonNull;
 
-import static androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY;
-
 public class UserStatisticsActivity extends SetThemeActivity {
 
     private static final String USER_STATISTICS_DEBUG = "User_Statistics";
@@ -41,6 +42,7 @@ public class UserStatisticsActivity extends SetThemeActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_statistics);
 
+        RetrofitHelper.initRetrofit(GoogleHelper.getClient(this));
         getUser();
         getMatches();
     }
@@ -73,14 +75,14 @@ public class UserStatisticsActivity extends SetThemeActivity {
 
     private void updateUserView(User user) {
         TextView userView = findViewById(R.id.user_name_text_view);
-        userView.setText(Html.fromHtml(String.format(getString(R.string.statistics_name_text), color, user.getFirstName(), user.getLastName()), Html.FROM_HTML_MODE_LEGACY));
+        userView.setText(getVersionSafeSpanned(String.format(getString(R.string.statistics_name_text), color, user.getFirstName(), user.getLastName())));
     }
 
     private void updateStatsView(User user) {
         TextView winsView = findViewById(R.id.wins_text_view);
         TextView lossesView = findViewById(R.id.losses_text_view);
-        winsView.setText(Html.fromHtml(String.format(getString(R.string.statistics_win_text), color, user.getWins()), Html.FROM_HTML_MODE_LEGACY));
-        lossesView.setText(Html.fromHtml(String.format(getString(R.string.statistics_loss_text), color, user.getLosses()), Html.FROM_HTML_MODE_LEGACY));
+        winsView.setText(getVersionSafeSpanned(String.format(getString(R.string.statistics_win_text), color, user.getWins())));
+        lossesView.setText(getVersionSafeSpanned(String.format(getString(R.string.statistics_loss_text), color, user.getLosses())));
     }
 
     private void getMatches() {
@@ -156,14 +158,14 @@ public class UserStatisticsActivity extends SetThemeActivity {
                 opponentColour = getColor(opponentColourRes);
 
                 if (isPlayerOne) {
-                    scoreTextView.setText(Html.fromHtml(String.format(getString(R.string.hits_text),
-                            color, playerColour, match.getPlayerOneScore(), opponentColour, match.getPlayerTwoScore()), FROM_HTML_MODE_LEGACY));
+                    scoreTextView.setText(getVersionSafeSpanned(String.format(getString(R.string.hits_text),
+                            color, playerColour, match.getPlayerOneScore(), opponentColour, match.getPlayerTwoScore())));
                 } else {
-                    scoreTextView.setText(Html.fromHtml(String.format(getString(R.string.hits_text),
-                            color, playerColour, match.getPlayerTwoScore(), opponentColour, match.getPlayerOneScore()), FROM_HTML_MODE_LEGACY));
+                    scoreTextView.setText(getVersionSafeSpanned(String.format(getString(R.string.hits_text),
+                            color, playerColour, match.getPlayerTwoScore(), opponentColour, match.getPlayerOneScore())));
                 }
 
-                resultView.setText(Html.fromHtml(String.format(getString(R.string.match_result_text), playerColour, winOrLossMessage), Html.FROM_HTML_MODE_LEGACY));
+                resultView.setText(getVersionSafeSpanned(String.format(getString(R.string.match_result_text), playerColour, winOrLossMessage)));
             }
 
             private void setDateView(String date) {
@@ -173,7 +175,7 @@ public class UserStatisticsActivity extends SetThemeActivity {
 
             private void setOpponentView(String opponent) {
                 TextView opponentView = view.findViewById(R.id.opponent_text_view);
-                opponentView.setText(Html.fromHtml(String.format(getString(R.string.opponent_text), color, opponent), Html.FROM_HTML_MODE_LEGACY));
+                opponentView.setText(getVersionSafeSpanned(String.format(getString(R.string.opponent_text), color, opponent)));
             }
         }
 
@@ -199,4 +201,11 @@ public class UserStatisticsActivity extends SetThemeActivity {
         }
     }
 
+    private Spanned getVersionSafeSpanned(String html) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            return Html.fromHtml(html);
+        } else {
+            return Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
+        }
+    }
 }

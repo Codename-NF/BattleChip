@@ -240,4 +240,15 @@ public class Ship
         }
     }
 
+    /* Export ship data as a string */
+    public string ExportShip()
+    {
+        string x = mCells[0].mBoardPosition.x + " ";
+        string y = (mOrientation == 2) ? mCells[0].mBoardPosition.y + " " : (mCells[0].mBoardPosition.y - (mLength - 1)) + " ";
+        string l = mLength + " ";
+        // Horizontal is now 1, with vertical being 0 (for integration with DE1)
+        string o = (mOrientation == 2) ? "1" : "0"; 
+
+        return x + y + l + o;
+    }
 }

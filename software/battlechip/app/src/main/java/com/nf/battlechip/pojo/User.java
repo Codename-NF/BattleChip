@@ -21,6 +21,9 @@ public class User {
 
     private int losses;
 
+    @SerializedName("player_id")
+    private int playerId;
+
     @NonNull
     public String getFirstName() {
         return firstName == null ? "" : firstName;
@@ -42,5 +45,9 @@ public class User {
 
     public int getLosses() {
         return losses;
+    }
+
+    public int getPlayerId() {
+        return playerId;
     }
 }
