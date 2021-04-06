@@ -19,7 +19,7 @@ public class Cell : EventTrigger
 {
     public Image mImage;
     private Sprite mRegularSprite;
-    private Sprite mHitSprite;
+    private Sprite mSunkSprite;
 
     public CellState mCellState;
 
@@ -45,7 +45,7 @@ public class Cell : EventTrigger
 
         mRectTransform = GetComponent<RectTransform>();
         mRegularSprite = Resources.Load<Sprite>("tileshape");
-        mHitSprite = Resources.Load<Sprite>("tileshape_hit");
+        mSunkSprite = Resources.Load<Sprite>("tileshape_sunk");
     }
 
     protected void Update()
@@ -144,6 +144,7 @@ public class Cell : EventTrigger
                 break;
             case CellState.Stacked: // (Illegal) overlapping of ships
                 mImage.color = GlobalState.ColorTheme.CellOverlapColor;
+                mImage.sprite = mSunkSprite;
                 break;
             case CellState.Targeted: // Player wants to shoot this cell
                 mImage.color = new Color32(255, 255, 255, 255);
@@ -153,13 +154,13 @@ public class Cell : EventTrigger
                 {
                     // Cell shows a hit on the opponent
                     tempColor = GlobalState.ColorTheme.CellEnemyColor;
-                    mImage.sprite = mHitSprite;
+                    tempColor.a = 100;
                 }
                 else 
                 {
                     // Cell shows a hit on the player
                     tempColor = GlobalState.ColorTheme.CellPieceColor;
-                    mImage.sprite = mHitSprite;
+                    tempColor.a = 100;
                 }
                 mImage.color = tempColor;
                 break;
@@ -169,16 +170,16 @@ public class Cell : EventTrigger
                     // Cell shows a hit on the opponent
                     tempColor = GlobalState.ColorTheme.CellEnemyColor;
                     tempColor.a = 100;
-                    mImage.sprite = mHitSprite;
                 }
                 else 
                 {
                     // Cell shows a hit on the player
                     tempColor = GlobalState.ColorTheme.CellPieceColor;
                     tempColor.a = 100;
-                    mImage.sprite = mHitSprite;
+                    
                 }
                 mImage.color = tempColor;
+                mImage.sprite = mSunkSprite;
                 break;
             case CellState.Missed: // This cell was shot (but it was empty)
                 mImage.color = new Color32(0, 0, 0, 0);

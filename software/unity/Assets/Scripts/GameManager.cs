@@ -53,10 +53,13 @@ public class GameManager : MonoBehaviour
         byte blueTint = (byte)((blue >> 4) + 170);
         byte greenTint = (byte)((green >> 4) + 170);
 
-        // Apply color theme directly to ship
+        // Apply color theme for ship and board
         GlobalState.ColorTheme.CellPieceColor = new Color32(red, blue, green, opacity);
         GlobalState.ColorTheme.CellColorDark = new Color32(redLite, blueLite, greenLite, opacity);
         GlobalState.ColorTheme.CellColorLight = new Color32(redTint, blueTint, greenTint, opacity);
+
+        GlobalState.ColorTheme.CellOverlapColor = GlobalState.ColorTheme.CellPieceColor;
+        GlobalState.ColorTheme.CellOverlapColor.a = 120;
 
         var main = mBackground.main;
         main.startColor = new ParticleSystem.MinMaxGradient(new Color32(55, 57, 62, 255), new Color32(15, 17, 22, 255));
