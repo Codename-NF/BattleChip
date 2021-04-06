@@ -1,4 +1,4 @@
-package com.nf.battlechip;
+package com.nf.battlechip.interfaces;
 
 import com.nf.battlechip.pojo.Matches;
 import com.nf.battlechip.pojo.User;

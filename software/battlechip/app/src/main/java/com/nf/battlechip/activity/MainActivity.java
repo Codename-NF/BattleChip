@@ -17,9 +17,9 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
-import com.nf.battlechip.BluetoothThread;
+import com.nf.battlechip.interfaces.BluetoothThread;
 import com.nf.battlechip.R;
-import com.nf.battlechip.UnityMessage;
+import com.nf.battlechip.interfaces.UnityMessage;
 
 import java.io.IOException;
 

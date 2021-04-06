@@ -13,9 +13,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
-import com.nf.battlechip.GoogleHelper;
+import com.nf.battlechip.interfaces.GoogleHelper;
 import com.nf.battlechip.R;
-import com.nf.battlechip.RetrofitHelper;
+import com.nf.battlechip.interfaces.RetrofitHelper;
 import com.nf.battlechip.pojo.User;
 
 import retrofit2.Call;

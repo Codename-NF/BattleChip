@@ -93,7 +93,7 @@ public class GameManager : MonoBehaviour
     // Logic used by the confirm button based on GameManager's state
     public void ConfirmButton()
     {
-        AndroidJavaClass jc = new AndroidJavaClass("com.nf.battlechip.UnityMessage");
+        AndroidJavaClass jc = new AndroidJavaClass("com.nf.battlechip.interfaces.UnityMessage");
 
         switch (GlobalState.GameState)
         {
