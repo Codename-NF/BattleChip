@@ -338,12 +338,7 @@ void assign_ships(list<player>::iterator *player, list<setupvalues> values) {
 
         // adding all the boxes into the set
         for (int i = 0; i < length; i++) {
-            cout << "inserting (" << x_in+(offset_x*i) << ", " << y_in + (offset_y*i) << ")" << endl;
             (*player)->all_boxes_on_board.insert(box(x_in + (offset_x * i), y_in + (offset_y * i)));
-        }
-        for (set<box>::iterator it = (*player)->all_boxes_on_board.begin(); it != (*player)->all_boxes_on_board.end(); it++) {
-            cout << "All the boxes I have: \n";
-            cout << "(" << it->x << ", " << it->y << ") \n";
         }
 
     }

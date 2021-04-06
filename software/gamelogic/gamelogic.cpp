@@ -57,10 +57,8 @@ int main () {
             }
         }
         else { // dealing with UI / BT
-            cout << "i'm here" << endl;
             Init_RS232();
             Init_Wifi();
-            cout << "past init" << endl;
             int mode;
             bool single_player = false;
             createmessage input1 = create_lobby();
