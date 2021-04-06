@@ -29,6 +29,7 @@ void WIFIFlush(void);
 void print_to_board(int p1, int p2, int win, int score1, int score2);
 void printdecimal(int x);
 void postgameresults(int p1, int p2, int winner, int score1, int score2);
+void delay(int number_of_seconds);
 
 static const char dofile[] = "dofile(\"send_match_results.lua\")\n";
 static const char upload_match_results[] = "upload_match_results(~, ~, ~, ~, ~)\n";
