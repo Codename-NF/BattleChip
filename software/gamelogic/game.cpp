@@ -529,7 +529,7 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
             }
             // Set the AI targeting mode if it's a hit
             if (current_attacking == PLAYER2 && single_player_mode && status == HIT_STATUS_CODE) {
-                    AI_target = true;
+                AI_target = true;
             }
             send_result_message_BT(current_attacking, x_in, y_in, game_finished, status, single_player_mode);
             send_targeted_message_BT(next_up, x_in, y_in, game_finished, status, single_player_mode);
