@@ -426,11 +426,9 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
                 if (mode == EASY_AI_MODE) {
                     if (!AI_target) {
                         srand (time(0));
-                        magic_number = rand() % 100;
-                        while (!not_hit_yet(magic_number%10, magic_number/10, (*p1)->boxes_hit)) {
-                            srand (time(0));
+                        do {
                             magic_number = rand() % 100;
-                        }
+                        } while (!not_hit_yet(magic_number%10, magic_number/10, (*p1)->boxes_hit));
                     }
                     else {
                         set<box> fired;
