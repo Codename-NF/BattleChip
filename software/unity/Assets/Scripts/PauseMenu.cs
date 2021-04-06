@@ -40,7 +40,7 @@ public class PauseMenu : MonoBehaviour
     public void Forfeit()
     {
         Debug.Log("Forfeiting Game");
-        AndroidJavaClass jc = new AndroidJavaClass("com.nf.battlechip.UnityMessage");
+        AndroidJavaClass jc = new AndroidJavaClass("com.nf.battlechip.interfaces.UnityMessage");
         jc.CallStatic("forfeit");
 
         PlayerPrefs.SetString("result", "playerForfeit");

@@ -1,4 +1,4 @@
-package com.nf.battlechip;
+package com.nf.battlechip.interfaces;
 
 import android.content.Context;
 

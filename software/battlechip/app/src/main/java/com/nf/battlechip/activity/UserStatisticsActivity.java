@@ -18,10 +18,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.nf.battlechip.GoogleHelper;
+import com.nf.battlechip.interfaces.GoogleHelper;
 import com.nf.battlechip.R;
-import com.nf.battlechip.RetrofitHelper;
-import com.nf.battlechip.UserService;
+import com.nf.battlechip.interfaces.RetrofitHelper;
+import com.nf.battlechip.interfaces.UserService;
 import com.nf.battlechip.pojo.Match;
 import com.nf.battlechip.pojo.Matches;
 import com.nf.battlechip.pojo.User;

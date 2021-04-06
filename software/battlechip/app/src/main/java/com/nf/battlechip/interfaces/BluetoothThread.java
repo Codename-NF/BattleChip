@@ -1,4 +1,4 @@
-package com.nf.battlechip;
+package com.nf.battlechip.interfaces;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -19,7 +19,7 @@ public class BluetoothThread {
     private static final String BLUETOOTH_DEBUG = "Bluetooth";
     private static BluetoothThread instance = null;
 
-    private static final Set<String> CHIP_ONE_MAC_IDS = new HashSet<>(Arrays.asList("20:18:11:21:24:72", "B8:9A:2A:30:2B:35", "34:F6:4B:D7:53:65", "5C:F3:70:9F:40:7A", "20:18:11:21:20:13")); // TODO: rely only on device name?
+    private static final Set<String> CHIP_ONE_MAC_IDS = new HashSet<>(Arrays.asList("20:18:11:21:24:72", "B8:9A:2A:30:2B:35", "34:F6:4B:D7:53:65", "5C:F3:70:9F:40:7A", "20:18:11:21:20:13"));
     private static final Set<String> CHIP_TWO_MAC_IDS = new HashSet<>(Arrays.asList("20:18:11:20:32:62"));
     private static final UUID SERVICE_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
@@ -140,7 +140,7 @@ public class BluetoothThread {
         }
     }
 
-    public void close() {
+    private void close() {
         try {
             bluetoothSocket.close();
         } catch (IOException e) {

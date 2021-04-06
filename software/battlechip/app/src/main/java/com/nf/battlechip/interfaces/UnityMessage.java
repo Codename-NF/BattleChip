@@ -1,4 +1,4 @@
-package com.nf.battlechip;
+package com.nf.battlechip.interfaces;
 
 import android.util.Log;
 
@@ -9,7 +9,7 @@ import java.util.Locale;
 
 public class UnityMessage {
 
-    private static String UNITY_MESSAGE_DEBUG = "Unity";
+    private static final String UNITY_MESSAGE_DEBUG = "Unity";
 
     // Called by Unity to inform Android of placement message
     public static void placement(String message) {
