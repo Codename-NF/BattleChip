@@ -51,7 +51,7 @@ public class UnityMessage {
 
     // Called in Android to send join game message
     public static void join(int playerId) {
-        String message = String.format(Locale.ENGLISH, "j %d", playerId);
+        String message = String.format(Locale.ENGLISH, "j %d~", playerId);
         BluetoothThread.getInstance().write(message.getBytes());
     }
 

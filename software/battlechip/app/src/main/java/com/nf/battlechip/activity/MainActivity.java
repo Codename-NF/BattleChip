@@ -42,16 +42,6 @@ public class MainActivity extends SetThemeActivity implements ActivityCompat.OnR
         findViewById(R.id.player_stats_button).setOnClickListener(view -> startActivity(new Intent(this, UserStatisticsActivity.class)));
     }
 
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-
-        BluetoothThread thread = BluetoothThread.getInstance();
-        if (thread != null) {
-            thread.close();
-        }
-    }
-
     private void showSinglePlayerDialog(int playerId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Choose an AI difficulty");
@@ -123,10 +113,6 @@ public class MainActivity extends SetThemeActivity implements ActivityCompat.OnR
             }
             dialog.dismiss();
         });
-    }
-
-    private void startUnityActivity() {
-        startActivity(new Intent(this, MainUnityActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP));
     }
 
     private void startLobbyActivity() {
