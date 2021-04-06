@@ -20,16 +20,16 @@ public class GameoverHandler : EventTrigger
         switch (result)
         {
             case "win":
-                statusMessage = "You Won!";
+                statusMessage = "You win! \n\nAll enemy ships have sunk!";
                 break;
             case "loss":
-                statusMessage = "Nice Try!";
+                statusMessage = "Nice Try! \n\nAll your ships have sunk!";
                 break;
             case "playerForfeit":
-                statusMessage = "You Surrendered";
+                statusMessage = "Nice try!\n\nYou surrendered";
                 break;
             case "opponentForfeit":
-                statusMessage = "Opponent Surrendered";
+                statusMessage = "You win! \n\nYour opponent surrendered";
                 break;
             default:
                 statusMessage = "";
