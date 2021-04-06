@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         mAllowStatusUpdates = false;
-        mIsGettingResult = true;
+        mIsGettingResult = false;
         GlobalState.GameState = GameState.Placement;
         GlobalState.ColorTheme = new ColorTheme();
         GlobalState.WaitingForPush = false;
