@@ -46,42 +46,15 @@ afterAll(async () => {
 //     return res;
 // };
 
-// beforeAll(async () => {
-//     await testDB.connect();
-
-//     /* Clear out the testDB */
-//     await List.deleteMany({});
-//     await User.deleteMany({});
-
-//     await User.create({
-//         id: TestUserID,
-//         name: "TestUserX",
-//         firebaseToken: "FakeTokenX",
-//     });
-    
-//     await List.create(testList1);
-//     await List.create(testList2);
-//     await List.create(testList4);
-//     await List.create(testList5);
-// });
-
-// afterAll(async () => {
-//     await testDB.close();
-// });
-
-describe("Basic", () => {
-    it("This should pass", async () => {
-        const thisWorks = true;
-        expect(thisWorks).toEqual(true);
-    });
-});
-
-describe("Get User", () => {
-    it("Basic", async () => {
-        const myUser = await User.find({player_id: 1}).catch((error) => {
-            console.log(error);
-            return null; }
-        )
-        expect(myUser).toEqual(testUser1);
+describe("Sanity Check", () => {
+    it("Get user from the database", async () => {
+        const myUser = await User.findOne({player_id: 1}).catch((error) => null);
+        
+        expect(myUser.email).toEqual(testUser1.email);
+        expect(myUser.first_name).toEqual(testUser1.first_name);
+        expect(myUser.last_name).toEqual(testUser1.last_name);
+        expect(myUser.losses).toEqual(testUser1.losses);
+        expect(myUser.wins).toEqual(testUser1.wins);
+        expect(myUser.player_id).toEqual(testUser1.player_id);
     });
 });
