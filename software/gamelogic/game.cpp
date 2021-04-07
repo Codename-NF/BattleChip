@@ -21,9 +21,7 @@ void getting_names(battleship *game, int player_num) {
     list<player>::iterator player_it = (*game).players.begin();
     int count = 0;
     while (!all_players_joined) {
-// ******************* bluetooth place holder *******************
         string name = ask_for_name();
-// ******************* bluetooth place holder *******************
         if (player_it->player_name.empty()) {
             player_it->player_name = name;
             player_it++;
@@ -43,7 +41,6 @@ void setting_up_ships(list<player>::iterator *p1, list<player>::iterator *p2, bo
 
     int p1count = 0;
     while (!setup_finished) {
-// ******************* bluetooth place holder *******************
         setupvalues inputs = setupvalues(-1, -1, -1, -1, -1);
         if (p1count < NUM_OF_SHIPS) {
             inputs = ask_for_setup(1);
@@ -69,7 +66,6 @@ void setting_up_ships(list<player>::iterator *p1, list<player>::iterator *p2, bo
         else {
             came_from_player1 = false;
         }
-// ******************* bluetooth place holder *******************
         if (out_of_bound(x_in, y_in, length, orientation)) {
             cout << "out of bound" << endl;
             p1count--;
@@ -123,8 +119,7 @@ void playing_game(list<player>::iterator *p1, list<player>::iterator *p2, bool s
 
     bool start1 = true;
     while (!game_finished) {
-// ******************* bluetooth place holder *******************
-        shootvalues inputs = shootvalues(-1, -1, -1);
+        shootvalues inputs;
         if (start1) {
             inputs = ask_for_shoot(1);
             start1 = !start1;
@@ -135,10 +130,6 @@ void playing_game(list<player>::iterator *p1, list<player>::iterator *p2, bool s
                 start1 = !start1;
             }
             else {
-                // Get input from HARDWARE AI algorithm 
-
-                // for now be random shoots
-                /* initialize random seed: */
                 cout << "AI to shoot......." << endl;
                 srand (time(0));
                 inputs.x = rand() % (BOUNDARY_MAX + 1);
@@ -160,7 +151,7 @@ void playing_game(list<player>::iterator *p1, list<player>::iterator *p2, bool s
         else {
             came_from_player1 = false;
         }
-// ******************* bluetooth place holder *******************
+
         if (x_in < BOUNDARY_MIN || y_in < BOUNDARY_MIN || x_in > BOUNDARY_MAX || y_in > BOUNDARY_MAX) {
             cout << "Can't hit here buddy. Please try again." << endl;
             start1 = !start1;
@@ -207,9 +198,6 @@ void playing_game(list<player>::iterator *p1, list<player>::iterator *p2, bool s
 void AI_setting_up(list<player>::iterator *AI) {
     list<ship>::iterator ships_being_set_up = (*AI)->ships_list.begin();
 
-    // setting up ships 
-    // keep getting random place until it works? 
-    // 5 ships, 2 3 3 4 5 
     int ship_sizes[5]= {2, 3, 3, 4, 5};
 
     int i = 0;
@@ -220,12 +208,10 @@ void AI_setting_up(list<player>::iterator *AI) {
         int orientation = (rand() % 2) + 1;
         int length = ship_sizes[i];
         if (out_of_bound(x_in, y_in, length, orientation)) {
-            //cout << "out of bound" << endl;
             continue;
         }
 
         if (!path_empty(x_in, y_in, length, orientation, (*AI)->all_boxes_on_board)) {
-            //cout << "another ship in the way for " << (*AI)->player_name << endl;
             continue;
         }
 
@@ -263,13 +249,9 @@ createmessage create_lobby() {
     int got_msg = 0;
     do {
         got_msg = get_create_message_BT(&input1);
-        // int input2 = get_join_message_BT();
-        // if (input2 != -1) {
-        //     send_join_reponse_BT(FAILURE);
-        // }
     } while (!got_msg);
     
-
+    // checking the create keyword 'c'
     if (input1.keywrod == 'c') {
         send_create_response_BT(input1.playing_mode, SUCCESS);
     }
@@ -336,7 +318,7 @@ void assign_ships(list<player>::iterator *player, list<setupvalues> values) {
             offset_y = 0;
         }
 
-        // adding all the boxes into the set
+        // adding all the boxes into the all boxes on board set
         for (int i = 0; i < length; i++) {
             (*player)->all_boxes_on_board.insert(box(x_in + (offset_x * i), y_in + (offset_y * i)));
         }
@@ -416,16 +398,17 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
                 turn_1 = true;
             }
             else {
-                // Get input from HARDWARE AI algorithm
+                // playing against AI
                 int magic_number;
                 if (mode == EASY_AI_MODE) {
                     if (!AI_target) {
                         srand (time(0));
                         do {
                             magic_number = rand() % 100;
-                        } while (!not_hit_yet(magic_number%10, magic_number/10, (*p1)->boxes_hit));
+                        } while (!not_hit_yet(magic_number%10, magic_number/10, (*p1)->boxes_hit)); // ensure that it doesn't choose a box have shot before
                     }
                     else {
+                        // when hit randomlly, switch to hard AI mode to start targetting the hit ship till it's sunk like any normal human would do
                         set<box> fired;
                         set<box> hits;
                         create_fired_for_AI(&((*p1)->boxes_hit), &fired);
@@ -497,7 +480,7 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
                 if (current_attacking == PLAYER2 && single_player_mode) {
                     AI_target = false;
                 }
-                // need to go through all boxes with that ship
+                // change all the boxes associated with that ship to sunk status code 
                 ship sunk_ship = change_status_box_all_boxes(x_in, y_in, &(current_under_attack->boxes_hit), &(current_under_attack->ships_list));
 
                 // only if it's sunk it would be a possibly of gameover 
@@ -506,7 +489,7 @@ void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, boo
                     int player1_score = get_score((*p2)->boxes_hit);
                     int player2_score = get_score((*p1)->boxes_hit);
                     int winnerid;
-                    if (current_attacking == 1) {
+                    if (current_attacking == PLAYER1) {
                         winnerid = (*p1)->player_id;
                     }
                     else {
