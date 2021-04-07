@@ -5,12 +5,11 @@ const mongod = new MongoMemoryServer();
 
 module.exports = {
     connect: async () => {
-        const uri = await mongoServer.getUri()
         const mongooseOpts = {
             useNewUrlParser: true,
             useUnifiedTopology: true
         };
-        await mongoose.connect(uri, mongooseOpts);
+        await mongoose.connect("mongodb://localhost:27018/test", mongooseOpts);
     },
     close: async () => {
         await mongoose.connection.dropDatabase();
