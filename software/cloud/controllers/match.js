@@ -15,19 +15,7 @@ const updateUserRecord = async (email, didWinGame) => {
 module.exports = {
 	getMatches: async (req, res) => {
 		const userEmail = res.locals.email
-        
-        // Get the page number from the page parameter (?page=)
-        let pageNumber = parseInt(req.query.page);
-        
-        // Default to page 1 if requested page is invalid
-        if (pageNumber === NaN) {
-            pageNumber = 1;
-        }
-        else {
-            // If user gave a page number with a decimal, just round down
-            pageNumber = (Math.floor(pageNumber) > 1) ? Math.floor(pageNumber) : 1;
-        }
-        
+
         // Check if user exists
         const myUser = await User.findOne({ email: userEmail }).catch(() => null);
 
@@ -40,14 +28,10 @@ module.exports = {
             // Sort matches by most recent date
             allMyMatches.sort((a, b) => parseFloat(b.date) - parseFloat(a.date));
             
-            // Get the requested page of up to 10 entries
-            const firstIndex = 10 * (pageNumber - 1);
-            const lastIndex = 10 * pageNumber;
-            
             res.status(200).send(
                 {
                     "status" : "OK",
-                    "matches" : allMyMatches.slice(firstIndex, lastIndex),
+                    "matches" : allMyMatches,
                 }
             )
         }
@@ -66,9 +50,20 @@ module.exports = {
             
             const playerOneEmail = player1.email;
             // If player two is an AI
-            if (req.body.player_two === 0) {
+            if (req.body.player_two === 0 || req.body.player_two === 1) {
                 // Create a record of the match
-                const winnerEmail = (req.body.winner == playerOneId) ? playerOneEmail : "AI";
+                let winnerEmail;
+                let nameOfAI;
+                
+                if (req.body.player_two === 0) {
+                    winnerEmail = (req.body.winner == playerOneId) ? playerOneEmail : "Easy_AI_Email";
+                    nameOfAI = "Easy AI";
+                }
+                else {
+                    winnerEmail = (req.body.winner == playerOneId) ? playerOneEmail : "Hard_AI_Email";
+                    nameOfAI = "Hard AI";
+                }
+                
                 const newMatch = {
                     player_one: playerOneEmail,
                     player_two: "AI",
@@ -76,7 +71,7 @@ module.exports = {
                     player_one_score: req.body.player_one_score,
                     player_two_score: req.body.player_two_score,
                     player_one_name: `${player1.first_name} ${player1.last_name}`,
-                    player_two_name: "AI",
+                    player_two_name: nameOfAI,
                     date: Date.now() * 1000
                 }
                 await Match.create(newMatch);
