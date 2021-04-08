@@ -29,7 +29,8 @@ const int HIT_COLOR     = RED;
 const int SUNK_CROSS_COLOR    = BLACK;
 
 // BT protocols constants
-const int AI_PLAYER_ID = 0;
+const int EASY_AI_PLAYER_ID = 0;
+const int HARD_AI_PLAYER_ID = 1;
 
 const int EASY_AI_MODE      = 0;
 const int HARD_AI_MODE      = 1;

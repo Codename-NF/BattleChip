@@ -102,8 +102,13 @@ int main () {
                         AI = it;
                     }
                 }
+                if (mode == EASY_AI_MODE) {
+                    setting_player_id(&p1, &AI, input1.playerid, EASY_AI_PLAYER_ID);
+                }
+                else if (mode == HARD_AI_MODE) {
+                    setting_player_id(&p1, &AI, input1.playerid, HARD_AI_PLAYER_ID);
+                }
                 
-                setting_player_id(&p1, &AI, input1.playerid, AI_PLAYER_ID);
                 
                 setting_up_ships_BT(&p1, &AI, single_player);
 
