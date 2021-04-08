@@ -1,5 +1,5 @@
 const User = require("../../models/user");
-const userController = require("../../controllers/user");
+const loginController = require("../../controllers/login");
 const testDB = require("../db/mongodb");
 
 /* Test users to be inserted in test DB */
@@ -26,6 +26,30 @@ const testUser1 = {
     wins: 0,
     losses: 0,
     player_id: 2
+}
+const testUser2 = {
+    first_name: "TestUser",
+    last_name: "Two",
+    email: "test2@gmail.com",
+    wins: 0,
+    losses: 0,
+    player_id: 3
+}
+const testUser3 = {
+    first_name: "TestUser",
+    last_name: " ",
+    email: "test3@gmail.com",
+    wins: 0,
+    losses: 0,
+    player_id: 4
+}
+const testUser4 = {
+    first_name: "",
+    last_name: "Four",
+    email: "test4@gmail.com",
+    wins: 0,
+    losses: 0,
+    player_id: 5
 }
 
 /* Returns a mocked incoming request object */
@@ -68,9 +92,9 @@ afterAll(async () => {
     await testDB.close();
 });
 
-/* User tests */
-describe("Get user", () => {
-    it("Case: User exists", async () => {
+/* Login tests */
+describe("Login", () => {
+    it("Case: User exists already", async () => {
         const req = mockRequest();
         const res = mockResponse();
         
@@ -78,49 +102,71 @@ describe("Get user", () => {
         res.locals.email = testUser1.email;
 
         /* Test getUser functionality */
-        await userController.getUser(req, res);
+        await loginController.loginUser(req, res);
 
         /* Expected response */
         expect(res.status).toHaveBeenCalledWith(200);
         expect(res.body).toMatchObject(testUser1);
     });
 
-    it("Case: User does not exist", async () => {
+    it("Case: User is a new player", async () => {
         const req = mockRequest();
         const res = mockResponse();
-        
-        /* Middleware stores email into res.locals */
-        res.locals.email = "fakeuser@gmail.com";
+
+        /* User creation uses fullname and email */
+        res.locals.firstname = testUser2.first_name;
+        res.locals.lastname = testUser2.last_name;
+        res.locals.email = testUser2.email;
 
         /* Test getUser functionality */
-        await userController.getUser(req, res);
-        
+        await loginController.loginUser(req, res);
+
         /* Expected response */
-        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.status).toHaveBeenCalledWith(201);
+        expect(res.body).toMatchObject(testUser2);
     });
-    
-    it("Case: Email parameter is missing", async () => {
+
+    it("Case: User is a new player (no lastname)", async () => {
         const req = mockRequest();
         const res = mockResponse();
+
+        /* User creation uses fullname and email */
+        res.locals.firstname = testUser3.first_name;
+        res.locals.email = testUser3.email;
 
         /* Test getUser functionality */
-        await userController.getUser(req, res);
-        
+        await loginController.loginUser(req, res);
+
         /* Expected response */
-        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.status).toHaveBeenCalledWith(201);
+        expect(res.body).toMatchObject(testUser3);
     });
-    
-    it("Case: Email parameter is improperly formatted", async () => {
+
+    it("Case: User is a new player (no firstname)", async () => {
         const req = mockRequest();
         const res = mockResponse();
 
-        /* Intentional set bad parameter */
+        /* User creation uses fullname and email */
+        res.locals.email = testUser4.email;
+
+        /* Test getUser functionality */
+        await loginController.loginUser(req, res);
+
+        /* Expected response */
+        expect(res.status).toHaveBeenCalledWith(500);
+    });
+    
+    it("Case: User is a new player (improper email format)", async () => {
+        const req = mockRequest();
+        const res = mockResponse();
+
+        /* User creation uses fullname and email */
         res.locals.email = { fail: 777 };
 
         /* Test getUser functionality */
-        await userController.getUser(req, res);
-        
+        await loginController.loginUser(req, res);
+
         /* Expected response */
-        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.status).toHaveBeenCalledWith(500);
     });
 });
