@@ -1,4 +1,10 @@
 language: node_js
-os: windows
 node_js:
-  - 14
+- 14
+before_install:
+- cd /home/travis/build/Codename-NF/BattleChip/software/cloud/
+- npm i -g npm@6.14.8
+install:
+- npm install
+script:
+- npm test
