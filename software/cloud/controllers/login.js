@@ -13,12 +13,12 @@ module.exports = {
         else {
             // Get count of users in DB, assign unique id as count + 1
             const userCount = await User.countDocuments({});
-            const lastName = (res.locals.lastname) ? res.locals.lastname : "";
+            const lastName = (res.locals.lastname) ? res.locals.lastname : " ";
             
             const newUser = {
 				player_id: userCount, // Not userCount + 1 since id is zero indexed
                 first_name: res.locals.firstname,
-                last_name: res.locals.lastname,
+                last_name: lastName,
                 email: res.locals.email,
 				wins: 0,
 				losses: 0,
