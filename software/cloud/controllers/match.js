@@ -52,21 +52,13 @@ module.exports = {
             // If player two is an AI
             if (req.body.player_two === 0 || req.body.player_two === 1) {
                 // Create a record of the match
-                let winnerEmail;
-                let nameOfAI;
-                
-                if (req.body.player_two === 0) {
-                    winnerEmail = (req.body.winner == playerOneId) ? playerOneEmail : "Easy_AI_Email";
-                    nameOfAI = "Easy AI";
-                }
-                else {
-                    winnerEmail = (req.body.winner == playerOneId) ? playerOneEmail : "Hard_AI_Email";
-                    nameOfAI = "Hard AI";
-                }
+                let nameOfAI = (req.body.player_two === 0) ? "Easy AI" : "Hard AI";
+                let emailOfAI = (req.body.player_two === 0) ? "Easy_AI_Email" : "Hard_AI_Email";
+                let winnerEmail = (req.body.winner == playerOneId) ? playerOneEmail : emailOfAI;
                 
                 const newMatch = {
                     player_one: playerOneEmail,
-                    player_two: "AI",
+                    player_two: nameOfAI,
                     winner: winnerEmail,
                     player_one_score: req.body.player_one_score,
                     player_two_score: req.body.player_two_score,
@@ -80,11 +72,7 @@ module.exports = {
                 await updateUserRecord(playerOneEmail, (playerOneEmail === winnerEmail));
                 
                 // Respond with a 201
-                res.status(201).send(
-                    {
-                        "status" : "OK"
-                    }
-                );
+                res.status(201).send(newMatch);
             }
             // If player two is NOT an AI
             else {
@@ -111,11 +99,7 @@ module.exports = {
                     await updateUserRecord(playerTwoEmail, (playerTwoEmail === winnerEmail));
                     
                     // Respond with a 201
-                    res.status(201).send(
-                        {
-                            "status" : "OK"
-                        }
-                    );
+                    res.status(201).send(newMatch);
                 }
                 // Respond with an error if player two doesn't exist
                 else {
