@@ -94,7 +94,7 @@ public class MainActivity extends SetThemeActivity implements ActivityCompat.OnR
         builder.setMessage("Select a color");
         builder.setView(R.layout.dialog_color);
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
-        builder.setPositiveButton("Confirm", (dialog, which) -> {}); // this gets replaced later
+        builder.setPositiveButton("Confirm", (dialog, which) -> {}); // this gets replaced using setButton
         AlertDialog dialog = builder.create();
         dialog.show();
 
@@ -108,7 +108,7 @@ public class MainActivity extends SetThemeActivity implements ActivityCompat.OnR
                 PreferenceManager.getDefaultSharedPreferences(this).edit()
                         .putInt("theme", Integer.parseInt(themeId.substring(1))).apply(); // remove @ symbol with substring
                 PreferenceManager.getDefaultSharedPreferences(this).edit()
-                        .putLong("color", Long.parseLong(color.substring(1).toUpperCase(), 16)).apply();
+                        .putLong("color", Long.parseLong(color.substring(1).toUpperCase(), 16)).apply(); // remove @ symbol with substring
                 recreate();
             }
             dialog.dismiss();
@@ -119,8 +119,8 @@ public class MainActivity extends SetThemeActivity implements ActivityCompat.OnR
         startActivity(new Intent(this, LobbyActivity.class).setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
     }
 
+    // Referenced https://developer.android.com/guide/topics/connectivity/bluetooth
     private void getBackgroundPermissionsIfNecessary() {
-        // https://developer.android.com/guide/topics/connectivity/bluetooth
         // get background location permission
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
@@ -134,8 +134,8 @@ public class MainActivity extends SetThemeActivity implements ActivityCompat.OnR
         }
     }
 
+    // Referenced https://developer.android.com/guide/topics/connectivity/bluetooth
     private void setUpBluetooth() {
-        // https://developer.android.com/guide/topics/connectivity/bluetooth
         // get bluetooth adapter and ensure that phone supports bluetooth
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null) {
@@ -143,7 +143,6 @@ public class MainActivity extends SetThemeActivity implements ActivityCompat.OnR
             return;
         }
 
-        // https://developer.android.com/guide/topics/connectivity/bluetooth
         // prompt user to enable bluetooth
         if (!bluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);

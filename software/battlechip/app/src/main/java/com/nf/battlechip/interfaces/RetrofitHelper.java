@@ -30,6 +30,7 @@ public class RetrofitHelper {
             loggingInterceptor.level(HttpLoggingInterceptor.Level.BODY);
             httpClientBuilder.addNetworkInterceptor(loggingInterceptor);
 
+            // Interceptor allows us to get the latest ID token from Google Sign-In each time
             httpClientBuilder.addInterceptor(chain -> {
                 String idToken = "";
                 try {

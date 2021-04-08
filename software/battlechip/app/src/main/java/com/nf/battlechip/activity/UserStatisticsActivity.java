@@ -132,7 +132,7 @@ public class UserStatisticsActivity extends SetThemeActivity {
 
             public void setMatch(Match match) {
                 String email = GoogleSignIn.getLastSignedInAccount(UserStatisticsActivity.this).getEmail();
-                boolean isPlayerOne = email.equals(match.getPlayerOne());
+                boolean isPlayerOne = match.getPlayerOne().equals(email);
                 setResultView(match, isPlayerOne);
                 setDateView(match.getDate());
                 setOpponentView(isPlayerOne ? match.getPlayerTwoName() : match.getPlayerOneName());
@@ -146,6 +146,7 @@ public class UserStatisticsActivity extends SetThemeActivity {
                 @ColorRes int playerColourRes, opponentColourRes;
                 @ColorInt int playerColour, opponentColour;
 
+                // gets correct message to display, along with color
                 if ((isPlayerOne && winnerIsPlayerOne) || (!isPlayerOne && !winnerIsPlayerOne)) {
                     winOrLossMessage = "Win";
                     playerColourRes = R.color.winning_green;
