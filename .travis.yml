@@ -2,7 +2,7 @@ language: node_js
 node_js:
 - 14
 before_install:
-- cd ${TRAVIS_BUILD_DIR}/Codename-NF/BattleChip/software/cloud/
+- cd ${TRAVIS_BUILD_DIR}/software/cloud/
 - npm i -g npm@6.14.8
 install:
 - npm install
