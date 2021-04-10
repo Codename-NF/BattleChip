@@ -6,9 +6,10 @@ using UnityEngine.SceneManagement;
 using TMPro;
 using System.Threading.Tasks;
 
+/* Object keeping track of the client's game state */
 public class GameManager : MonoBehaviour
 {
-    // Pieces to be added to the board on initialization
+    /* Pieces to be added to the board on initialization */
     public static int[] ShipPieces = { 2, 3, 3, 4, 5 };
 
     public Board mBoard;
@@ -17,11 +18,11 @@ public class GameManager : MonoBehaviour
     public List<Ship> mShips;
     public ParticleSystem mBackground;
 
-    private bool mAllowStatusUpdates;
     private int mPlayerShipsRemaining;
+    private bool mAllowStatusUpdates;
     private bool mIsGettingResult;
 
-    // Start is called before the first frame update
+    /* Start is called before the first frame update */
     void Start()
     {
         mAllowStatusUpdates = false;
@@ -31,20 +32,20 @@ public class GameManager : MonoBehaviour
         GlobalState.WaitingForPush = false;
         GlobalState.GameIsPaused = false;
 
-        // Get color theme from android        
+        /* Get color theme from android */
         long color = new AndroidJavaClass("com.nf.battlechip.activity.MainUnityActivity").CallStatic<long>("getColor");
         Debug.LogFormat("Color retrieved is {0}.", color);
 
-        // If no color is available, set as default
-        color = (color != 0) ? color : 4293467747; // red
+        /* If no color is available, set red default */
+        color = (color != 0) ? color : 4293467747; /* This is red */
 
-        // Extract color values from long variable
+        /* Extract color values from long variable */
         byte opacity = (byte) ((color & 0xFF000000) >> 24);
         byte red = (byte) ((color & 0x00FF0000) >> 16);
         byte blue = (byte) ((color & 0x0000FF00) >> 8);
         byte green = (byte) ((color & 0x000000FF));
 
-        // Generate board colors based on theme color
+        /* Generate board colors based on theme color */
         byte redLite = (byte) ((red >> 3) + 140);
         byte blueLite = (byte) ((blue >> 3) + 140);
         byte greenLite = (byte) ((green >> 3) + 140);
@@ -53,7 +54,7 @@ public class GameManager : MonoBehaviour
         byte blueTint = (byte)((blue >> 4) + 170);
         byte greenTint = (byte)((green >> 4) + 170);
 
-        // Apply color theme for ship and board
+        /* Apply color theme for ships and board */
         GlobalState.ColorTheme.CellPieceColor = new Color32(red, blue, green, opacity);
         GlobalState.ColorTheme.CellColorDark = new Color32(redLite, blueLite, greenLite, opacity);
         GlobalState.ColorTheme.CellColorLight = new Color32(redTint, blueTint, greenTint, opacity);
@@ -61,18 +62,19 @@ public class GameManager : MonoBehaviour
         GlobalState.ColorTheme.CellOverlapColor = GlobalState.ColorTheme.CellPieceColor;
         GlobalState.ColorTheme.CellOverlapColor.a = 120;
 
+        /* Enable the background particle emissions */
         var main = mBackground.main;
         main.startColor = new ParticleSystem.MinMaxGradient(new Color32(55, 57, 62, 255), new Color32(15, 17, 22, 255));
         var emission = mBackground.emission;
         emission.enabled = true;
 
-        // Create a board and put pieces on it
+        /* Create the board*/
         mBoard.Create();
 
+        /* Put pieces (ships) onto the board */
         mShips = new List<Ship>();
         for (int i = 0; i < ShipPieces.Length; i++)
         {
-            // Ship.CreateShip(Board board, int xCoord, int yCoord, int length)
             Debug.LogFormat("Creating ship of length {0} at {1}, {2}", ShipPieces[i], 0, i * 2);
             mShips.Add(Ship.CreateShip(mBoard, 0, i * 2, ShipPieces[i]));
         }
@@ -81,16 +83,17 @@ public class GameManager : MonoBehaviour
         mAllowStatusUpdates = true;
     }
 
+    /* If any ships overlap, update the status message */
     private void Update()
     {
         if (mAllowStatusUpdates && !mBoard.ValidateShips() && GlobalState.GameState == GameState.Placement)
         {
-            mAllowStatusUpdates = false; // Only run one of these threads at a time
+            mAllowStatusUpdates = false; /* Only run one of these threads at a time */
             StartCoroutine(UpdatePlacementMessage());
         }
     }
 
-    // Logic used by the confirm button based on GameManager's state
+    /* Logic used by the confirm button based on GameManager's state */
     public void ConfirmButton()
     {
         AndroidJavaClass jc = new AndroidJavaClass("com.nf.battlechip.interfaces.UnityMessage");
@@ -99,10 +102,10 @@ public class GameManager : MonoBehaviour
         {
             case GameState.Placement:
                 string exportString = CreatePlacementString(mShips);
-                Debug.Log(exportString); // Debug, Placement
+                Debug.Log(exportString);
                 mStatus.GetComponent<TextMeshProUGUI>().text = "Placements confirmed. Waiting for opponent...";
 
-                // Send ship placements to Android
+                /* Send ship placements to Android */
                 jc.CallStatic("placement", exportString);
 
                 GlobalState.WaitingForPush = true;
@@ -115,14 +118,13 @@ public class GameManager : MonoBehaviour
                 Debug.Log("Shoot " + xCoord.ToString() + " " + yCoord.ToString() + "\n");
                 mStatus.GetComponent<TextMeshProUGUI>().text = "Firing at " + Convert.ToChar(xCoord + 65) + (yCoord + 1).ToString() + "...";
 
-                // Send target coords to Android
+                /* Send target coords to Android */
                 jc.CallStatic("shoot", xCoord, yCoord);
 
                 GlobalState.WaitingForPush = true;
                 break;
 
-            // No button logic for Defending because there is nothing for the camera to confirm
-
+            /* No button logic for Defending because there is nothing for the camera to confirm */
             default:
                 Debug.Log("ERROR: Button should be NOT visible right now!");
                 break;
@@ -154,10 +156,10 @@ public class GameManager : MonoBehaviour
             case "start":
                 if (GlobalState.GameState == GameState.Placement && GlobalState.WaitingForPush)
                 {
-                    // If player is first
+                    /* If player is first */
                     if (int.Parse(msgTokens[1]) == 1)
                     {
-                        // Prepare attack screen
+                        /* Prepare attack screen */
                         mTitle.GetComponent<TextMeshProUGUI>().text = "Your Turn to Attack!";
                         mStatus.GetComponent<TextMeshProUGUI>().text = "Tap the tile you want to strike.";
                         GlobalState.GameState = GameState.Attacking;
@@ -166,7 +168,7 @@ public class GameManager : MonoBehaviour
                     }
                     else
                     {
-                        // Prepare defending screen
+                        /* Prepare defending screen */
                         mTitle.GetComponent<TextMeshProUGUI>().text = "Opponent's Turn...";
                         mStatus.GetComponent<TextMeshProUGUI>().text = "Your opponent is attacking!";
                         GlobalState.GameState = GameState.Defending;
@@ -182,11 +184,11 @@ public class GameManager : MonoBehaviour
                     mIsGettingResult = true;
                     int xCoord = int.Parse(msgTokens[1]);
                     int yCoord = int.Parse(msgTokens[2]);
-                    int gameStatus = int.Parse(msgTokens[3]); // 1 == gameover
-                    int hitStatus = int.Parse(msgTokens[4]); // 0 == miss, 1 == hit, 2 == sunk
+                    int gameStatus = int.Parse(msgTokens[3]); /* 1 == gameover */
+                    int hitStatus = int.Parse(msgTokens[4]); /* 0 == miss, 1 == hit, 2 == sunk */
                     mBoard.mTargetedCell = null;
 
-                    // Update the player's history of shots on the opponent
+                    /* Update the player's history of shots on the opponent */
                     switch (hitStatus)
                     {
                         case 0:
@@ -199,16 +201,16 @@ public class GameManager : MonoBehaviour
                             break;
                         case 2:
                             mStatus.GetComponent<TextMeshProUGUI>().text = "Nice! You sunk a ship!";
-                            // Get the ship's position, update each of it's cells to 'sunk'
+                            /* Get the ship's position, update each of it's cells to 'sunk' */
                             
                             int shipX = int.Parse(msgTokens[5]);
                             int shipY = int.Parse(msgTokens[6]);
                             int shipL = int.Parse(msgTokens[7]);
-                            int shipO = int.Parse(msgTokens[8]); // Vertical == 1, Horizontal == 2
+                            int shipO = int.Parse(msgTokens[8]); /* Vertical == 1, Horizontal == 2 */
                             
                             for (int i = 0; i < shipL; i++)
                             {
-                                // Update cell to sunk
+                                /* Update cell to sunk */
                                 mBoard.mShotsOnOpponent[shipX, shipY] = ShotType.Sunk;
                                 if (shipO == 2)
                                 {
@@ -225,11 +227,11 @@ public class GameManager : MonoBehaviour
                             break;
                     }
                     
-                    if (gameStatus == 1) // If player sunk the opponent's last ship
+                    if (gameStatus == 1) /* If player sunk the opponent's last ship */
                     {
                         StartCoroutine(EndTheGame("win"));
                     }
-                    else // Wait a moment, then switch state to opponent's turn
+                    else /* Wait a moment, then switch state to opponent's turn */
                     {
                         StartCoroutine(ProcessPlayerAttackResult());
                     }
@@ -243,12 +245,12 @@ public class GameManager : MonoBehaviour
                 }
                 else
                 {
-                    // NOTE: Our hardware accelerated AI makes its decision SO FAST that we need to delay the handling of 'targeted'
+                    /* NOTE: Our hardware accelerated AI makes its decision SO FAST that we need to delay the handling of 'targeted' */
                     Task.Delay(3000).ContinueWith(t => AndroidToUnity("targeted " + msgTokens[1] + " " + msgTokens[2]));
                 }
                 
                 break;
-            case "f": // Opponent forfeited
+            case "f": /* Opponent forfeited */
                 StartCoroutine(EndTheGame("opponentForfeit"));
                 break;
 
@@ -265,15 +267,15 @@ public class GameManager : MonoBehaviour
             int xCoord = x;
             int yCoord = y;
 
-            // Shot hit if the cell has 1 piece on it
+            /* Shot hit if the cell has 1 piece on it */
             bool didHit = (mBoard.mAllCells[xCoord, yCoord].mIncludedShips.Count == 1);
 
-            // Update list of shots
+            /* Update list of shots */
             mBoard.mShotsOnMe[xCoord, yCoord] = (didHit) ? ShotType.Hit : ShotType.Miss;
 
             if (didHit)
             {
-                // If the connecting shot sinks the ship
+                /* If the connecting shot sinks the ship */
                 if (mBoard.mAllCells[xCoord, yCoord].mIncludedShips[0].HasShipSunk())
                 {
                     mStatus.GetComponent<TextMeshProUGUI>().text = "Oof! Our ship at " + Convert.ToChar(xCoord + 65) + (yCoord + 1).ToString() + " has sunk!";
@@ -295,7 +297,7 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                // Wait a moment, then switch state to player's turn
+                /* Wait a moment, then switch state to player's turn */
                 StartCoroutine(ProcessOpponentAttack());
             }
 
@@ -304,10 +306,10 @@ public class GameManager : MonoBehaviour
     /* Display the opponent's shot on player, wait three seconds, the swap to attack */
     private IEnumerator ProcessOpponentAttack()
     {
-        // Wait 3 seconds
+        /* Wait 3 seconds */
         yield return new WaitForSeconds(3);
         
-        // Prepare attack screen
+        /* Prepare attack screen */
         mTitle.GetComponent<TextMeshProUGUI>().text = "Your Turn to Attack!";
         mStatus.GetComponent<TextMeshProUGUI>().text = "Tap the tile you want to strike.";
         GlobalState.GameState = GameState.Attacking;
@@ -318,24 +320,24 @@ public class GameManager : MonoBehaviour
     /* Display the opponent's shot on player, wait three seconds, the swap to attack */
     private IEnumerator ProcessPlayerAttackResult()
     {
-        // Wait 3 seconds
+        /* Wait 3 seconds */
         yield return new WaitForSeconds(3);
 
-        // Prepare defending screen
+        /* Prepare defending screen */
         mTitle.GetComponent<TextMeshProUGUI>().text = "Opponent's Turn...";
         mStatus.GetComponent<TextMeshProUGUI>().text = "Your opponent is attacking!";
         GlobalState.GameState = GameState.Defending;
 
         GlobalState.WaitingForPush = true;
-        mIsGettingResult = false; // Done getting result
+        mIsGettingResult = false; /* Done getting result */
     }
 
     private IEnumerator UpdatePlacementMessage()
     {
-        // Wait half a second
+        /* Wait a second */
         yield return new WaitForSeconds(1);
 
-        // If there is still a collision, update status;
+        /* If there is still a collision, update status; */
         if (!mBoard.ValidateShips() && GlobalState.GameState == GameState.Placement)
         {
             mStatus.GetComponent<TextMeshProUGUI>().text = "Make sure no ships overlap!";
@@ -344,15 +346,15 @@ public class GameManager : MonoBehaviour
         {
             mStatus.GetComponent<TextMeshProUGUI>().text = "Press confirm when ready";
         }
-        mAllowStatusUpdates = true; // Allow another one of these threads to run
+        mAllowStatusUpdates = true; /* Allow another one of these threads to run */
     }
 
     private IEnumerator EndTheGame(string result)
     {
-        // Wait half a second
+        /* Wait two seconds */
         yield return new WaitForSeconds(2);
 
         PlayerPrefs.SetString("result", result);
-        SceneManager.LoadScene(1); // Gameover scene has index 1
+        SceneManager.LoadScene(1); /* Gameover scene has index 1 */
     }
 }
