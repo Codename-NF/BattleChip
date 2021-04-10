@@ -328,14 +328,15 @@ void assign_ships(list<player>::iterator *player, list<setupvalues> values) {
 }
 
 void setting_up_ships_BT(list<player>::iterator *p1, list<player>::iterator *p2, bool single_player_mode) {
-    list<setupvalues> list_of_placement;
+    list<setupvalues> list_of_placement_p1;
+    list<setupvalues> list_of_placement_p2;
     int success = 0;
     do {
-        success = get_placement_message_BT(&list_of_placement, PLAYER1);
+        success = get_placement_message_BT(&list_of_placement_p1, PLAYER1);
     }
     while (!success);
 
-    assign_ships(p1, list_of_placement);
+    assign_ships(p1, list_of_placement_p1);
     
     if (single_player_mode) {
         AI_setting_up(p2);
@@ -345,11 +346,11 @@ void setting_up_ships_BT(list<player>::iterator *p1, list<player>::iterator *p2,
     success = 0;
 
     do {
-        success = get_placement_message_BT(&list_of_placement, PLAYER2);
+        success = get_placement_message_BT(&list_of_placement_p2, PLAYER2);
     }
     while (!success);
     
-    assign_ships(p2, list_of_placement);
+    assign_ships(p2, list_of_placement_p2);
 
 }
 
