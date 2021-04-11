@@ -19,6 +19,7 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.nf.battlechip.interfaces.BluetoothThread;
 import com.nf.battlechip.R;
+import com.nf.battlechip.interfaces.GoogleHelper;
 import com.nf.battlechip.interfaces.UnityMessage;
 
 import java.io.IOException;
@@ -40,6 +41,7 @@ public class MainActivity extends SetThemeActivity implements ActivityCompat.OnR
         findViewById(R.id.single_player_button).setOnClickListener(view -> showSinglePlayerDialog(playerId));
         findViewById(R.id.multi_player_button).setOnClickListener(view -> showMultiplayerDialog(playerId));
         findViewById(R.id.player_stats_button).setOnClickListener(view -> startActivity(new Intent(this, UserStatisticsActivity.class)));
+        findViewById(R.id.logout_button).setOnClickListener(view -> logout());
     }
 
     private void showSinglePlayerDialog(int playerId) {
@@ -117,6 +119,11 @@ public class MainActivity extends SetThemeActivity implements ActivityCompat.OnR
 
     private void startLobbyActivity() {
         startActivity(new Intent(this, LobbyActivity.class).setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
+    }
+
+    private void logout() {
+        GoogleHelper.getClient(this).signOut().addOnCompleteListener(this,
+                task -> startActivity(new Intent(this, LoginActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK)));
     }
 
     // Referenced https://developer.android.com/guide/topics/connectivity/bluetooth

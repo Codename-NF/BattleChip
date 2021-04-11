@@ -13,4 +13,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="losing_red">#ff0000</color>
     <color name="winning_green">#00bf00</color>
+    <color name="logout_red">#e23b3b</color>
 </resources>
