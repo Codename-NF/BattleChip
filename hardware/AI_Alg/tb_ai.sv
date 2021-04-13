@@ -17,10 +17,47 @@ module tb_ai();
     end
 
     initial begin
-        rst_n = 1'd0;
+        reset_n = 1'd0;
         #100;
-        rst_n = 1'd1;
-        wait (wait_request === 1'd0)
+        reset_n = 1'd1;
+        wait (wait_request === 1'd0);
+        #50;
+        write_en = 1'd1;
+        read_en = 1'd0;
+        addr = 4'd1;
+        data_in = 32'd0;
+        #100;
+        addr = 4'd2;
+        data_in = 32'd0;
+        #100;
+        addr = 4'd3;
+        data_in = 32'd0;
+        #100;
+        addr = 4'd4;
+        data_in = 32'd0;
+        #100;
+        addr = 4'd5;
+        data_in = 32'd0;
+        #100;
+        addr = 4'd6;
+        data_in = 32'd0;
+        #100;
+        addr = 4'd7;
+        data_in = 32'd0;
+        #100;
+        addr = 4'd8;
+        data_in = 32'd0;
+        #100;
+        addr = 4'd9;
+        data_in = 32'd31;
+        #100;
+        addr = 4'd0;
+        data_in = 32'd0;
+        #100;
+        write_en = 1'd0;
+        wait (wait_request === 1'd0);
+        #50;
+        read_en = 1'd1;
         #100;
         $stop;
     end
