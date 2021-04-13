@@ -188,24 +188,24 @@ struct shootvalues {
 /**
  * createmessage struct that represent a create message from BT
  * keyword: the message keyword 
- * numplayer: number of players for the lobby
+ * playing_mode: number of players for the lobby
  * playerid: unique id for database
  * 
 **/
 struct createmessage {
     char keywrod;
-    int numplayer;
+    int playing_mode;
     int playerid;
 
     createmessage() {
         this->keywrod = 'f';
-        this->numplayer = -1;
+        this->playing_mode = -1;
         this->playerid = -1;
     }
 
-    createmessage(char keyword, int numplayer, int playerid) {
+    createmessage(char keyword, int playing_mode, int playerid) {
         this->keywrod = keyword;
-        this->numplayer = numplayer;
+        this->playing_mode = playing_mode;
         this->playerid = playerid;
     }
 };

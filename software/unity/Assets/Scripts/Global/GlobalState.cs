@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/* Possible states that the game can be in */
 public enum GameState
 {
     Placement,
@@ -9,15 +10,15 @@ public enum GameState
     Defending,
 };
 
+/* Static object holding the state of the application */
 public static class GlobalState
 {
-    // Global state of the Unity application 
     private static ColorTheme colorTheme;
     private static GameState gameState;
     private static bool waitingForPush;
     private static bool gameIsPaused;
 
-    // Keeps track of the games state (placement/attack/defend)
+    /* Keeps track of the games state (placement/attack/defend) */
     public static GameState GameState
     {
         get
@@ -30,7 +31,7 @@ public static class GlobalState
         }
     }
 
-    // Keeps track of the imported color scheme
+    /* Keeps track of the imported color scheme */
     public static ColorTheme ColorTheme
     {
         get
@@ -43,7 +44,7 @@ public static class GlobalState
         }
     }
 
-    // Keeps track of when Unity is waiting for a response
+    /* Keeps track of when Unity is waiting for a response */
     public static bool WaitingForPush
     {
         get
@@ -56,7 +57,7 @@ public static class GlobalState
         }
     }
 
-    // Tracks if Unity UI is in the pause/forfeit menu
+    /* Tracks if Unity UI is in the pause/forfeit menu */
     public static bool GameIsPaused
     {
         get

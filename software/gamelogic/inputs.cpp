@@ -67,8 +67,7 @@ Format:
 Placement message (app to console)
 “p coordinate1 bitfield1 coordinate2 bitfield2 ...~” 
 Note: These are shown with spaces in between, but they are not sent in reality
-Example: “~”
-coordinate is a byte taking on values from 0 to 99 inclusive, where the coordinate of the ship is actually at (coordinate / 10, coordinate % 10)
+coordinate is a byte taking on values from 0 to 99 inclusive, where the coordinate of the ship is actually at (coordinate % 10, coordinate / 10)
 bitfield contains two attributes
 Upper 4 bits are unused
 shipOrientation (0/1) (1 bit) -> 0 is vertical and 1 is horizontal 
@@ -90,13 +89,14 @@ int get_placement_message_BT(list<setupvalues> *list_setupval, int device_num) {
     if (receive_char[0] != 'p') {
         return FAILURE;
     }
+    // The start of placement message is at 1, 3, 5, 7, 9
     for (int i = 1; i < 10; i += 2) {
-        int x,y,size, orientation;
+        int x, y, size, orientation;
         x = receive_char[i] % 10;
         y = receive_char[i] / 10;
         char bitfield = receive_char[i+1];
-        orientation = (bitfield & 1) + 1;
-        size = bitfield >> 1;
+        orientation = (bitfield & 1) + 1; // get the last bit of the bitfield 
+        size = bitfield >> 1; // getting rid of the last bit of the bitfield
 
         (*list_setupval).push_back(setupvalues(x, y, size, orientation, device_num));
 
@@ -108,7 +108,7 @@ int get_placement_message_BT(list<setupvalues> *list_setupval, int device_num) {
 
 /*
 Format:
-“shoot xCoordinate yCoordinate\n\n”
+“s xCoordinate yCoordinate~”
 */
 int get_shoot_message_BT(shootvalues *input, int device_num) {
     char receive_char[BT_RECEIVE_SIZE];
@@ -147,11 +147,12 @@ int get_shoot_message_BT(shootvalues *input, int device_num) {
         return SUCCESS;
     }
 
+    // checking if it's the correct shoot message
     if (receive_char[0] != 's') {
         return FAILURE;
     }
 
-    (*input).x = receive_char[2] - '0';
+    (*input).x = receive_char[2] - '0'; // subtract char 0 becasue we want the int value of the char instead of the asci decimal value of the char
     (*input).y = receive_char[4] - '0';
     (*input).device_num = device_num;
 
@@ -246,9 +247,13 @@ void send_targeted_message_BT(int device_num, int x, int y, int gamestatus, int 
 /*
 Format:
 Create message (app to console)
-“c numPlayers playerID ~” 
+“c mode playerID ~” 
 playerID is the ID of the player
-numPlayers is 1 or 2, 1 for vs AI, 2 for multiplayer
+Mode is 0 or 1 or 2
+    0  for easy AI mode, 
+    1 for hard AI mode,
+    2 for multiplayer
+
 Only sent to BluetoothChip0
 
 */
@@ -261,8 +266,8 @@ int get_create_message_BT(createmessage *msg) {
             return FAILURE;
         } 
         (*msg).keywrod = receive_char[0];
-        (*msg).numplayer = receive_char[2] - '0';
-        (*msg).playerid = atoi(receive_char + 4);
+        (*msg).playing_mode = receive_char[2] - '0'; // subtract char 0 becasue we want the int value of the char instead of the asci decimal value of the char
+        (*msg).playerid = atoi(receive_char + 4); // get the rest of the string and read that as int 
         
         return SUCCESS;
     }
@@ -272,15 +277,18 @@ int get_create_message_BT(createmessage *msg) {
 
 /*
 Format:
-“create numPlayers status~”
-numPlayers is 1 or 2, 1 for vs AI, 2 for multiplayer
+“create mode status~”
+Mode is 0 or 1 or 2
+    0  for easy AI mode, 
+    1 for hard AI mode,
+    2 for multiplayer
 status is “1” or “0”
 “0” if a game is already in progress
 Else “1” if multiplayer lobby created successfully
 */
-void send_create_response_BT(int num_players, int status) {
+void send_create_response_BT(int mode, int status) {
     stringstream message;
-    message << "create " << num_players << " " << status << "~";
+    message << "create " << mode << " " << status << "~";
     BT_send_0(message.str().c_str());
     
 }
@@ -293,7 +301,8 @@ Join message (app to console)
 playerID is the player ID
 Can only join a pre-existing lobby
 Only sent to BluetoothChip1
-
+returns player id on success 
+-1 on failsure
 */
 int get_join_message_BT() {
     char receive_char[BT_RECEIVE_SIZE];
@@ -328,6 +337,12 @@ void send_ready_message_BT() {
     BT_send_1("ready~");
 }
 
+
+/*
+Format:
+"f~" 
+to indicate that the the other player have forfeited 
+*/
 void send_win_by_forfeit_BT(int device_num) {
     if (device_num == 1) {
         BT_send_0("f~");
@@ -351,8 +366,10 @@ int where_to_shoot_AI(set<box> fired, bitset<5> ships_alive, set<box> hits) {
         hits_bits[number] = 1;
     }
 
-    std::bitset<100> divider (std::string("0000000000000000000000000000000000000000000000000000000000000000000011111111111111111111111111111111"));
+    // divider to split up the 100 bits to 32 bits fragments that the algorithm can take
+    bitset<100> divider (std::string("0000000000000000000000000000000000000000000000000000000000000000000011111111111111111111111111111111"));
 
+    // bit shift and AND operations to get the right bits 
     unsigned long fired0 = (fired_bits & divider).to_ulong();
     unsigned long fired1 = ((fired_bits >> 32) & divider).to_ulong();
     unsigned long fired2 = ((fired_bits >> 64) & divider).to_ulong();

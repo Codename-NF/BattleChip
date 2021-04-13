@@ -1,6 +1,7 @@
 #include "Wifi.h"
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 /**************************************************************************
 /*  Subroutine to initialise the RS232 Port by writing some data
@@ -10,6 +11,16 @@
 **
 **  Refer to UART data sheet for details of registers and programming
 ***************************************************************************/
+
+void delay(int number_of_seconds)
+{
+	// Converting time into milli_seconds
+	int milli_seconds = 100 * number_of_seconds;
+	// Storing start time
+	clock_t start_time = clock();
+	// looping till required time is not achieved
+	while (clock() < start_time + milli_seconds) ;
+}
 
 void printdecimal(int x) 
 { 
@@ -105,16 +116,12 @@ void Init_Wifi(void) {
     WIFIFlush();
 
     *WIFI_RESET = 0;
-    //DELAY FOR RESET ** REPLACE WITH SLEEP
-    for (i = 0; i < 20; i++) {
-        printf("1\n");
-    }
+    //DELAY FOR RESET
+    delay(2);
 
     *WIFI_RESET = 1;
-    //DELAY FOR RESET OFF INIT SEQUENCE ** REPLACE WITH SLEEP
-    for (i = 0; i < 20; i++) {
-        printf("2\n");
-    }
+    //DELAY FOR RESET OFF INIT SEQUENCE
+    delay(2);
     WIFIFlush();
     
     //INITIALIZE THE FILE
@@ -123,10 +130,8 @@ void Init_Wifi(void) {
         putcharWIFI(dofile[i]);
         i++;
     }
-    //CONFIRM FILE LOAD ** REPLACE WITH SLEEP
-    for (i = 0; i < 5; i++) {
-        printf("1\n");
-    }
+    //CONFIRM FILE LOAD
+    delay(2);
     WIFIFlush();  
 }
 
@@ -135,10 +140,8 @@ void postgameresults(int p1, int p2, int winner, int score1, int score2) {
     int i = 0;
     char results[256];
 
-    //DELAY FOR CONFIRM ** REPLACE WITH SLEEP
-    for (i = 0; i < 5; i++) {
-        printf("1\n");
-    }
+    //DELAY FOR CONFIRM
+    delay(2);
 
     // KEEP HERE IN EVENT WE NEED RESULT
     // for (i = 0; i < 256; i++) {

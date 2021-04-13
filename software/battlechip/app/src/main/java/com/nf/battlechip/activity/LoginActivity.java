@@ -3,7 +3,6 @@ package com.nf.battlechip.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -13,9 +12,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
-import com.nf.battlechip.GoogleHelper;
 import com.nf.battlechip.R;
-import com.nf.battlechip.RetrofitHelper;
+import com.nf.battlechip.interfaces.GoogleHelper;
+import com.nf.battlechip.interfaces.RetrofitHelper;
 import com.nf.battlechip.pojo.User;
 
 import retrofit2.Call;
@@ -31,14 +30,14 @@ public class LoginActivity extends SetThemeActivity {
 
     private static final String LOGIN_DEBUG_TAG = "Login";
 
-    // https://developers.google.com/identity/sign-in/android/sign-in
+    // Referenced code from https://developers.google.com/identity/sign-in/android/sign-in
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         client = GoogleHelper.getClient(this);
 
-        // user is already signed in
+        // check if user is already signed in
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if (account != null) {
             Log.d(LOGIN_DEBUG_TAG, "Already signed in!");
@@ -46,14 +45,11 @@ public class LoginActivity extends SetThemeActivity {
         }
 
         setContentView(R.layout.activity_login);
-
-        findViewById(R.id.sign_in_button).setOnClickListener(this::signIn);
+        findViewById(R.id.sign_in_button).setOnClickListener(view ->
+                startActivityForResult(client.getSignInIntent(), SIGN_IN_REQUEST_CODE));
     }
 
-    public void signIn(View v) {
-        startActivityForResult(client.getSignInIntent(), SIGN_IN_REQUEST_CODE);
-    }
-
+    // Referenced code from https://developers.google.com/identity/sign-in/android/sign-in
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -63,6 +59,7 @@ public class LoginActivity extends SetThemeActivity {
         }
     }
 
+    // Referenced code from https://developers.google.com/identity/sign-in/android/sign-in
     private void handleSignedInUser(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);

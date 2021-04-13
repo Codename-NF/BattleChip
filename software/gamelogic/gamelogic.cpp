@@ -57,20 +57,18 @@ int main () {
             }
         }
         else { // dealing with UI / BT
-            cout << "i'm here" << endl;
             Init_RS232();
             Init_Wifi();
-            cout << "past init" << endl;
-            int num_players;
+            int mode;
             bool single_player = false;
             createmessage input1 = create_lobby();
             blankscreen( BLUE );
-            num_players = input1.numplayer;
+            mode = input1.playing_mode;
 
-            if (num_players == 2) {
+            if (mode == MULTI_PLAYER_MODE) {
                 int input2 = wait_for_player2();
 
-                battleship game = battleship(num_players);
+                battleship game = battleship(2);
                 list<player>::iterator p1, p2;
                 for (list<player>::iterator it = game.players.begin(); it != game.players.end(); it++) {
                     if (it->player_num == PLAYER1) {
@@ -88,7 +86,7 @@ int main () {
                 setting_up_ships_BT(&p1, &p2, single_player);
 
 
-                playing_game_BT(&p1, &p2, single_player);
+                playing_game_BT(&p1, &p2, single_player, mode);
             }
             else {
                 // if player_num == 1 -> plyaing with AI
@@ -104,12 +102,17 @@ int main () {
                         AI = it;
                     }
                 }
+                if (mode == EASY_AI_MODE) {
+                    setting_player_id(&p1, &AI, input1.playerid, EASY_AI_PLAYER_ID);
+                }
+                else if (mode == HARD_AI_MODE) {
+                    setting_player_id(&p1, &AI, input1.playerid, HARD_AI_PLAYER_ID);
+                }
                 
-                setting_player_id(&p1, &AI, input1.playerid, AI_PLAYER_ID);
                 
                 setting_up_ships_BT(&p1, &AI, single_player);
 
-                playing_game_BT(&p1, &AI, single_player);
+                playing_game_BT(&p1, &AI, single_player, mode);
             }
         }
     }

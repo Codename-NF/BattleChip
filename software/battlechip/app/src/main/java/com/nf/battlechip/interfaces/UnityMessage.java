@@ -1,4 +1,4 @@
-package com.nf.battlechip;
+package com.nf.battlechip.interfaces;
 
 import android.util.Log;
 
@@ -9,7 +9,7 @@ import java.util.Locale;
 
 public class UnityMessage {
 
-    private static String UNITY_MESSAGE_DEBUG = "Unity";
+    private static final String UNITY_MESSAGE_DEBUG = "Unity";
 
     // Called by Unity to inform Android of placement message
     public static void placement(String message) {
@@ -20,6 +20,10 @@ public class UnityMessage {
         if (splitMessage.length % 4 != 0) {
             Log.d(UNITY_MESSAGE_DEBUG, "Placement message not properly formatted");
         }
+        // Encoding the message into the expected format for Bluetooth
+        // A passed ship is "x y size orientation"
+        // We convert "x y" into a single byte equal to 10x + y
+        // "size orientation" is converted into a single byte, where lower 4 bits are size, and orientation is last bit
         for (int i = 0; i < splitMessage.length; i += 4) {
             bytes[i / 2 + 1] = (byte) (Byte.parseByte(splitMessage[i]) + Byte.parseByte(splitMessage[i + 1]) * 10);
             bytes[i / 2 + 2] = (byte) (Byte.parseByte(splitMessage[i + 2]) * 2 + Byte.parseByte(splitMessage[i + 3]));
@@ -43,14 +47,15 @@ public class UnityMessage {
     }
 
     // Called in Android to send create game message
-    public static void create(int playerId, int numPlayers) {
-        String message = String.format(Locale.ENGLISH, "c %d %d~", numPlayers, playerId);
+    // mode = 0 for easy, 1 for hard, 2 for multiplayer
+    public static void create(int playerId, int mode) {
+        String message = String.format(Locale.ENGLISH, "c %d %d~", mode, playerId);
         BluetoothThread.getInstance().write(message.getBytes());
     }
 
     // Called in Android to send join game message
     public static void join(int playerId) {
-        String message = String.format(Locale.ENGLISH, "j %d", playerId);
+        String message = String.format(Locale.ENGLISH, "j %d~", playerId);
         BluetoothThread.getInstance().write(message.getBytes());
     }
 
@@ -59,19 +64,16 @@ public class UnityMessage {
         String[] splitMessage = message.split("\\s");
         String command = splitMessage[0];
         if ("create".equals(command)) {
-            // failed to create game
-            if ("0".equals(splitMessage[2])) {
+            if ("0".equals(splitMessage[2])) { // failed to create game
                 LobbyActivity.failedToCreateGame();
-                // single-player game ready
-            } else if ("1".equals(splitMessage[1])) {
+            } else if (Integer.parseInt(splitMessage[1]) <= 1) { // single-player game ready
                 LobbyActivity.gamesIsReady();
             }
-            // failed to join an existing game
-        } else if ("join".equals(command) && "0".equals(splitMessage[1])) {
+        } else if ("join".equals(command) && "0".equals(splitMessage[1])) { // failed to join an existing game
             LobbyActivity.failedToCreateGame();
         } else if ("ready".equals(command)) {
             LobbyActivity.gamesIsReady();
-        } else {
+        } else { // pass remaining messages through to Unity
             UnityPlayer.UnitySendMessage("PR_GameManager", "AndroidToUnity", message);
         }
     }

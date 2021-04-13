@@ -26,6 +26,7 @@ public class LobbyActivity extends AppCompatActivity {
 
         instance = this;
 
+        // check flags and transition if they are set
         if (gameIsReady) {
             gameIsReady = false;
             startUnityActivity();
@@ -44,7 +45,7 @@ public class LobbyActivity extends AppCompatActivity {
 
     public static void gamesIsReady() {
         Log.d(LOBBY_DEBUG, "Game is ready");
-        if (instance == null) {
+        if (instance == null) { // set flag if lobby has not been loaded yet
             gameIsReady = true;
         } else {
             instance.startUnityActivity();
@@ -53,7 +54,7 @@ public class LobbyActivity extends AppCompatActivity {
 
     public static void failedToCreateGame() {
         Log.d(LOBBY_DEBUG, "Failed to create game");
-        if (instance == null) {
+        if (instance == null) { // set flag if lobby has not been loaded yet
             failedToCreateGame = true;
         } else {
             instance.handleCreateGameFailed();
@@ -61,11 +62,8 @@ public class LobbyActivity extends AppCompatActivity {
     }
 
     private void handleCreateGameFailed() {
-        Button returnButton;
-        TextView lobbyMessage;
-
-        returnButton = findViewById(R.id.return_button);
-        lobbyMessage = findViewById(R.id.lobby_text_view);
+        Button returnButton = findViewById(R.id.return_button);
+        TextView lobbyMessage = findViewById(R.id.lobby_text_view);
 
         returnButton.setVisibility(View.VISIBLE);
         returnButton.setOnClickListener(view -> startActivity(new Intent(this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK)));

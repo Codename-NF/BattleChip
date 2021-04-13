@@ -1,4 +1,4 @@
-package com.nf.battlechip;
+package com.nf.battlechip.interfaces;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.tasks.Tasks;
@@ -12,7 +12,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitHelper {
 
-    private static String SERVER_URL = "http://ec2-54-151-115-99.us-west-1.compute.amazonaws.com:9091/";
+    private static final String SERVER_URL = "http://ec2-54-151-115-99.us-west-1.compute.amazonaws.com:9091/";
     private static UserService userService = null;
     private static Retrofit retrofit = null;
 
@@ -30,6 +30,7 @@ public class RetrofitHelper {
             loggingInterceptor.level(HttpLoggingInterceptor.Level.BODY);
             httpClientBuilder.addNetworkInterceptor(loggingInterceptor);
 
+            // Interceptor allows us to get the latest ID token from Google Sign-In each time
             httpClientBuilder.addInterceptor(chain -> {
                 String idToken = "";
                 try {

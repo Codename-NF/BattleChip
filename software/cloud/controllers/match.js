@@ -15,19 +15,7 @@ const updateUserRecord = async (email, didWinGame) => {
 module.exports = {
 	getMatches: async (req, res) => {
 		const userEmail = res.locals.email
-        
-        // Get the page number from the page parameter (?page=)
-        let pageNumber = parseInt(req.query.page);
-        
-        // Default to page 1 if requested page is invalid
-        if (pageNumber === NaN) {
-            pageNumber = 1;
-        }
-        else {
-            // If user gave a page number with a decimal, just round down
-            pageNumber = (Math.floor(pageNumber) > 1) ? Math.floor(pageNumber) : 1;
-        }
-        
+
         // Check if user exists
         const myUser = await User.findOne({ email: userEmail }).catch(() => null);
 
@@ -40,14 +28,10 @@ module.exports = {
             // Sort matches by most recent date
             allMyMatches.sort((a, b) => parseFloat(b.date) - parseFloat(a.date));
             
-            // Get the requested page of up to 10 entries
-            const firstIndex = 10 * (pageNumber - 1);
-            const lastIndex = 10 * pageNumber;
-            
             res.status(200).send(
                 {
                     "status" : "OK",
-                    "matches" : allMyMatches.slice(firstIndex, lastIndex),
+                    "matches" : allMyMatches,
                 }
             )
         }
@@ -66,17 +50,20 @@ module.exports = {
             
             const playerOneEmail = player1.email;
             // If player two is an AI
-            if (req.body.player_two === 0) {
+            if (req.body.player_two === 0 || req.body.player_two === 1) {
                 // Create a record of the match
-                const winnerEmail = (req.body.winner == playerOneId) ? playerOneEmail : "AI";
+                let nameOfAI = (req.body.player_two === 0) ? "Easy AI" : "Hard AI";
+                let emailOfAI = (req.body.player_two === 0) ? "Easy_AI_Email" : "Hard_AI_Email";
+                let winnerEmail = (req.body.winner == playerOneId) ? playerOneEmail : emailOfAI;
+                
                 const newMatch = {
                     player_one: playerOneEmail,
-                    player_two: "AI",
+                    player_two: nameOfAI,
                     winner: winnerEmail,
                     player_one_score: req.body.player_one_score,
                     player_two_score: req.body.player_two_score,
                     player_one_name: `${player1.first_name} ${player1.last_name}`,
-                    player_two_name: "AI",
+                    player_two_name: nameOfAI,
                     date: Date.now() * 1000
                 }
                 await Match.create(newMatch);
@@ -85,11 +72,7 @@ module.exports = {
                 await updateUserRecord(playerOneEmail, (playerOneEmail === winnerEmail));
                 
                 // Respond with a 201
-                res.status(201).send(
-                    {
-                        "status" : "OK"
-                    }
-                );
+                res.status(201).send(newMatch);
             }
             // If player two is NOT an AI
             else {
@@ -116,11 +99,7 @@ module.exports = {
                     await updateUserRecord(playerTwoEmail, (playerTwoEmail === winnerEmail));
                     
                     // Respond with a 201
-                    res.status(201).send(
-                        {
-                            "status" : "OK"
-                        }
-                    );
+                    res.status(201).send(newMatch);
                 }
                 // Respond with an error if player two doesn't exist
                 else {

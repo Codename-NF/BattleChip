@@ -106,6 +106,15 @@ void assign_ships(list<player>::iterator *player, list<setupvalues> values);
 **/
 void setting_up_ships_BT(list<player>::iterator *p1, list<player>::iterator *p2, bool single_player_mode);
 
+/**
+ * Helper function to reveal ships for both players
+ * parameters: 
+ *      *p1: player 1
+ *      *p2: player 2
+ * return: 
+**/
+void reveal_ships(list<player>::iterator *p1, list<player>::iterator *p2);
+
 
 /**
  * Called by main function to play game
@@ -115,5 +124,5 @@ void setting_up_ships_BT(list<player>::iterator *p1, list<player>::iterator *p2,
  *      single_player_mode: indicating if it is single player mode 
  * return: 
 **/
-void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, bool single_player_mode);
+void playing_game_BT(list<player>::iterator *p1, list<player>::iterator *p2, bool single_player_mode, int mode);
 
