@@ -1,1 +1,2 @@
-# Unity Files for the BattleChip Android Client
+# Custom Unity Library
+![Cloud architecture diagram](unitydesign.png)
