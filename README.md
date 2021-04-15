@@ -15,5 +15,9 @@
 ## Cloud Server
 * `software/cloud/` contains the source files for the Node.js server
 * `software/cloud/test/unit` contains the automated Jest tests that are called by Travis CI
+
+## Game Engine
+* `software/gamelogic/` contains the source files for the game engine 
+* `software/gamelogic/utilstest.cpp` contains the automated Acutest test plans and test suites
 #
 ![Cloud architecture diagram](BattleChip.png)
