@@ -19,5 +19,14 @@
 ## Game Engine
 * `software/gamelogic/` contains the source files for the game engine 
 * `software/gamelogic/utilstest.cpp` contains the automated Acutest test plans and test suites
+
+## Hardware
+
+### Ai
+* `hardware/AI_Alg/` contains the verilog files for the Ai and the test bench
+
+### Bluetooth
+* `hardware/Bluetooth_firm/` contains the c files for the bluetooth firmware and files to run/test bluetooth
+
 #
 ![Cloud architecture diagram](BattleChip.png)
