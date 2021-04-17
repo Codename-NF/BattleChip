@@ -28,5 +28,10 @@
 ### Bluetooth
 * `hardware/Bluetooth_firm/` contains the c files for the bluetooth firmware and files to run/test bluetooth
 
+###
+* `hardware/VGA_algs/` contains the C and verilog files to run and test the VGA graphics components
+
+###
+* `hardware/Wifi_algs/` contains the C files to run wifi components, as well as the firmware and lua scripts that were flashed to the RFS board
 #
 ![Cloud architecture diagram](BattleChip.png)
